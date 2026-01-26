@@ -245,6 +245,29 @@
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            
+            <!-- Quick Questions Section (Arabic) -->
+            <div class="pt-2 border-t border-white/10">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-neutral-400">أسئلة سريعة</span>
+                <button 
+                  @click="refreshProductQuestions(p)" 
+                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  title="تحديث الأسئلة">
+                  ↻
+                </button>
+              </div>
+              <div class="space-y-1">
+                <template x-for="(q, idx) in getProductQuestions(p)" :key="p.id + '-' + idx">
+                  <button 
+                    @click="openChatWithQuestion(q, p)"
+                    class="w-full text-right text-xs px-2 py-1.5 rounded-lg bg-white/5 hover:bg-teal-500/20 text-neutral-300 hover:text-teal-300 transition-colors"
+                    x-text="q">
+                  </button>
+                </template>
+              </div>
+            </div>
+            
             <div class="flex items-center justify-between pt-2">
               <div>
                 <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
@@ -477,6 +500,30 @@
 
         cart:[],
 
+        // Question generation templates (Arabic)
+        questionTemplates: {
+          intents: [
+            'هل {subject} جيد لـ',
+            'كيف يعمل {subject} في',
+            'هل يستطيع {subject} التعامل مع',
+            'هل {subject} مناسب لـ',
+            'كيف أداء {subject} في'
+          ],
+          contexts: [
+            'القيادة اليومية على الطرق السريعة في حرارة الإمارات',
+            'حركة المرور في المدينة والتوقف المتكرر',
+            'رحلات الصحراء الطويلة',
+            'الطرق المبللة والأمطار المتقطعة',
+            'الطرق الوعرة والتضاريس الصعبة',
+            'ظروف الصيف الحارة',
+            'الاستخدام المختلط بين المدينة والطرق السريعة'
+          ],
+          subjects: [] // Generated dynamically per product
+        },
+        
+        // Store generated questions per product
+        productQuestions: {},
+
         async init(){
           const saved = localStorage.getItem('aa_cart');
           if (saved) this.cart = JSON.parse(saved);
@@ -549,6 +596,91 @@
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // Generate product subject for questions (Arabic)
+        getProductSubject(product){
+          // Use brand + model/name if available, otherwise "هذا الإطار"
+          if (product.brand && product.name) {
+            const modelName = product.name.replace(product.brand, '').trim();
+            return modelName ? `${product.brand} ${modelName}` : product.brand;
+          }
+          return 'هذا الإطار';
+        },
+
+        // Generate 3 unique questions for a product
+        generateQuestions(product){
+          const subject = this.getProductSubject(product);
+          const subjectWithSize = product.size ? `${subject} (${product.size})` : subject;
+          
+          // Create pool of all possible combinations
+          const allCombinations = [];
+          this.questionTemplates.intents.forEach(intent => {
+            this.questionTemplates.contexts.forEach(context => {
+              allCombinations.push({
+                intent,
+                context,
+                question: intent.replace('{subject}', subjectWithSize) + ' ' + context + '؟'
+              });
+            });
+          });
+          
+          // Shuffle all combinations
+          const shuffled = allCombinations.sort(() => Math.random() - 0.5);
+          
+          // Pick 3 with no adjacent duplicate intents (with retry limit)
+          const selected = [];
+          for (let i = 0; i < shuffled.length && selected.length < 3; i++) {
+            const candidate = shuffled[i];
+            // Check if this intent was just used
+            if (selected.length === 0 || selected[selected.length - 1].intent !== candidate.intent) {
+              selected.push(candidate);
+            }
+          }
+          
+          // Fallback: if we couldn't find 3, just take first 3 (unlikely with 35 combinations)
+          while (selected.length < 3 && selected.length < shuffled.length) {
+            selected.push(shuffled[selected.length]);
+          }
+          
+          return selected.map(s => s.question);
+        },
+
+        // Get or generate questions for a product
+        getProductQuestions(product){
+          if (!this.productQuestions[product.id]) {
+            this.productQuestions[product.id] = this.generateQuestions(product);
+          }
+          return this.productQuestions[product.id];
+        },
+
+        // Refresh questions for a specific product
+        refreshProductQuestions(product){
+          this.productQuestions[product.id] = this.generateQuestions(product);
+        },
+
+        // Open AI chat with pre-filled question and product context
+        openChatWithQuestion(question, product){
+          const priceInfo = this.formatPrice(product.price);
+          const context = `لمنتج ${this.getProductSubject(product)}${product.size ? ' (' + product.size + ')' : ''}${product.desc ? '، ' + product.desc : ''} - السعر: ${priceInfo}`;
+          const fullMessage = `${question}\n\n[معلومات المنتج: ${context}]`;
+          
+          // Open the AI chat widget
+          const chatBtn = document.querySelector('.ai-chat-btn');
+          const chatBox = document.querySelector('.ai-chat-box');
+          if (chatBtn && chatBox) {
+            chatBox.style.display = 'flex';
+            chatBox.style.flexDirection = 'column';
+            
+            // Pre-fill the input and auto-send
+            const chatInput = chatBox.querySelector('.ai-chat-input');
+            const sendBtn = chatBox.querySelector('.ai-chat-send');
+            if (chatInput && sendBtn) {
+              chatInput.value = fullMessage;
+              // Auto-send the message by clicking the send button
+              sendBtn.click();
+            }
+          }
         },
 
         // send two emails with the standard template (orders/contact/brand inquiries)
