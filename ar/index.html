@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../customerMemory.js"></script>
   <style>
     html,body{font-family:Tajawal,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
     .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
@@ -20,7 +21,7 @@
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); loadBulkMode()">
+<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
@@ -426,6 +427,7 @@
     aria-label="WhatsApp"
     target="_blank"
     rel="noopener"
+    @click="trackWhatsAppUsage()"
   >
     واتساب
   </a>
@@ -441,9 +443,36 @@
     if (EMAILJS_PUBLIC_KEY) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
     function appState(){
+      // Restore preferences directly from localStorage before Alpine initializes
+      // Reading directly ensures values are available synchronously
+      let initialCurrency = 'USD';
+      let initialBulkMode = false;
+      let initialBrandFilter = '';
+      
+      try {
+        // Read directly from localStorage (synchronous, guaranteed to work)
+        const savedCurrency = localStorage.getItem('aa_currency');
+        if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
+          initialCurrency = savedCurrency;
+        }
+        
+        const savedBulkMode = localStorage.getItem('aa_bulkMode');
+        if (savedBulkMode === 'true') {
+          initialBulkMode = true;
+        }
+        
+        const savedBrandFilter = localStorage.getItem('aa_brandFilter');
+        if (savedBrandFilter) {
+          initialBrandFilter = savedBrandFilter;
+        }
+      } catch (e) {
+        // localStorage not available, use defaults
+        console.warn('localStorage not available:', e);
+      }
+      
       return {
         cartOpen:false,
-        filters:{brand:'', query:''},
+        filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
         contact:{name:'',email:'',message:''},
@@ -460,28 +489,25 @@
         ],
         
         // Currency conversion
-        selectedCurrency: 'USD',
+        selectedCurrency: initialCurrency,
         exchangeRates: { USD: 1, AED: 3.67 },
         currencySymbols: { USD: '$', AED: 'د.إ' },
 
         // Bulk Mode
-        bulkMode: false,
-
-        loadBulkMode(){
-          try { 
-            this.bulkMode = localStorage.getItem('bulkMode') === 'true'; 
-          } catch(e){}
-        },
+        bulkMode: initialBulkMode,
 
         toggleBulkMode(){
-          try { 
-            localStorage.setItem('bulkMode', this.bulkMode ? 'true' : 'false'); 
-          } catch(e){}
+          // Bulk mode is now automatically saved via watcher in init()
+          // This method just toggles the value, the watcher handles persistence
         },
 
         requestBulkQuote(p){
           const text = `مرحباً، أطلب عرض أسعار بالجملة لـ:\n\n- المنتج: ${p.name}\n- المقاس: ${p.size}\n- العلامة: ${p.brand}\n\nالكمية: `;
           window.open('https://wa.me/971554637045?text=' + encodeURIComponent(text), '_blank');
+          // Track bulk quote usage
+          if (window.CustomerMemory) {
+            CustomerMemory.markBulkQuoteUsed();
+          }
         },
 
         brands:[
@@ -572,15 +598,47 @@
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
           
-          // Load saved currency preference
-          const savedCurrency = localStorage.getItem('aa_currency');
-          if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
-            this.selectedCurrency = savedCurrency;
+          // Set up watchers for CustomerMemory preferences
+          if (window.CustomerMemory) {
+            // Watch currency changes
+            this.$watch('selectedCurrency', v => {
+              localStorage.setItem('aa_currency', v);
+              CustomerMemory.setCurrency(v);
+            });
+            
+            // Watch brand filter changes
+            this.$watch('filters.brand', v => {
+              CustomerMemory.setBrandFilter(v);
+            });
+            
+            // Watch bulk mode changes
+            this.$watch('bulkMode', v => {
+              CustomerMemory.setBulkMode(v);
+            });
+          } else {
+            // Fallback to direct localStorage
+            this.$watch('selectedCurrency', v => localStorage.setItem('aa_currency', v));
           }
-          this.$watch('selectedCurrency', v => localStorage.setItem('aa_currency', v));
           
           // Fetch exchange rates
           await this.fetchExchangeRates();
+        },
+        
+        // Show welcome back message
+        showWelcomeMessage(){
+          if (!window.CustomerMemory) return;
+          
+          // Show welcome message after a short delay to ensure page is loaded
+          setTimeout(() => {
+            CustomerMemory.showWelcomeBack();
+          }, 500);
+        },
+        
+        // Track WhatsApp usage
+        trackWhatsAppUsage(){
+          if (window.CustomerMemory) {
+            CustomerMemory.markWhatsAppUsed();
+          }
         },
         
         async fetchExchangeRates(){
