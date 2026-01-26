@@ -390,11 +390,36 @@
               {name:'POTENTIA SPORT 2', img:'https://placehold.co/600x400?text=POTENTIA+SPORT+2', desc:'تصویر موقت تا ارسال عکس رسمی.'}
             ]
           },
-          {name:'Kpatos', models:[]},
-          {name:'Dovroad', models:[]},
-          {name:'Haida', models:[]},
-          {name:'Neolin', models:[]},
-          {name:'Duraturn', models:[]}
+          {
+            name:'Kpatos',
+            models:[
+              {name:'به زودی', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'فهرست محصولات به‌زودی اضافه می‌شود.'}
+            ]
+          },
+          {
+            name:'Dovroad',
+            models:[
+              {name:'به زودی', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'فهرست محصولات به‌زودی اضافه می‌شود.'}
+            ]
+          },
+          {
+            name:'Haida',
+            models:[
+              {name:'به زودی', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'فهرست محصولات به‌زودی اضافه می‌شود.'}
+            ]
+          },
+          {
+            name:'Neolin',
+            models:[
+              {name:'به زودی', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'فهرست محصولات به‌زودی اضافه می‌شود.'}
+            ]
+          },
+          {
+            name:'Duraturn',
+            models:[
+              {name:'به زودی', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'فهرست محصولات به‌زودی اضافه می‌شود.'}
+            ]
+          }
         ],
 
         products:[
@@ -544,7 +569,43 @@
             this.introError = 'خطا: ' + (err?.text || err?.message || 'نامشخص');
           }
         },
-        
+
+        scrollChat(){
+          const el = this.$refs.chatScroll;
+          if (el) el.scrollTop = el.scrollHeight;
+        },
+
+        async sendChatMessage(){
+          const content = this.chatInput.trim();
+          if (!content || this.chatLoading) return;
+          this.chatError = '';
+          this.chatMessages.push({role:'user', content});
+          this.chatInput = '';
+          this.chatLoading = true;
+          this.$nextTick(() => this.scrollChat());
+          try {
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({message: content})
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(data?.error || data?.message || 'Failed to get AI response');
+            }
+            const reply = (data?.reply || '').trim() || 'متشکریم از پرسش شما. تیم ما به زودی پاسخ می‌دهد.';
+            this.chatMessages.push({role:'assistant', content: reply});
+          } catch(err) {
+            const msg = err?.message || 'چت هوشمند در حال حاضر در دسترس نیست.';
+            this.chatError = msg;
+            this.chatMessages.push({role:'assistant', content: 'متأسفانه دستیار هوشمند در حال حاضر در دسترس نیست. لطفاً بعداً امتحان کنید.'});
+          } finally {
+            this.chatLoading = false;
+            this.$nextTick(() => this.scrollChat());
+          }
+        }
+      }
+    }
   </script>
   <script src="/chat.js" defer></script>
 </body>
