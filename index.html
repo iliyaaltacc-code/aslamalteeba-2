@@ -617,7 +617,7 @@
           this.chatLoading = true;
           this.$nextTick(() => this.scrollChat());
           try {
-            const response = await fetch('/.netlify/functions/chat', {
+            const response = await fetch('/api/chat', {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
               body: JSON.stringify({message: content})
@@ -640,5 +640,6 @@
       }
     }
   </script>
+ <script src="/chat.js" defer></script>
 </body>
 </html>
