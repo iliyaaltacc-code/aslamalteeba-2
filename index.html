@@ -696,11 +696,13 @@
             chatBox.style.display = 'flex';
             chatBox.style.flexDirection = 'column';
             
-            // Pre-fill the input
+            // Pre-fill the input and auto-send
             const chatInput = chatBox.querySelector('.ai-chat-input');
-            if (chatInput) {
+            const sendBtn = chatBox.querySelector('.ai-chat-send');
+            if (chatInput && sendBtn) {
               chatInput.value = fullMessage;
-              chatInput.focus();
+              // Auto-send the message by clicking the send button
+              sendBtn.click();
             }
           }
         },
