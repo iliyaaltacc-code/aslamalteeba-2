@@ -94,13 +94,12 @@
     clear() {
       if (!this.isAvailable) return false;
       try {
-        // Clear only our keys
+        // Clear only customer memory preference keys (not cart)
         Object.values(STORAGE_KEYS).forEach(key => {
           localStorage.removeItem(key);
         });
-        // Also clear legacy keys
-        localStorage.removeItem('aa_cart');
-        localStorage.removeItem('bulkMode'); // Legacy key
+        // Clear legacy bulk mode key
+        localStorage.removeItem('bulkMode');
         return true;
       } catch (e) {
         console.warn('Error clearing localStorage:', e);
@@ -218,7 +217,8 @@
     // Reset all preferences
     resetAll() {
       storage.clear();
-      window.location.reload();
+      // Optionally reload the page - caller should confirm first
+      return true;
     },
     
     // Show welcome back notification
@@ -325,6 +325,7 @@
       button.onclick = () => {
         if (confirm(text.resetPreferences + '?')) {
           this.resetAll();
+          window.location.reload();
         }
       };
       
