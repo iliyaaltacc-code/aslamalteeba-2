@@ -245,6 +245,29 @@
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            
+            <!-- Quick Questions Section -->
+            <div class="pt-2 border-t border-white/10">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-neutral-400">Quick questions</span>
+                <button 
+                  @click="refreshProductQuestions(p)" 
+                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  title="Refresh questions">
+                  ↻
+                </button>
+              </div>
+              <div class="space-y-1">
+                <template x-for="(q, idx) in getProductQuestions(p)" :key="p.id + '-' + idx">
+                  <button 
+                    @click="openChatWithQuestion(q, p)"
+                    class="w-full text-left text-xs px-2 py-1.5 rounded-lg bg-white/5 hover:bg-teal-500/20 text-neutral-300 hover:text-teal-300 transition-colors"
+                    x-text="q">
+                  </button>
+                </template>
+              </div>
+            </div>
+            
             <div class="flex items-center justify-between pt-2">
               <div>
                 <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
@@ -500,6 +523,30 @@
 
         cart:[],
 
+        // Question generation templates
+        questionTemplates: {
+          intents: [
+            'Is {subject} good for',
+            'How does {subject} perform in',
+            'Can {subject} handle',
+            'Does {subject} work well for',
+            'Is {subject} suitable for'
+          ],
+          contexts: [
+            'daily highway driving in UAE heat',
+            'city traffic and frequent stops',
+            'long-distance desert trips',
+            'wet roads and occasional rain',
+            'off-road and rough terrain',
+            'hot summer conditions',
+            'mixed urban and highway use'
+          ],
+          subjects: [] // Generated dynamically per product
+        },
+        
+        // Store generated questions per product
+        productQuestions: {},
+
         async init(){
           const saved = localStorage.getItem('aa_cart');
           if (saved) this.cart = JSON.parse(saved);
@@ -572,6 +619,83 @@
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // Generate product subject for questions
+        getProductSubject(product){
+          // Use brand + model/name if available, otherwise "this tire"
+          if (product.brand && product.name) {
+            // Extract model name if it includes brand
+            const modelName = product.name.replace(product.brand, '').trim();
+            return modelName ? `${product.brand} ${modelName}` : product.brand;
+          }
+          return 'this tire';
+        },
+
+        // Generate 3 unique questions for a product
+        generateQuestions(product){
+          const subject = this.getProductSubject(product);
+          const subjectWithSize = product.size ? `${subject} (${product.size})` : subject;
+          
+          // Create pool of all possible combinations
+          const allCombinations = [];
+          this.questionTemplates.intents.forEach(intent => {
+            this.questionTemplates.contexts.forEach(context => {
+              allCombinations.push({
+                intent,
+                context,
+                question: intent.replace('{subject}', subjectWithSize) + ' ' + context + '?'
+              });
+            });
+          });
+          
+          // Shuffle and pick 3 unique combinations
+          const shuffled = allCombinations.sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 3);
+          
+          // Ensure no immediate repetition by checking if same intent used twice
+          const intents = selected.map(s => s.intent);
+          if (intents[0] === intents[1] || intents[1] === intents[2]) {
+            // Reshuffle if we have adjacent duplicates
+            return this.generateQuestions(product);
+          }
+          
+          return selected.map(s => s.question);
+        },
+
+        // Get or generate questions for a product
+        getProductQuestions(product){
+          if (!this.productQuestions[product.id]) {
+            this.productQuestions[product.id] = this.generateQuestions(product);
+          }
+          return this.productQuestions[product.id];
+        },
+
+        // Refresh questions for a specific product
+        refreshProductQuestions(product){
+          this.productQuestions[product.id] = this.generateQuestions(product);
+        },
+
+        // Open AI chat with pre-filled question and product context
+        openChatWithQuestion(question, product){
+          const priceInfo = this.formatPrice(product.price);
+          const context = `For ${this.getProductSubject(product)}${product.size ? ' (' + product.size + ')' : ''}${product.desc ? ', ' + product.desc : ''} - Price: ${priceInfo}`;
+          const fullMessage = `${question}\n\n[Product context: ${context}]`;
+          
+          // Open the AI chat widget
+          const chatBtn = document.querySelector('.ai-chat-btn');
+          const chatBox = document.querySelector('.ai-chat-box');
+          if (chatBtn && chatBox) {
+            chatBox.style.display = 'flex';
+            chatBox.style.flexDirection = 'column';
+            
+            // Pre-fill the input
+            const chatInput = chatBox.querySelector('.ai-chat-input');
+            if (chatInput) {
+              chatInput.value = fullMessage;
+              chatInput.focus();
+            }
+          }
         },
 
         // send two emails with the standard template (orders/contact/brand inquiries)
