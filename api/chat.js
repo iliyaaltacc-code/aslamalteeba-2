@@ -1,4 +1,6 @@
-// /api/chat.js — Real AI with memory (Vercel)
+export const config = {
+  runtime: "nodejs",
+};// /api/chat.js — Real AI with memory (Vercel)
 
 import OpenAI from "openai";
 
