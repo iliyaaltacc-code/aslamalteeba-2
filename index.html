@@ -221,6 +221,10 @@
         <p class="text-neutral-400">Search, filter by brand, add to cart, and place a test order.</p>
       </div>
       <div class="flex gap-2">
+        <select x-model="selectedCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+          <option value="USD">USD ($)</option>
+          <option value="AED">AED (د.إ)</option>
+        </select>
         <select x-model="filters.brand" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
           <option value="">All brands</option>
           <option>Duraturn</option>
@@ -243,7 +247,7 @@
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
             <div class="flex items-center justify-between pt-2">
               <div>
-                <div class="text-lg font-extrabold" x-text="'$'+p.price.toFixed(2)"></div>
+                <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
                 <div class="text-xs text-neutral-400" x-text="p.size"></div>
               </div>
               <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">Add</button>
@@ -290,7 +294,7 @@
             <div class="flex-1">
               <div class="font-semibold" x-text="item.name"></div>
               <div class="text-xs text-neutral-400" x-text="item.size + ' • ' + item.brand"></div>
-              <div class="text-sm" x-text="'$'+item.price.toFixed(2)"></div>
+              <div class="text-sm" x-text="formatPrice(item.price)"></div>
             </div>
             <div class="flex items-center gap-2">
               <button class="px-2 py-1 bg-white/10 rounded" @click="item.qty = Math.max(1, item.qty-1)">-</button>
@@ -305,15 +309,15 @@
       <div class="mt-6 p-4 glass rounded-2xl space-y-2">
         <div class="flex items-center justify-between text-sm">
           <span>Subtotal</span>
-          <span x-text="'$'+subtotal().toFixed(2)"></span>
+          <span x-text="formatPrice(subtotal())"></span>
         </div>
         <div class="flex items-center justify-between text-sm text-neutral-400">
           <span>VAT (5% demo)</span>
-          <span x-text="'$'+(subtotal()*0.05).toFixed(2)"></span>
+          <span x-text="formatPrice(subtotal()*0.05)"></span>
         </div>
         <div class="flex items-center justify-between font-bold pt-1">
           <span>Total</span>
-          <span x-text="'$'+(subtotal()*1.05).toFixed(2)"></span>
+          <span x-text="formatPrice(subtotal()*1.05)"></span>
         </div>
       </div>
 
@@ -431,6 +435,11 @@
         chatMessages:[
           {role:'assistant', content:'Welcome to Aslama Alteeba. How can the team help with tires, sizing, or availability?'}
         ],
+        
+        // Currency conversion
+        selectedCurrency: 'USD',
+        exchangeRates: { USD: 1, AED: 3.67 },
+        currencySymbols: { USD: '$', AED: 'د.إ' },
 
         brands:[
           {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'Value-focused lineup for passenger and SUV needs.'},
@@ -491,10 +500,49 @@
 
         cart:[],
 
-        init(){
+        async init(){
           const saved = localStorage.getItem('aa_cart');
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
+          
+          // Load saved currency preference
+          const savedCurrency = localStorage.getItem('aa_currency');
+          if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
+            this.selectedCurrency = savedCurrency;
+          }
+          this.$watch('selectedCurrency', v => localStorage.setItem('aa_currency', v));
+          
+          // Fetch exchange rates
+          await this.fetchExchangeRates();
+        },
+        
+        async fetchExchangeRates(){
+          try {
+            const response = await fetch('/api/exchange-rates');
+            const data = await response.json();
+            if (data.rates) {
+              this.exchangeRates = data.rates;
+            }
+          } catch (err) {
+            console.error('Failed to fetch exchange rates:', err);
+            // Keep using fallback rates already set
+          }
+        },
+        
+        convertPrice(usdPrice){
+          if (this.selectedCurrency === 'USD') {
+            return usdPrice;
+          } else if (this.selectedCurrency === 'AED') {
+            return usdPrice * this.exchangeRates.AED;
+          }
+          return usdPrice;
+        },
+        
+        formatPrice(usdPrice){
+          const converted = this.convertPrice(usdPrice);
+          const symbol = this.currencySymbols[this.selectedCurrency] || '$';
+          // AED and USD both use 2 decimal places
+          return `${symbol}${converted.toFixed(2)}`;
         },
 
         brandProductCount(brandName){
