@@ -526,11 +526,9 @@
           if (this.selectedCurrency === 'Toman') {
             // Toman uses larger numbers, show without decimals
             return `${Math.round(converted).toLocaleString()} ${symbol}`;
-          } else if (this.selectedCurrency === 'AED') {
-            return `${symbol}${converted.toFixed(2)}`;
-          } else {
-            return `${symbol}${converted.toFixed(2)}`;
           }
+          // AED and USD both use 2 decimal places
+          return `${symbol}${converted.toFixed(2)}`;
         },
 
         brandProductCount(brandName){
