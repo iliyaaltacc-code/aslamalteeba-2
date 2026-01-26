@@ -329,66 +329,7 @@
     </aside>
   </div>
 
-  <!-- AI CHAT PANEL -->
-  <div class="fixed bottom-5 left-5 z-50">
-    <button
-      class="px-4 py-3 rounded-2xl brand-gradient text-black font-extrabold shadow-lg hover:opacity-90"
-      @click="chatOpen = !chatOpen; if(chatOpen){$nextTick(() => scrollChat());}"
-      aria-label="Open AI chat"
-    >
-      چت هوشمند
-    </button>
-  </div>
-
-  <div
-    class="fixed bottom-20 left-5 z-50 w-[92vw] max-w-md"
-    x-show="chatOpen"
-    x-transition
-    @keydown.escape.window="chatOpen=false"
-  >
-    <div class="glass rounded-3xl border border-white/10 overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 bg-black/40">
-        <div>
-          <div class="font-bold">دستیار هوشمند Aslama</div>
-          <div class="text-xs text-neutral-400">درباره سایز، برند یا موجودی بپرسید.</div>
-        </div>
-        <button class="p-2 rounded-lg bg-white/5" @click="chatOpen=false">✕</button>
-      </div>
-
-      <div class="max-h-80 overflow-y-auto px-4 py-3 space-y-3" x-ref="chatScroll">
-        <template x-for="(msg, idx) in chatMessages" :key="idx">
-          <div class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
-            <div
-              class="px-3 py-2 rounded-2xl text-sm max-w-[80%]"
-              :class="msg.role === 'user' ? 'bg-emerald-500 text-black' : 'bg-white/10 text-neutral-100'"
-              x-text="msg.content"
-            ></div>
-          </div>
-        </template>
-
-        <template x-if="chatLoading">
-          <div class="flex justify-start">
-            <div class="px-3 py-2 rounded-2xl text-sm bg-white/10 text-neutral-100">در حال تایپ…</div>
-          </div>
-        </template>
-      </div>
-
-      <div class="border-t border-white/10 px-3 py-3 space-y-2">
-        <p class="text-xs text-red-400" x-show="chatError" x-text="chatError"></p>
-        <form class="flex gap-2" @submit.prevent="sendChatMessage()">
-          <input
-            x-model="chatInput"
-            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-right"
-            placeholder="سوال خود را بنویسید..."
-            :disabled="chatLoading"
-          />
-          <button
-            class="px-4 py-2 rounded-xl brand-gradient text-black font-bold"
-            :disabled="chatLoading || !chatInput.trim()"
-          >
-            ارسال
-          </button>
-        </form>
+  
       </div>
     </div>
   </div>
