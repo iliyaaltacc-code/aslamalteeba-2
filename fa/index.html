@@ -20,7 +20,7 @@
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init()">
+<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); loadBulkMode()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
@@ -219,8 +219,13 @@
       <div>
         <h2 class="text-3xl font-extrabold">فروشگاه تایر</h2>
         <p class="text-neutral-400">جستجو، فیلتر برند، افزودن به سبد و ثبت سفارش آزمایشی.</p>
+        <p class="text-amber-400 text-sm mt-1" x-show="bulkMode" x-cloak>برای سفارشات عمده و استعلامهای عمدهفروشی</p>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2 items-center">
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input type="checkbox" x-model="bulkMode" @change="toggleBulkMode()" class="rounded">
+          <span>خرید عمده</span>
+        </label>
         <select x-model="selectedCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
           <option value="USD">دلار آمریکا ($)</option>
           <option value="AED">درهم امارات (د.إ)</option>
@@ -269,11 +274,29 @@
             </div>
             
             <div class="flex items-center justify-between pt-2">
-              <div>
-                <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
-                <div class="text-xs text-neutral-400" x-text="p.size"></div>
-              </div>
-              <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">افزودن</button>
+              <!-- Normal mode -->
+              <template x-if="!bulkMode">
+                <div class="flex items-center justify-between w-full">
+                  <div>
+                    <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
+                    <div class="text-xs text-neutral-400" x-text="p.size"></div>
+                  </div>
+                  <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">افزودن</button>
+                </div>
+              </template>
+              
+              <!-- Bulk mode -->
+              <template x-if="bulkMode">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm text-neutral-400">برای قیمت عمده با ما تماس بگیرید</div>
+                      <div class="text-xs text-neutral-400" x-text="p.size"></div>
+                    </div>
+                  </div>
+                  <button class="w-full px-4 py-2 rounded-xl bg-amber-500 text-black font-bold hover:opacity-90" @click="requestBulkQuote(p)">درخواست قیمت عمده</button>
+                </div>
+              </template>
             </div>
           </div>
         </article>
@@ -405,6 +428,26 @@
         selectedCurrency: 'USD',
         exchangeRates: { USD: 1, AED: 3.67 },
         currencySymbols: { USD: '$', AED: 'د.إ' },
+
+        // Bulk Mode
+        bulkMode: false,
+
+        loadBulkMode(){
+          try { 
+            this.bulkMode = localStorage.getItem('bulkMode') === 'true'; 
+          } catch(e){}
+        },
+
+        toggleBulkMode(){
+          try { 
+            localStorage.setItem('bulkMode', this.bulkMode ? 'true' : 'false'); 
+          } catch(e){}
+        },
+
+        requestBulkQuote(p){
+          const text = `سلام، درخواست قیمت عمده برای:\n\n- محصول: ${p.name}\n- سایز: ${p.size}\n- برند: ${p.brand}\n\nتعداد: `;
+          window.open('https://wa.me/971554637045?text=' + encodeURIComponent(text), '_blank');
+        },
 
         brands:[
           {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'محصولات اقتصادی برای سواری و SUV.'},
