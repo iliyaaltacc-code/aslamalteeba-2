@@ -1,143 +1,161 @@
-// chat.js — UI FIX ONLY (FORCED DARK, OVERRIDES SITE CSS)
-// Logic, API, memory untouched — FIXED BUTTON WIRING
+// chat.js — Production frontend chat for /api/chat
+// Supports EN + FA, RTL, memory, typing indicator
+// Backend untouched
 
 (() => {
   const API_URL = "/api/chat";
+
+  // ---------------------------
+  // Language detection
+  // ---------------------------
+  const isFarsi =
+    document.documentElement.lang === "fa" ||
+    location.pathname.startsWith("/fa");
+
+  // ---------------------------
+  // Text dictionary
+  // ---------------------------
+  const TEXT = isFarsi
+    ? {
+        title: "دستیار هوشمند اسلمه الطیبه",
+        placeholder: "درباره سایز، برند یا موجودی تایر بپرسید…",
+        send: "ارسال",
+        typing: "در حال تایپ…",
+        error: "متأسفانه مشکلی پیش آمد. دوباره تلاش کنید.",
+        welcome:
+          "به اسلمه الطیبه خوش آمدید. چگونه می‌توانیم در زمینه تایر به شما کمک کنیم؟",
+      }
+    : {
+        title: "Aslama AI",
+        placeholder: "Ask about tires, sizes, brands…",
+        send: "Send",
+        typing: "Aslama AI is typing…",
+        error: "Sorry, something went wrong. Please try again.",
+        welcome:
+          "Welcome to Aslama Alteeba. How can we help with tires, sizing, or availability?",
+      };
+
+  // ---------------------------
+  // Memory (per page load)
+  // ---------------------------
   const chatHistory = [];
 
   // ---------------------------
-  // FORCE STYLES (OVERRIDE SITE)
+  // Styles
   // ---------------------------
   const style = document.createElement("style");
   style.textContent = `
-    .aslama-ai-btn {
+    .ai-chat-btn {
       position: fixed;
-      bottom: 18px;
-      left: 18px;
-      background: #1fd1a2 !important;
-      color: #052c22 !important;
-      border: none !important;
-      padding: 12px 18px;
+      bottom: 20px;
+      left: 20px;
+      background: #20c997;
+      color: #062d23;
+      border: none;
+      padding: 12px 16px;
       border-radius: 999px;
       font-weight: 700;
       cursor: pointer;
-      z-index: 99999;
-      box-shadow: 0 6px 20px rgba(31,209,162,.35);
+      z-index: 9999;
     }
 
-    .aslama-ai {
+    .ai-chat-box {
       position: fixed;
       bottom: 80px;
-      left: 18px;
+      left: 20px;
       width: 320px;
       height: 420px;
-      background: #141414 !important;
-      border-radius: 18px;
+      background: #111;
+      color: #fff;
+      border-radius: 14px;
       display: none;
       flex-direction: column;
       overflow: hidden;
-      z-index: 99999;
-      box-shadow: 0 30px 60px rgba(0,0,0,.55);
+      z-index: 9999;
+      box-shadow: 0 20px 40px rgba(0,0,0,.45);
       font-family: system-ui, -apple-system, Arial, sans-serif;
     }
 
-    .aslama-ai-header {
-      background: #1b1b1b !important;
-      padding: 12px 14px;
+    .ai-chat-box.rtl {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .ai-chat-head {
+      padding: 10px 12px;
+      background: #1a1a1a;
       font-weight: 700;
-      font-size: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      color: #fff;
     }
 
-    .aslama-ai-body {
+    .ai-chat-body {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       font-size: 13px;
     }
 
-    .aslama-bubble {
+    .ai-msg {
+      padding: 8px 10px;
+      border-radius: 10px;
       max-width: 85%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      line-height: 1.35;
       white-space: pre-wrap;
     }
 
-    .aslama-user {
-      background: #1fd1a2 !important;
-      color: #052c22 !important;
+    .ai-user {
+      background: #20c997;
+      color: #062d23;
       align-self: flex-end;
-      border-bottom-right-radius: 4px;
     }
 
-    .aslama-assistant {
-      background: #242424 !important;
-      color: #eaeaea !important;
+    .ai-bot {
+      background: #2a2a2a;
       align-self: flex-start;
-      border-bottom-left-radius: 4px;
     }
 
-    .aslama-typing {
-      opacity: .6;
-      font-style: italic;
+    .ai-chat-box.rtl .ai-user {
+      align-self: flex-start;
+    }
+
+    .ai-chat-box.rtl .ai-bot {
+      align-self: flex-end;
+    }
+
+    .ai-typing {
       font-size: 12px;
+      opacity: 0.7;
+      font-style: italic;
     }
 
-    .aslama-ai-footer {
-      padding: 10px;
+    .ai-chat-foot {
       display: flex;
       gap: 8px;
-      background: #141414 !important;
-      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 10px;
+      border-top: 1px solid #222;
     }
 
-    /* IMPORTANT: kill site styles for input */
-    .aslama-ai-footer input {
-      all: unset;
+    .ai-chat-input {
       flex: 1;
-      background: #1c1c1c !important;
-      color: #fff !important;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.1) !important;
-      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: #1a1a1a;
+      color: #fff;
     }
 
-    .aslama-ai-footer input::placeholder {
-      color: #888 !important;
-    }
-
-    .aslama-ai-footer .aslama-ai-send {
-      background: #1fd1a2 !important;
-      color: #052c22 !important;
-      border: none !important;
-      padding: 10px 16px;
-      border-radius: 12px;
+    .ai-chat-send {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      background: #20c997;
       font-weight: 700;
       cursor: pointer;
-    }
-
-    .aslama-ai-close {
-      all: unset;
-      cursor: pointer;
-      color: #aaa;
-      font-size: 18px;
-      line-height: 1;
-      padding: 2px 6px;
-      border-radius: 10px;
-    }
-
-    .aslama-ai-close:hover {
-      background: rgba(255,255,255,.08);
-      color: #fff;
     }
   `;
   document.head.appendChild(style);
@@ -145,72 +163,85 @@
   // ---------------------------
   // UI
   // ---------------------------
-  const btn = document.createElement("button");
-  btn.className = "aslama-ai-btn";
-  btn.type = "button";
-  btn.textContent = "AI Chat";
+  const openBtn = document.createElement("button");
+  openBtn.className = "ai-chat-btn";
+  openBtn.textContent = "AI Chat";
 
-  const chat = document.createElement("div");
-  chat.className = "aslama-ai";
-  chat.innerHTML = `
-    <div class="aslama-ai-header">
-      <span>Aslama AI Assistant</span>
-      <button type="button" class="aslama-ai-close" aria-label="Close">✕</button>
+  const box = document.createElement("div");
+  box.className = "ai-chat-box";
+  if (isFarsi) box.classList.add("rtl");
+
+  box.innerHTML = `
+    <div class="ai-chat-head">
+      <span>${TEXT.title}</span>
+      <button class="ai-close" style="background:none;border:none;color:#fff;cursor:pointer">✕</button>
     </div>
-    <div class="aslama-ai-body"></div>
-    <div class="aslama-ai-footer">
-      <input class="aslama-ai-input" placeholder="Ask about tires, sizes, brands…" />
-      <button type="button" class="aslama-ai-send">Send</button>
+    <div class="ai-chat-body"></div>
+    <div class="ai-chat-foot">
+      <input class="ai-chat-input" placeholder="${TEXT.placeholder}" />
+      <button class="ai-chat-send">${TEXT.send}</button>
     </div>
   `;
 
-  document.body.appendChild(btn);
-  document.body.appendChild(chat);
+  document.body.appendChild(openBtn);
+  document.body.appendChild(box);
 
-  const body = chat.querySelector(".aslama-ai-body");
-  const input = chat.querySelector(".aslama-ai-input");
-  const sendBtn = chat.querySelector(".aslama-ai-send");
-  const closeBtn = chat.querySelector(".aslama-ai-close");
+  const body = box.querySelector(".ai-chat-body");
+  const input = box.querySelector(".ai-chat-input");
+  const sendBtn = box.querySelector(".ai-chat-send");
+  const closeBtn = box.querySelector(".ai-close");
 
-  btn.addEventListener("click", () => {
-    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-    chat.style.flexDirection = "column";
+  // ---------------------------
+  // Open / Close
+  // ---------------------------
+  openBtn.onclick = () => {
+    box.style.display = box.style.display === "flex" ? "none" : "flex";
+    box.style.flexDirection = "column";
     input.focus();
-  });
+  };
 
-  closeBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  closeBtn.onclick = (e) => {
     e.stopPropagation();
-    chat.style.display = "none";
-  });
+    box.style.display = "none";
+  };
 
+  // ---------------------------
+  // Helpers
+  // ---------------------------
   const addMsg = (cls, text) => {
     const div = document.createElement("div");
-    div.className = `aslama-bubble ${cls}`;
+    div.className = `ai-msg ${cls}`;
     div.textContent = text;
     body.appendChild(div);
     body.scrollTop = body.scrollHeight;
     return div;
   };
 
+  // Welcome message
+  addMsg("ai-bot", TEXT.welcome);
+
   // ---------------------------
-  // SEND (UNCHANGED LOGIC)
+  // Send message
   // ---------------------------
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
 
     input.value = "";
-    addMsg("aslama-user", text);
+
+    addMsg("ai-user", text);
     chatHistory.push({ role: "user", content: text });
 
-    const typing = addMsg("aslama-assistant aslama-typing", "Aslama AI is typing…");
+    const typing = addMsg("ai-bot ai-typing", TEXT.typing);
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: chatHistory }),
+        body: JSON.stringify({
+          messages: chatHistory,
+          locale: isFarsi ? "fa" : "en",
+        }),
       });
 
       const data = await res.json();
@@ -218,24 +249,17 @@
 
       if (!res.ok || !data.reply) throw new Error("Bad response");
 
-      addMsg("aslama-assistant", data.reply);
+      addMsg("ai-bot", data.reply);
       chatHistory.push({ role: "assistant", content: data.reply });
     } catch (err) {
       typing.remove();
-      addMsg("aslama-assistant", "Sorry, something went wrong. Please try again.");
+      addMsg("ai-bot", TEXT.error);
       console.error(err);
     }
   };
 
-  sendBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    send();
-  });
-
+  sendBtn.onclick = send;
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      send();
-    }
+    if (e.key === "Enter") send();
   });
 })();
