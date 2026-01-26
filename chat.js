@@ -1,195 +1,192 @@
-// chat.js — Frontend UI ONLY (logic unchanged)
-// Talks to /api/chat, keeps memory + typing indicator
+// chat.js — UI FIX ONLY (FORCED DARK, OVERRIDES SITE CSS)
+// Logic, API, memory untouched
 
 (() => {
   const API_URL = "/api/chat";
   const chatHistory = [];
 
-  /* =========================
-     STYLES (OLD UI LOOK)
-  ========================= */
+  // ---------------------------
+  // FORCE STYLES (OVERRIDE SITE)
+  // ---------------------------
   const style = document.createElement("style");
   style.textContent = `
-    .ai-chat-launch {
+    .aslama-ai-btn {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: #20c997;
-      color: #062d23;
-      border: none;
+      bottom: 18px;
+      left: 18px;
+      background: #1fd1a2 !important;
+      color: #052c22 !important;
+      border: none !important;
       padding: 12px 18px;
       border-radius: 999px;
       font-weight: 700;
       cursor: pointer;
-      z-index: 9999;
-      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+      z-index: 99999;
+      box-shadow: 0 6px 20px rgba(31,209,162,.35);
     }
 
-    .ai-panel {
+    .aslama-ai {
       position: fixed;
       bottom: 80px;
-      left: 20px;
-      width: 300px;
+      left: 18px;
+      width: 320px;
       height: 420px;
-      background: rgba(18,18,18,.98);
-      backdrop-filter: blur(8px);
-      color: #fff;
-      border-radius: 16px;
+      background: #141414 !important;
+      border-radius: 18px;
       display: none;
       flex-direction: column;
       overflow: hidden;
-      z-index: 9999;
-      box-shadow: 0 25px 50px rgba(0,0,0,.55);
-      font-family: system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      z-index: 99999;
+      box-shadow: 0 30px 60px rgba(0,0,0,.55);
+      font-family: system-ui, -apple-system, Arial, sans-serif;
     }
 
-    .ai-header {
+    .aslama-ai-header {
+      background: #1b1b1b !important;
       padding: 12px 14px;
-      background: #161616;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       font-weight: 700;
-      border-bottom: 1px solid #222;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: #fff;
     }
 
-    .ai-header button {
-      background: none;
-      border: none;
-      color: #aaa;
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    .ai-body {
+    .aslama-ai-body {
       flex: 1;
       padding: 12px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       font-size: 13px;
     }
 
-    .ai-bubble {
+    .aslama-bubble {
       max-width: 85%;
-      padding: 8px 12px;
+      padding: 10px 12px;
       border-radius: 14px;
       line-height: 1.35;
       white-space: pre-wrap;
     }
 
-    .ai-user {
+    .aslama-user {
+      background: #1fd1a2 !important;
+      color: #052c22 !important;
       align-self: flex-end;
-      background: #20c997;
-      color: #062d23;
       border-bottom-right-radius: 4px;
     }
 
-    .ai-assistant {
+    .aslama-assistant {
+      background: #242424 !important;
+      color: #eaeaea !important;
       align-self: flex-start;
-      background: #2a2a2a;
       border-bottom-left-radius: 4px;
     }
 
-    .ai-typing {
-      opacity: .7;
+    .aslama-typing {
+      opacity: .6;
       font-style: italic;
       font-size: 12px;
     }
 
-    .ai-footer {
+    .aslama-ai-footer {
+      padding: 10px;
       display: flex;
       gap: 8px;
-      padding: 10px;
-      border-top: 1px solid #222;
-      background: #141414;
+      background: #141414 !important;
+      border-top: 1px solid rgba(255,255,255,.08);
     }
 
-    .ai-input {
+    /* THIS IS THE IMPORTANT PART */
+    .aslama-ai-footer input {
+      all: unset;
       flex: 1;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
+      background: #1c1c1c !important;
+      color: #fff !important;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.1) !important;
       font-size: 13px;
     }
 
-    .ai-send {
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: none;
-      background: #20c997;
-      color: #062d23;
+    .aslama-ai-footer input::placeholder {
+      color: #888 !important;
+    }
+
+    .aslama-ai-footer button {
+      background: #1fd1a2 !important;
+      color: #052c22 !important;
+      border: none !important;
+      padding: 10px 16px;
+      border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
     }
   `;
   document.head.appendChild(style);
 
-  /* =========================
-     UI STRUCTURE
-  ========================= */
-  const openBtn = document.createElement("button");
-  openBtn.className = "ai-chat-launch";
-  openBtn.textContent = "AI Chat";
+  // ---------------------------
+  // UI
+  // ---------------------------
+  const btn = document.createElement("button");
+  btn.className = "aslama-ai-btn";
+  btn.textContent = "AI Chat";
 
-  const panel = document.createElement("div");
-  panel.className = "ai-panel";
-  panel.innerHTML = `
-    <div class="ai-header">
+  const chat = document.createElement("div");
+  chat.className = "aslama-ai";
+  chat.innerHTML = `
+    <div class="aslama-ai-header">
       <span>Aslama AI Assistant</span>
-      <button class="ai-close">×</button>
+      <button class="close" style="all:unset;cursor:pointer;color:#aaa">✕</button>
     </div>
-    <div class="ai-body"></div>
-    <div class="ai-footer">
-      <input class="ai-input" placeholder="Ask about tires, sizes, brands" />
-      <button class="ai-send">Send</button>
+    <div class="aslama-ai-body"></div>
+    <div class="aslama-ai-footer">
+      <input placeholder="Ask about tires, sizes, brands…" />
+      <button>Send</button>
     </div>
   `;
 
-  document.body.appendChild(openBtn);
-  document.body.appendChild(panel);
+  document.body.appendChild(btn);
+  document.body.appendChild(chat);
 
-  const body = panel.querySelector(".ai-body");
-  const input = panel.querySelector(".ai-input");
-  const sendBtn = panel.querySelector(".ai-send");
-  const closeBtn = panel.querySelector(".ai-close");
+  const body = chat.querySelector(".aslama-ai-body");
+  const input = chat.querySelector("input");
+  const sendBtn = chat.querySelector("button:last-child");
+  const closeBtn = chat.querySelector(".close");
 
-  openBtn.onclick = () => {
-    panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-    panel.style.flexDirection = "column";
+  btn.onclick = () => {
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+    chat.style.flexDirection = "column";
     input.focus();
   };
 
   closeBtn.onclick = () => {
-    panel.style.display = "none";
+    chat.style.display = "none";
   };
 
-  /* =========================
-     HELPERS
-  ========================= */
-  const addBubble = (cls, text) => {
+  const addMsg = (cls, text) => {
     const div = document.createElement("div");
-    div.className = `ai-bubble ${cls}`;
+    div.className = `aslama-bubble ${cls}`;
     div.textContent = text;
     body.appendChild(div);
     body.scrollTop = body.scrollHeight;
     return div;
   };
 
-  /* =========================
-     SEND MESSAGE (UNCHANGED)
-  ========================= */
+  // ---------------------------
+  // SEND (UNCHANGED LOGIC)
+  // ---------------------------
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
-    input.value = "";
 
-    addBubble("ai-user", text);
+    input.value = "";
+    addMsg("aslama-user", text);
     chatHistory.push({ role: "user", content: text });
 
-    const typing = addBubble("ai-assistant ai-typing", "Aslama AI is typing…");
+    const typing = addMsg("aslama-assistant aslama-typing", "Aslama AI is typing…");
 
     try {
       const res = await fetch(API_URL, {
@@ -203,12 +200,11 @@
 
       if (!res.ok || !data.reply) throw new Error("Bad response");
 
-      addBubble("ai-assistant", data.reply);
+      addMsg("aslama-assistant", data.reply);
       chatHistory.push({ role: "assistant", content: data.reply });
-
     } catch (err) {
       typing.remove();
-      addBubble("ai-assistant", "Sorry, something went wrong. Please try again.");
+      addMsg("aslama-assistant", "Sorry, something went wrong. Please try again.");
       console.error(err);
     }
   };
