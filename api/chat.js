@@ -1,15 +1,12 @@
 export const config = {
   runtime: "nodejs",
-};// /api/chat.js — Real AI with memory (Vercel)
+};
 
 import OpenAI from "openai";
 
-const client = new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-// Simple in-memory store (per deployment instance)
-let conversations = {};
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -17,50 +14,30 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, sessionId = "default" } = req.body || {};
-    if (!message) {
-      return res.status(400).json({ error: "No message provided" });
+    const { messages } = req.body;
+
+    if (!Array.isArray(messages)) {
+      return res.status(400).json({ error: "messages must be an array" });
     }
 
-    // Initialize memory
-    if (!conversations[sessionId]) {
-      conversations[sessionId] = [
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
         {
           role: "system",
           content:
-            "You are Aslama AI, a professional, concise, helpful assistant for a premium tire company in the UAE. Be confident, clear, and friendly. Avoid emojis.",
+            "You are Aslama AI, a professional assistant for a UAE tire supplier. Be concise, helpful, and business-focused. Ask clarifying questions when needed.",
         },
-      ];
-    }
-
-    // Add user message
-    conversations[sessionId].push({
-      role: "user",
-      content: message,
-    });
-
-    // Call OpenAI
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: conversations[sessionId],
-      temperature: 0.4,
-      max_tokens: 300,
+        ...messages,
+      ],
+      temperature: 0.5,
     });
 
     const reply = completion.choices[0].message.content;
 
-    // Store assistant reply
-    conversations[sessionId].push({
-      role: "assistant",
-      content: reply,
-    });
-
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error("AI error:", err);
-    return res.status(500).json({
-      error: "AI failed",
-      details: err.message,
-    });
+    console.error("AI ERROR:", err);
+    return res.status(500).json({ error: "AI failure" });
   }
 }
