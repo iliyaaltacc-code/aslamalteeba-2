@@ -329,31 +329,7 @@
     </aside>
   </div>
 
-  <!-- AI CHAT PANEL -->
-  <div class="fixed bottom-5 left-5 z-50">
-    <button
-      class="px-4 py-3 rounded-2xl brand-gradient text-black font-extrabold shadow-lg hover:opacity-90"
-      @click="chatOpen = !chatOpen; if(chatOpen){$nextTick(() => scrollChat());}"
-      aria-label="Open AI chat"
-    >
-      الدردشة الذكية
-    </button>
-  </div>
-
-  <div
-    class="fixed bottom-20 left-5 z-50 w-[92vw] max-w-md"
-    x-show="chatOpen"
-    x-transition
-    @keydown.escape.window="chatOpen=false"
-  >
-    <div class="glass rounded-3xl border border-white/10 overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 bg-black/40">
-        <div>
-          <div class="font-bold">مساعد Aslama الذكي</div>
-          <div class="text-xs text-neutral-400">اسأل عن المقاسات أو العلامات أو التوفر.</div>
-        </div>
-        <button class="p-2 rounded-lg bg-white/5" @click="chatOpen=false">✕</button>
-      </div>
+  
 
       <div class="max-h-80 overflow-y-auto px-4 py-3 space-y-3" x-ref="chatScroll">
         <template x-for="(msg, idx) in chatMessages" :key="idx">
@@ -609,33 +585,7 @@
           if (el) el.scrollTop = el.scrollHeight;
         },
 
-        async sendChatMessage(){
-          const content = this.chatInput.trim();
-          if (!content || this.chatLoading) return;
-          this.chatError = '';
-          this.chatMessages.push({role:'user', content});
-          this.chatInput = '';
-          this.chatLoading = true;
-          this.$nextTick(() => this.scrollChat());
-          try {
-            const response = await fetch('/.netlify/functions/chat', {
-              method: 'POST',
-              headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({message: content, locale: 'ar'})
-            });
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-              throw new Error(data?.error || data?.message || 'تعذر الحصول على رد من المساعد');
-            }
-            const reply = (data?.reply || '').trim() || 'شكراً لسؤالك. سيتواصل الفريق معك قريباً.';
-            this.chatMessages.push({role:'assistant', content: reply});
-          } catch(err) {
-            const msg = err?.message || 'المساعد غير متاح حالياً.';
-            this.chatError = msg;
-            this.chatMessages.push({role:'assistant', content: 'عذراً، المساعد غير متاح حالياً. حاول مرة أخرى لاحقاً.'});
-          } finally {
-            this.chatLoading = false;
-            this.$nextTick(() => this.scrollChat());
+        
           }
         }
       }
