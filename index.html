@@ -1,0 +1,644 @@
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aslama Alteeba — Tire Shop</title>
+  <meta name="description" content="Aslama Alteeba: premium tire supplier in the UAE. Browse Duraturn, Bridgestone, Firemax. Quality, heritage, and reliability." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
+    .brand-gradient{background:linear-gradient(135deg,#00E0A4,#32D5FF)}
+    .shine{position:relative;overflow:hidden}
+    .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
+    [x-cloak]{display:none !important}
+    @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
+  </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init()">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 glass">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+      <h1 class="text-xl font-extrabold tracking-tight">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <nav class="hidden md:flex gap-6 text-sm">
+        <a href="#about" class="hover:text-white">About</a>
+        <div class="relative" x-data="{open:false}">
+          <button class="hover:text-white flex items-center gap-2" aria-haspopup="true" :aria-expanded="open" @click="open = !open" @keydown.escape="open=false">
+            Products
+            <span class="text-xs text-neutral-400">▾</span>
+          </button>
+          <div class="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-white/10 bg-neutral-950/95 backdrop-blur p-2 shadow-xl" x-show="open" x-transition.origin.top.left @click.outside="open=false" x-cloak>
+            <a href="#passenger-car-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Passenger Car Tires</a>
+            <a href="#truck-bus-radial-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Truck And Bus Radial Tires</a>
+            <a href="#otr-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">OTR Tires</a>
+            <a href="#truck-bus-bias-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Truck And Bus Bias Tires</a>
+          </div>
+        </div>
+        <a href="#hq" class="hover:text-white">HQ</a>
+        <a href="#imports" class="hover:text-white">Imports</a>
+        <a href="#shipping" class="hover:text-white">Shipping</a>
+        <a href="#brands" class="hover:text-white">Brands</a>
+        <a href="#intro" class="hover:text-white">Introduction Email</a>
+        <a href="#shop" class="hover:text-white">Shop</a>
+        <a href="#contact" class="hover:text-white">Contact</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" @click="cartOpen=true">
+          Cart <span class="ml-1 text-emerald-400 font-bold" x-text="cart.length"></span>
+        </button>
+
+        <a href="/fa/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+          Persian
+        </a>
+        <a href="/ar/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+          Arabic
+        </a>
+
+        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
+          +971 55 463 7045
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <h2 class="text-5xl font-extrabold mb-4 leading-tight">Premium Tires.<br><span class="text-emerald-400">UAE Quality.</span></h2>
+      <p class="text-lg text-neutral-300 mb-6">Aslama Alteeba delivers high-grade tires across the UAE. Partnerships with Duraturn, Bridgestone, and Firemax ensure safety, comfort, and reliability.</p>
+      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Shop Tires</a>
+    </div>
+    <div>
+      <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-4">Our History</h2>
+    <p class="text-neutral-300 leading-relaxed">Founded in Dubai in 2017, Aslama Alteeba began as a small supplier focused on bringing safe, affordable, and performance-driven tires to local markets. Over the years, we evolved into a trusted distributor, known for precision logistics and customer care.</p>
+  </section>
+
+  <!-- MATERIALS -->
+  <section id="materials" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4">Products</h2>
+    <p class="text-neutral-300 leading-relaxed mb-8">Explore the core product families we supply for private vehicles, long-haul fleets, and heavy-duty industrial use. Each range is curated for consistent performance, predictable wear, and dependable casing integrity across the conditions they are designed for.</p>
+    <div class="space-y-32 md:space-y-44">
+      <article id="passenger-car-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3">Passenger Car Tires</h3>
+        <p class="text-neutral-300 leading-relaxed">Passenger car tires are engineered for daily comfort, low noise, and safe braking at highway speeds. Our selection emphasizes optimized tread patterns for wet traction, balanced rolling resistance for fuel economy, and stable shoulder blocks for confident lane changes. Customers can choose touring-focused options for smooth rides or performance-oriented compounds for precise steering response, all backed by consistent uniformity standards that reduce vibration over long distances.</p>
+        <div class="mt-6 space-y-4">
+          <div class="max-w-md">
+            <label class="text-sm font-semibold text-neutral-200">Passenger car tire brands</label>
+            <select
+              x-model="passengerBrandSelection"
+              @change="activePassengerBrand = passengerBrandSelection"
+              class="mt-2 w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2"
+            >
+              <option value="">Select a brand to view models</option>
+              <template x-for="b in passengerBrands" :key="b.name">
+                <option :value="b.name" x-text="b.name"></option>
+              </template>
+            </select>
+          </div>
+
+          <div x-show="passengerBrandSelection" x-transition x-cloak class="glass rounded-2xl p-5 border-white/10">
+            <div class="flex flex-wrap gap-2 mb-4">
+              <template x-for="b in passengerBrands" :key="b.name">
+                <button
+                  class="px-3 py-2 rounded-xl text-sm border border-white/10"
+                  :class="activePassengerBrand === b.name ? 'bg-emerald-400 text-black font-semibold' : 'bg-white/5 text-neutral-200 hover:bg-white/10'"
+                  @click="activePassengerBrand = b.name; passengerBrandSelection = b.name"
+                  x-text="b.name"
+                ></button>
+              </template>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" x-show="passengerBrandModels(activePassengerBrand).length">
+              <template x-for="m in passengerBrandModels(activePassengerBrand)" :key="m.name">
+                <article class="rounded-2xl overflow-hidden bg-black/30 border border-white/10">
+                  <img :src="m.img" :alt="m.name" class="w-full h-36 object-cover" />
+                  <div class="p-3 space-y-1">
+                    <h4 class="font-semibold" x-text="m.name"></h4>
+                    <p class="text-xs text-neutral-400" x-text="m.desc"></p>
+                  </div>
+                </article>
+              </template>
+            </div>
+            <p class="text-sm text-neutral-400" x-show="passengerBrandSelection && !passengerBrandModels(activePassengerBrand).length">
+              Model lineup coming soon.
+            </p>
+          </div>
+        </div>
+      </article>
+      <article id="truck-bus-radial-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3">Truck And Bus Radial Tires</h3>
+        <p class="text-neutral-300 leading-relaxed">Truck and bus radial tires are built to maximize mileage and load stability for commercial fleets. These casings use steel-belted radial construction to control heat, improve tread life, and support retreading cycles. We stock options for steer, drive, and trailer positions, with tread designs tailored for long-haul efficiency, regional durability, or urban stop-start traction. The result is predictable wear, reduced downtime, and improved cost-per-kilometer performance.</p>
+      </article>
+      <article id="otr-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3">OTR Tires</h3>
+        <p class="text-neutral-300 leading-relaxed">OTR (Off-the-Road) tires are specified for heavy machinery operating in quarries, construction sites, and mining environments. These tires prioritize cut resistance, deep lug depth, and robust sidewall protection to handle sharp debris and high torque loads. The product mix includes patterns for loaders, graders, and articulated dump trucks, with compounds tuned for heat management and traction on loose or rocky terrain. This ensures long service life under extreme working conditions.</p>
+      </article>
+      <article id="truck-bus-bias-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3">Truck And Bus Bias Tires</h3>
+        <p class="text-neutral-300 leading-relaxed">Truck and bus bias tires remain the preferred choice for certain regional routes, mixed surfaces, and low-speed heavy-load applications. Their cross-ply construction delivers strong sidewall rigidity and resistance to impacts, making them suitable for rugged sites and older fleets. We provide bias options with reinforced plies, durable compounds, and tread patterns designed for traction and stability on uneven roads, helping operators maintain reliable performance in demanding environments.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- HQ -->
+  <section id="hq" class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-4">Headquarters & Facilities</h2>
+    <p class="text-neutral-300 leading-relaxed">Our Dubai HQ is the operational hub for logistics, import coordination, and partner management. With satellite facilities in Sharjah and Ras Al Khaimah, we ensure smooth inventory distribution and real-time container tracking.</p>
+  </section>
+
+  <!-- IMPORTS -->
+  <section id="imports" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4">Global Imports</h2>
+    <p class="text-neutral-300 leading-relaxed">We source from certified manufacturers across Japan, China, and Thailand, maintaining relationships with Duraturn, Bridgestone, and Firemax plants. Every shipment passes through customs-approved facilities, ensuring authenticity and traceability.</p>
+  </section>
+
+  <!-- SHIPPING -->
+  <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-4">Shipping & Installation</h2>
+    <p class="text-neutral-300 leading-relaxed">Rapid delivery across all Emirates. Choose local pickup, on-site installation, or direct shipment for fleet clients. We collaborate with service centers to provide same-day fitting when possible.</p>
+  </section>
+
+  <!-- BRANDS -->
+  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+    <div class="flex items-end justify-between gap-4 mb-8">
+      <div>
+        <h2 class="text-3xl font-extrabold">Brands</h2>
+        <p class="text-neutral-400">Browse our partner brands and send an inquiry instantly.</p>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <template x-for="b in brands" :key="b.name">
+        <article class="glass rounded-3xl overflow-hidden border-white/10">
+          <div class="bg-black/30 p-4 h-32 flex items-center justify-center">
+            <img :src="b.img" :alt="b.name + ' logo'" class="max-h-24 object-contain" />
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold text-lg" x-text="b.name"></h3>
+              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' products'"></span>
+            </div>
+            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
+            <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="sendBrandInquiry(b.name)">
+              Send Inquiry
+            </button>
+          </div>
+        </article>
+      </template>
+    </div>
+  </section>
+<!-- INTRODUCTION EMAIL -->
+  <section id="intro" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/40 rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4">Get an Introduction Email</h2>
+    <p class="text-neutral-300 mb-6">Enter your details to receive a professional introduction email about our services. A copy goes to you and to our inbox automatically.</p>
+    <form @submit.prevent="sendIntro" class="space-y-4 max-w-xl">
+      <input required x-model="intro.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Full Name"/>
+      <input required x-model="intro.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Email Address"/>
+      <input required x-model="intro.phone" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Phone Number"/>
+      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Introduction Email</button>
+      <p x-show="introSuccess" class="text-emerald-400 text-sm mt-1">✅ Email sent successfully!</p>
+      <p x-show="introError" class="text-red-400 text-sm mt-1" x-text="introError"></p>
+    </form>
+  </section>
+
+  <!-- SHOP -->
+  <section id="shop" class="max-w-7xl mx-auto px-4 py-20">
+    <div class="flex items-end justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-3xl font-extrabold">Shop Tires</h2>
+        <p class="text-neutral-400">Search, filter by brand, add to cart, and place a test order.</p>
+      </div>
+      <div class="flex gap-2">
+        <select x-model="filters.brand" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+          <option value="">All brands</option>
+          <option>Duraturn</option>
+          <option>Bridgestone</option>
+          <option>Firemax</option>
+        </select>
+        <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <template x-for="p in filteredProducts()" :key="p.id">
+        <article class="glass rounded-3xl overflow-hidden shine border-white/10">
+          <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
+          <div class="p-4 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold" x-text="p.name"></h3>
+              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
+            </div>
+            <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            <div class="flex items-center justify-between pt-2">
+              <div>
+                <div class="text-lg font-extrabold" x-text="'$'+p.price.toFixed(2)"></div>
+                <div class="text-xs text-neutral-400" x-text="p.size"></div>
+              </div>
+              <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">Add</button>
+            </div>
+          </div>
+        </article>
+      </template>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="max-w-7xl mx-auto px-4 py-20">
+    <h2 class="text-3xl font-bold mb-6">Contact Us</h2>
+    <form @submit.prevent="sendContact" class="space-y-4 max-w-xl">
+      <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your name"/>
+      <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your email"/>
+      <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your message"></textarea>
+      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Message</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/10 text-neutral-400 text-sm text-center py-6">
+    © <span x-text="new Date().getFullYear()"></span> Aslama Alteeba. All rights reserved.
+  </footer>
+
+  <!-- CART DRAWER -->
+  <div class="fixed inset-0 z-50" x-show="cartOpen" x-transition>
+    <div class="absolute inset-0 bg-black/60" @click="cartOpen=false"></div>
+    <aside class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-neutral-900 border-l border-white/10 p-5 overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-extrabold">Your cart</h3>
+        <button class="p-2 rounded-lg bg-white/5" @click="cartOpen=false">✕</button>
+      </div>
+
+      <template x-if="cart.length===0">
+        <p class="text-neutral-400">Cart is empty.</p>
+      </template>
+
+      <div class="space-y-3">
+        <template x-for="(item, idx) in cart" :key="item.id + '-' + idx">
+          <div class="flex gap-3 items-center glass rounded-2xl p-3">
+            <img :src="item.img" :alt="item.name" class="w-16 h-16 rounded-xl object-contain bg-black/30"/>
+            <div class="flex-1">
+              <div class="font-semibold" x-text="item.name"></div>
+              <div class="text-xs text-neutral-400" x-text="item.size + ' • ' + item.brand"></div>
+              <div class="text-sm" x-text="'$'+item.price.toFixed(2)"></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="px-2 py-1 bg-white/10 rounded" @click="item.qty = Math.max(1, item.qty-1)">-</button>
+              <span x-text="item.qty"></span>
+              <button class="px-2 py-1 bg-white/10 rounded" @click="item.qty++">+</button>
+              <button class="px-2 py-1 bg-white/10 rounded" title="Remove" @click="cart.splice(idx,1)">×</button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div class="mt-6 p-4 glass rounded-2xl space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span>Subtotal</span>
+          <span x-text="'$'+subtotal().toFixed(2)"></span>
+        </div>
+        <div class="flex items-center justify-between text-sm text-neutral-400">
+          <span>VAT (5% demo)</span>
+          <span x-text="'$'+(subtotal()*0.05).toFixed(2)"></span>
+        </div>
+        <div class="flex items-center justify-between font-bold pt-1">
+          <span>Total</span>
+          <span x-text="'$'+(subtotal()*1.05).toFixed(2)"></span>
+        </div>
+      </div>
+
+      <form class="mt-6 space-y-3" @submit.prevent="placeOrder()">
+        <h4 class="font-bold">Checkout</h4>
+        <input required x-model="checkout.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Full name"/>
+        <input required x-model="checkout.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Email for confirmation"/>
+        <input x-model="checkout.phone" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Phone (optional)"/>
+        <input x-model="checkout.vehicle" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Vehicle (optional)"/>
+        <button class="w-full px-5 py-3 rounded-2xl brand-gradient text-black font-bold" :disabled="cart.length===0">Place test order</button>
+        <p class="text-xs text-neutral-400">On submit, two emails are sent: one to us and one to you. No mail app required.</p>
+      </form>
+    </aside>
+  </div>
+
+  <!-- AI CHAT PANEL -->
+  <div class="fixed bottom-5 left-5 z-50">
+    <button
+      class="px-4 py-3 rounded-2xl brand-gradient text-black font-extrabold shadow-lg hover:opacity-90"
+      @click="chatOpen = !chatOpen; if(chatOpen){$nextTick(() => scrollChat());}"
+      aria-label="Open AI chat"
+    >
+      AI Chat
+    </button>
+  </div>
+
+  <div
+    class="fixed bottom-20 left-5 z-50 w-[92vw] max-w-md"
+    x-show="chatOpen"
+    x-transition
+    @keydown.escape.window="chatOpen=false"
+  >
+    <div class="glass rounded-3xl border border-white/10 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 bg-black/40">
+        <div>
+          <div class="font-bold">Aslama AI Assistant</div>
+          <div class="text-xs text-neutral-400">Ask about sizes, brands, or availability.</div>
+        </div>
+        <button class="p-2 rounded-lg bg-white/5" @click="chatOpen=false">✕</button>
+      </div>
+
+      <div class="max-h-80 overflow-y-auto px-4 py-3 space-y-3" x-ref="chatScroll">
+        <template x-for="(msg, idx) in chatMessages" :key="idx">
+          <div class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+            <div
+              class="px-3 py-2 rounded-2xl text-sm max-w-[80%]"
+              :class="msg.role === 'user' ? 'bg-emerald-500 text-black' : 'bg-white/10 text-neutral-100'"
+              x-text="msg.content"
+            ></div>
+          </div>
+        </template>
+
+        <template x-if="chatLoading">
+          <div class="flex justify-start">
+            <div class="px-3 py-2 rounded-2xl text-sm bg-white/10 text-neutral-100">Typing…</div>
+          </div>
+        </template>
+      </div>
+
+      <div class="border-t border-white/10 px-3 py-3 space-y-2">
+        <p class="text-xs text-red-400" x-show="chatError" x-text="chatError"></p>
+        <form class="flex gap-2" @submit.prevent="sendChatMessage()">
+          <input
+            x-model="chatInput"
+            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm"
+            placeholder="Type a question..."
+            :disabled="chatLoading"
+          />
+          <button
+            class="px-4 py-2 rounded-xl brand-gradient text-black font-bold"
+            :disabled="chatLoading || !chatInput.trim()"
+          >
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHATSAPP FLOAT BUTTON (ALWAYS VISIBLE) -->
+  <a
+    href="https://wa.me/971554637045?text=Hello%20Aslama%20Alteeba%2C%20I%20would%20like%20to%20inquire%20about%20tires."
+    class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl bg-emerald-500 text-black font-extrabold shadow-lg hover:opacity-90"
+    aria-label="WhatsApp"
+    target="_blank"
+    rel="noopener"
+  >
+    WhatsApp
+  </a>
+<!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    const EMAILJS_PUBLIC_KEY = "qkXfa4_PMbGhuWHaX";
+    const EMAILJS_SERVICE_ID = "service_hhs4z1i";
+    const EMAILJS_TEMPLATE_ID = "template_2djz9zc";   // orders + contact + brand inquiries
+    const EMAILJS_INTRO_TEMPLATE = "template_efwbezh"; // introduction email
+
+    if (EMAILJS_PUBLIC_KEY) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+    function appState(){
+      return {
+        cartOpen:false,
+        filters:{brand:'', query:''},
+        passengerBrandSelection:'',
+        activePassengerBrand:'',
+        contact:{name:'',email:'',message:''},
+        checkout:{name:'',email:'',phone:'',vehicle:''},
+        intro:{name:'',email:'',phone:''},
+        introSuccess:false,
+        introError:'',
+        chatOpen:false,
+        chatInput:'',
+        chatLoading:false,
+        chatError:'',
+        chatMessages:[
+          {role:'assistant', content:'Welcome to Aslama Alteeba. How can the team help with tires, sizing, or availability?'}
+        ],
+
+        brands:[
+          {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'Value-focused lineup for passenger and SUV needs.'},
+          {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'Affordable quality tires with strong touring and A/T options.'},
+          {name:'Haida', img:'https://i.postimg.cc/yNYNNGxd/haidatireb.webp', desc:'Reliable tire range with a balance of durability and value.'},
+          {name:'Vikrant', img:'https://i.postimg.cc/vZXQCvzS/Vikrant-Tyres-Logo.jpg', desc:'Tyres built for dependable performance and everyday use.'}
+        ],
+
+        passengerBrands:[
+          {
+            name:'Firemax',
+            models:[
+              {name:'FM601', img:'https://placehold.co/600x400?text=Firemax+FM601', desc:'Placeholder image until official asset is provided.'},
+              {name:'FM518', img:'https://placehold.co/600x400?text=Firemax+FM518', desc:'Placeholder image until official asset is provided.'},
+              {name:'POTENTIA SPORT 2', img:'https://placehold.co/600x400?text=POTENTIA+SPORT+2', desc:'Placeholder image until official asset is provided.'}
+            ]
+          },
+          {name:'Kpatos', models:[]},
+          {name:'Dovroad', models:[]},
+          {name:'Haida', models:[]},
+          {name:'Neolin', models:[]},
+          {name:'Duraturn', models:[]}
+        ],
+
+        products:[
+          {id:'dur-1', brand:'Duraturn', name:'Duraturn Mozzo Touring', size:'205/55R16', price:79.99, img:'https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png', desc:'All-season comfort with optimized tread blocks.'},
+          {id:'bri-1', brand:'Bridgestone', name:'Bridgestone WeatherPeak', size:'225/45R17', price:129.99, img:'https://cdn.pneusecono.ca/images/produits/Bridgestone-Weatherpeak.jpg', desc:'Confident in wet & light snow. Touring refinement.'},
+          {id:'fir-1', brand:'Firemax', name:'Firemax FM501', size:'235/75R15', price:69.99, img:'https://fdflex.com/wp-content/uploads/2024/01/FM501_2.png', desc:'Value SUV tire with stable highway manners.'},
+          {id:'dur-2', brand:'Duraturn', name:'Duraturn Travia A/T', size:'265/70R16', price:92.50, img:'https://cdn11.bigcommerce.com/s-e8i94i2k1a/images/stencil/1280x1280/products/58714/844891/duraturn-travia-at-b-aaa-1__48494.1719256293.jpg?c=2', desc:'All-terrain versatility for trucks & SUVs.'},
+          {id:'bri-2', brand:'Bridgestone', name:'Bridgestone Dueler A/T Ascent', size:'275/60R20', price:189.00, img:'https://m.media-amazon.com/images/I/9116emC8QiL._AC_UF350,350_QL80_.jpg', desc:'All-terrain grip with on-road comfort.'},
+          {id:'fir-2', brand:'Firemax', name:'Firemax FM316', size:'205/55R16', price:58.00, img:'https://www.tiremaxx.ca/public/upload/product/pattern_rc-upload-1688577203434-12.webp', desc:'Budget-friendly passenger car tire.'}
+        ],
+
+        cart:[],
+
+        init(){
+          const saved = localStorage.getItem('aa_cart');
+          if (saved) this.cart = JSON.parse(saved);
+          this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
+        },
+
+        brandProductCount(brandName){
+          return this.products.filter(p => p.brand === brandName).length;
+        },
+
+        passengerBrandModels(brandName){
+          const brand = this.passengerBrands.find(b => b.name === brandName);
+          return brand ? brand.models : [];
+        },
+
+        filteredProducts(){
+          return this.products.filter(p => {
+            const brandMatch = !this.filters.brand || p.brand === this.filters.brand;
+            const q = this.filters.query.trim().toLowerCase();
+            const queryMatch = !q || (p.name + ' ' + p.size).toLowerCase().includes(q);
+            return brandMatch && queryMatch;
+          });
+        },
+
+        addToCart(p){
+          const existing = this.cart.find(i => i.id === p.id);
+          if (existing) existing.qty++;
+          else this.cart.push({...p, qty:1});
+          this.cartOpen = true;
+        },
+
+        subtotal(){
+          return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // send two emails with the standard template (orders/contact/brand inquiries)
+        async sendTwoEmails(params){
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: params.customer_email || params.from_email});
+        },
+
+        // BRAND INQUIRY
+        async sendBrandInquiry(brandName){
+          const list = this.products.filter(p => p.brand === brandName);
+          const lines = list.length
+            ? list.map(p => `• ${p.name} (${p.size}) — $${p.price.toFixed(2)}`).join('\n')
+            : 'No products listed for this brand yet.';
+
+          const params = {
+            subject_line: `Brand Inquiry — ${brandName}`,
+            from_name: 'Website Visitor',
+            from_email: 'no-reply@alsamalteeba.netlify.app',
+            customer_email: 'no-reply@alsamalteeba.netlify.app',
+            message: `A visitor requested information about ${brandName}.`,
+            brand_name: brandName,
+            brand_products: lines
+          };
+
+          try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
+            alert('✅ Inquiry sent! We will contact you soon.');
+          } catch (err){
+            console.error(err);
+            alert('❌ Error sending inquiry: ' + (err?.text || err?.message || 'Unknown'));
+          }
+        },
+
+        // CONTACT
+        async sendContact(){
+          const params = {
+            subject_line: 'Contact — Aslama Alteeba',
+            from_name: this.contact.name,
+            from_email: this.contact.email,
+            customer_email: this.contact.email,
+            message: this.contact.message
+          };
+          try {
+            await this.sendTwoEmails(params);
+            alert('✅ Message sent!');
+            this.contact = {name:'',email:'',message:''};
+          } catch (err){
+            console.error(err);
+            alert('❌ Error sending message: ' + (err?.text || err?.message || 'Unknown'));
+          }
+        },
+
+        // ORDER
+        async placeOrder(){
+          if (this.cart.length===0) return;
+          const lines = this.cart.map(i => `${i.qty}x ${i.name} (${i.size}) — $${(i.price*i.qty).toFixed(2)}`).join('\n');
+          const sub = this.subtotal(), vat=sub*0.05, total=sub+vat;
+          const params = {
+            subject_line: `Order — ${this.checkout.name}`,
+            from_name: this.checkout.name,
+            from_email: this.checkout.email,
+            customer_email: this.checkout.email,
+            message: 'New order placed via site (test mode).',
+            order_lines: lines,
+            order_subtotal: `$${sub.toFixed(2)}`,
+            order_vat: `$${vat.toFixed(2)}`,
+            order_total: `$${total.toFixed(2)}`,
+            customer_phone: this.checkout.phone || 'N/A',
+            customer_vehicle: this.checkout.vehicle || 'N/A'
+          };
+          try {
+            await this.sendTwoEmails(params);
+            alert('✅ Order placed successfully!');
+            this.cart = [];
+            this.cartOpen = false;
+            this.checkout = {name:'',email:'',phone:'',vehicle:''};
+          } catch(err){
+            console.error(err);
+            alert('❌ Error sending order: ' + (err?.text || err?.message || 'Unknown'));
+          }
+        },
+
+        // INTRO EMAIL (uses dedicated template)
+        async sendIntro(){
+          this.introSuccess = false; this.introError = '';
+          const params = {
+            subject_line: 'Introduction Request — Aslama Alteeba',
+            from_name: this.intro.name,
+            from_email: this.intro.email,
+            customer_email: this.intro.email,
+            phone: this.intro.phone
+          };
+          try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_INTRO_TEMPLATE, {...params, to_email: 'Ilimot2012@gmail.com'});
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_INTRO_TEMPLATE, {...params, to_email: params.customer_email});
+            this.introSuccess = true;
+            this.intro = {name:'',email:'',phone:''};
+          } catch(err){
+            console.error(err);
+            this.introError = 'Error: ' + (err?.text || err?.message || 'Unknown');
+          }
+        },
+
+        scrollChat(){
+          const el = this.$refs.chatScroll;
+          if (el) el.scrollTop = el.scrollHeight;
+        },
+
+        async sendChatMessage(){
+          const content = this.chatInput.trim();
+          if (!content || this.chatLoading) return;
+          this.chatError = '';
+          this.chatMessages.push({role:'user', content});
+          this.chatInput = '';
+          this.chatLoading = true;
+          this.$nextTick(() => this.scrollChat());
+          try {
+            const response = await fetch('/.netlify/functions/chat', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({message: content})
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(data?.error || data?.message || 'Failed to get AI response');
+            }
+            const reply = (data?.reply || '').trim() || 'Thanks for your question. The team will follow up soon.';
+            this.chatMessages.push({role:'assistant', content: reply});
+          } catch(err) {
+            const msg = err?.message || 'AI chat is unavailable right now.';
+            this.chatError = msg;
+            this.chatMessages.push({role:'assistant', content: 'Sorry, the assistant is unavailable right now. Please try again later.'});
+          } finally {
+            this.chatLoading = false;
+            this.$nextTick(() => this.scrollChat());
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
