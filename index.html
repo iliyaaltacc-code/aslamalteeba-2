@@ -24,9 +24,9 @@
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-      <h1 class="text-xl font-extrabold tracking-tight">Aslama <span class="text-emerald-400">Alteeba</span></h1>
-      <nav class="hidden md:flex gap-6 text-sm">
+    <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
+      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <nav class="hidden md:flex gap-6 text-sm flex-wrap">
         <a href="#about" class="hover:text-white">About</a>
         <div class="relative" x-data="{open:false}">
           <button class="hover:text-white flex items-center gap-2" aria-haspopup="true" :aria-expanded="open" @click="open = !open" @keydown.escape="open=false">
@@ -48,7 +48,7 @@
         <a href="#shipping" class="hover:text-white">Shipping</a>
         <a href="#brands" class="hover:text-white">Brands</a>
       </nav>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 ml-auto">
         <button class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" @click="cartOpen=true">
           Cart <span class="ml-1 text-emerald-400 font-bold" x-text="cart.length"></span>
         </button>
