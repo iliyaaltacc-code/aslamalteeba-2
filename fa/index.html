@@ -603,43 +603,7 @@
             this.introError = 'خطا: ' + (err?.text || err?.message || 'نامشخص');
           }
         },
-
-        scrollChat(){
-          const el = this.$refs.chatScroll;
-          if (el) el.scrollTop = el.scrollHeight;
-        },
-
-        async sendChatMessage(){
-          const content = this.chatInput.trim();
-          if (!content || this.chatLoading) return;
-          this.chatError = '';
-          this.chatMessages.push({role:'user', content});
-          this.chatInput = '';
-          this.chatLoading = true;
-          this.$nextTick(() => this.scrollChat());
-          try {
-            const response = await fetch('/.netlify/functions/chat', {
-              method: 'POST',
-              headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({message: content, locale: 'fa'})
-            });
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-              throw new Error(data?.error || data?.message || 'خطا در درخواست هوش مصنوعی');
-            }
-            const reply = (data?.reply || '').trim() || 'ممنون از سوال شما. همکاران به زودی با شما تماس می گیرند.';
-            this.chatMessages.push({role:'assistant', content: reply});
-          } catch(err) {
-            const msg = err?.message || 'هوش مصنوعی در حال حاضر در دسترس نیست.';
-            this.chatError = msg;
-            this.chatMessages.push({role:'assistant', content: 'متاسفانه دستیار در حال حاضر در دسترس نیست. لطفا بعدا دوباره تلاش کنید.'});
-          } finally {
-            this.chatLoading = false;
-            this.$nextTick(() => this.scrollChat());
-          }
-        }
-      }
-    }
+        
   </script>
   <script src="/chat.js" defer></script>
 </body>
