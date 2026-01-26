@@ -466,18 +466,31 @@
     if (EMAILJS_PUBLIC_KEY) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
     function appState(){
-      // Restore preferences from CustomerMemory before Alpine initializes
+      // Restore preferences directly from localStorage before Alpine initializes
+      // Reading directly ensures values are available synchronously
       let initialCurrency = 'USD';
       let initialBulkMode = false;
       let initialBrandFilter = '';
       
-      if (window.CustomerMemory) {
-        const savedCurrency = CustomerMemory.getCurrency();
+      try {
+        // Read directly from localStorage (synchronous, guaranteed to work)
+        const savedCurrency = localStorage.getItem('aa_currency');
         if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
           initialCurrency = savedCurrency;
         }
-        initialBulkMode = CustomerMemory.getBulkMode();
-        initialBrandFilter = CustomerMemory.getBrandFilter() || '';
+        
+        const savedBulkMode = localStorage.getItem('aa_bulkMode');
+        if (savedBulkMode === 'true') {
+          initialBulkMode = true;
+        }
+        
+        const savedBrandFilter = localStorage.getItem('aa_brandFilter');
+        if (savedBrandFilter) {
+          initialBrandFilter = savedBrandFilter;
+        }
+      } catch (e) {
+        // localStorage not available, use defaults
+        console.warn('localStorage not available:', e);
       }
       
       return {
