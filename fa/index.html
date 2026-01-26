@@ -590,15 +590,22 @@
             });
           });
           
-          // Shuffle and pick 3 unique combinations
+          // Shuffle all combinations
           const shuffled = allCombinations.sort(() => Math.random() - 0.5);
-          const selected = shuffled.slice(0, 3);
           
-          // Ensure no immediate repetition by checking if same intent used twice
-          const intents = selected.map(s => s.intent);
-          if (intents[0] === intents[1] || intents[1] === intents[2]) {
-            // Reshuffle if we have adjacent duplicates
-            return this.generateQuestions(product);
+          // Pick 3 with no adjacent duplicate intents (with retry limit)
+          const selected = [];
+          for (let i = 0; i < shuffled.length && selected.length < 3; i++) {
+            const candidate = shuffled[i];
+            // Check if this intent was just used
+            if (selected.length === 0 || selected[selected.length - 1].intent !== candidate.intent) {
+              selected.push(candidate);
+            }
+          }
+          
+          // Fallback: if we couldn't find 3, just take first 3 (unlikely with 35 combinations)
+          while (selected.length < 3 && selected.length < shuffled.length) {
+            selected.push(shuffled[selected.length]);
           }
           
           return selected.map(s => s.question);
