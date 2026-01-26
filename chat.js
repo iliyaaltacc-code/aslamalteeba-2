@@ -1,42 +1,56 @@
-// chat.js — Production frontend chat for /api/chat
-// Supports EN + FA, RTL, memory, typing indicator
-// Backend untouched
+// chat.js — Production AI Chat (EN / FA / AR auto-detect)
+// Frontend only. Backend remains /api/chat.
 
 (() => {
   const API_URL = "/api/chat";
 
   // ---------------------------
-  // Language detection
+  // Locale detection
   // ---------------------------
-  const isFarsi =
-    document.documentElement.lang === "fa" ||
-    location.pathname.startsWith("/fa");
+  const path = location.pathname;
+  const htmlLang = document.documentElement.lang;
+
+  const isArabic = path.startsWith("/ar") || htmlLang === "ar";
+  const isFarsi  = path.startsWith("/fa") || htmlLang === "fa";
+
+  const locale = isArabic ? "ar" : isFarsi ? "fa" : "en";
+  const isRTL = locale !== "en";
 
   // ---------------------------
-  // Text dictionary
+  // Translations
   // ---------------------------
-  const TEXT = isFarsi
-    ? {
-        title: "دستیار هوشمند اسلمه الطیبه",
-        placeholder: "درباره سایز، برند یا موجودی تایر بپرسید…",
-        send: "ارسال",
-        typing: "در حال تایپ…",
-        error: "متأسفانه مشکلی پیش آمد. دوباره تلاش کنید.",
-        welcome:
-          "به اسلمه الطیبه خوش آمدید. چگونه می‌توانیم در زمینه تایر به شما کمک کنیم؟",
-      }
-    : {
-        title: "Aslama AI",
-        placeholder: "Ask about tires, sizes, brands…",
-        send: "Send",
-        typing: "Aslama AI is typing…",
-        error: "Sorry, something went wrong. Please try again.",
-        welcome:
-          "Welcome to Aslama Alteeba. How can we help with tires, sizing, or availability?",
-      };
+  const TEXT = {
+    en: {
+      button: "AI Chat",
+      title: "Aslama AI Assistant",
+      subtitle: "Ask about sizes, brands, or availability.",
+      placeholder: "Type your question…",
+      send: "Send",
+      typing: "Aslama AI is typing…",
+      error: "Sorry, something went wrong. Please try again."
+    },
+    fa: {
+      button: "چت هوشمند",
+      title: "دستیار هوشمند اسلمه",
+      subtitle: "درباره سایز، برند یا موجودی بپرسید.",
+      placeholder: "سؤال خود را بنویسید…",
+      send: "ارسال",
+      typing: "دستیار در حال تایپ است…",
+      error: "مشکلی پیش آمد. لطفاً دوباره تلاش کنید."
+    },
+    ar: {
+      button: "الدردشة الذكية",
+      title: "مساعد أسلمة الذكي",
+      subtitle: "اسأل عن المقاسات أو العلامات أو التوفر.",
+      placeholder: "اكتب سؤالك…",
+      send: "إرسال",
+      typing: "المساعد يكتب الآن…",
+      error: "حدث خطأ. يرجى المحاولة مرة أخرى."
+    }
+  }[locale];
 
   // ---------------------------
-  // Memory (per page load)
+  // Memory (per session)
   // ---------------------------
   const chatHistory = [];
 
@@ -48,114 +62,114 @@
     .ai-chat-btn {
       position: fixed;
       bottom: 20px;
-      left: 20px;
-      background: #20c997;
+      ${isRTL ? "right:20px" : "left:20px"};
+      background: linear-gradient(135deg,#20c997,#2dd4bf);
       color: #062d23;
       border: none;
-      padding: 12px 16px;
+      padding: 12px 18px;
       border-radius: 999px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
     .ai-chat-box {
       position: fixed;
       bottom: 80px;
-      left: 20px;
-      width: 320px;
-      height: 420px;
-      background: #111;
+      ${isRTL ? "right:20px" : "left:20px"};
+      width: 340px;
+      height: 440px;
+      background: rgba(15,15,15,.95);
+      backdrop-filter: blur(10px);
       color: #fff;
-      border-radius: 14px;
+      border-radius: 18px;
       display: none;
       flex-direction: column;
       overflow: hidden;
       z-index: 9999;
-      box-shadow: 0 20px 40px rgba(0,0,0,.45);
+      box-shadow: 0 25px 60px rgba(0,0,0,.55);
       font-family: system-ui, -apple-system, Arial, sans-serif;
-    }
-
-    .ai-chat-box.rtl {
-      direction: rtl;
-      text-align: right;
+      direction: ${isRTL ? "rtl" : "ltr"};
     }
 
     .ai-chat-head {
-      padding: 10px 12px;
-      background: #1a1a1a;
-      font-weight: 700;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.04);
+      font-weight: 800;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
+    .ai-chat-sub {
+      font-size: 11px;
+      opacity: .7;
+      margin-top: 2px;
+    }
+
     .ai-chat-body {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       font-size: 13px;
     }
 
     .ai-msg {
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
       max-width: 85%;
       white-space: pre-wrap;
+      line-height: 1.4;
     }
 
     .ai-user {
       background: #20c997;
       color: #062d23;
-      align-self: flex-end;
+      align-self: ${isRTL ? "flex-start" : "flex-end"};
+      border-bottom-${isRTL ? "left" : "right"}-radius: 4px;
     }
 
     .ai-bot {
-      background: #2a2a2a;
-      align-self: flex-start;
-    }
-
-    .ai-chat-box.rtl .ai-user {
-      align-self: flex-start;
-    }
-
-    .ai-chat-box.rtl .ai-bot {
-      align-self: flex-end;
+      background: rgba(255,255,255,.08);
+      align-self: ${isRTL ? "flex-end" : "flex-start"};
+      border-bottom-${isRTL ? "right" : "left"}-radius: 4px;
     }
 
     .ai-typing {
-      font-size: 12px;
-      opacity: 0.7;
+      opacity: .7;
       font-style: italic;
+      font-size: 12px;
     }
 
     .ai-chat-foot {
       display: flex;
       gap: 8px;
-      padding: 10px;
-      border-top: 1px solid #222;
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.08);
     }
 
     .ai-chat-input {
       flex: 1;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
       border: none;
       outline: none;
-      background: #1a1a1a;
+      background: rgba(255,255,255,.08);
       color: #fff;
     }
 
     .ai-chat-send {
-      padding: 8px 14px;
-      border-radius: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
       border: none;
       background: #20c997;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
+      color: #062d23;
     }
   `;
   document.head.appendChild(style);
@@ -165,16 +179,17 @@
   // ---------------------------
   const openBtn = document.createElement("button");
   openBtn.className = "ai-chat-btn";
-  openBtn.textContent = "AI Chat";
+  openBtn.textContent = TEXT.button;
 
   const box = document.createElement("div");
   box.className = "ai-chat-box";
-  if (isFarsi) box.classList.add("rtl");
-
   box.innerHTML = `
     <div class="ai-chat-head">
-      <span>${TEXT.title}</span>
-      <button class="ai-close" style="background:none;border:none;color:#fff;cursor:pointer">✕</button>
+      <div>
+        <div>${TEXT.title}</div>
+        <div class="ai-chat-sub">${TEXT.subtitle}</div>
+      </div>
+      <button class="ai-close" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer">×</button>
     </div>
     <div class="ai-chat-body"></div>
     <div class="ai-chat-foot">
@@ -191,17 +206,13 @@
   const sendBtn = box.querySelector(".ai-chat-send");
   const closeBtn = box.querySelector(".ai-close");
 
-  // ---------------------------
-  // Open / Close
-  // ---------------------------
   openBtn.onclick = () => {
     box.style.display = box.style.display === "flex" ? "none" : "flex";
     box.style.flexDirection = "column";
     input.focus();
   };
 
-  closeBtn.onclick = (e) => {
-    e.stopPropagation();
+  closeBtn.onclick = () => {
     box.style.display = "none";
   };
 
@@ -209,26 +220,22 @@
   // Helpers
   // ---------------------------
   const addMsg = (cls, text) => {
-    const div = document.createElement("div");
-    div.className = `ai-msg ${cls}`;
-    div.textContent = text;
-    body.appendChild(div);
+    const d = document.createElement("div");
+    d.className = `ai-msg ${cls}`;
+    d.textContent = text;
+    body.appendChild(d);
     body.scrollTop = body.scrollHeight;
-    return div;
+    return d;
   };
 
-  // Welcome message
-  addMsg("ai-bot", TEXT.welcome);
-
   // ---------------------------
-  // Send message
+  // Send
   // ---------------------------
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
 
     input.value = "";
-
     addMsg("ai-user", text);
     chatHistory.push({ role: "user", content: text });
 
@@ -238,28 +245,25 @@
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: chatHistory,
-          locale: isFarsi ? "fa" : "en",
-        }),
+        body: JSON.stringify({ messages: chatHistory })
       });
 
       const data = await res.json();
       typing.remove();
 
-      if (!res.ok || !data.reply) throw new Error("Bad response");
+      if (!res.ok || !data.reply) throw new Error();
 
       addMsg("ai-bot", data.reply);
       chatHistory.push({ role: "assistant", content: data.reply });
-    } catch (err) {
+
+    } catch {
       typing.remove();
       addMsg("ai-bot", TEXT.error);
-      console.error(err);
     }
   };
 
   sendBtn.onclick = send;
-  input.addEventListener("keydown", (e) => {
+  input.addEventListener("keydown", e => {
     if (e.key === "Enter") send();
   });
 })();
