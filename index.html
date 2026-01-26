@@ -22,7 +22,7 @@
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); loadBulkMode(); restorePreferences(); showWelcomeMessage()">
+<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
@@ -466,9 +466,23 @@
     if (EMAILJS_PUBLIC_KEY) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
     function appState(){
+      // Restore preferences from CustomerMemory before Alpine initializes
+      let initialCurrency = 'USD';
+      let initialBulkMode = false;
+      let initialBrandFilter = '';
+      
+      if (window.CustomerMemory) {
+        const savedCurrency = CustomerMemory.getCurrency();
+        if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
+          initialCurrency = savedCurrency;
+        }
+        initialBulkMode = CustomerMemory.getBulkMode();
+        initialBrandFilter = CustomerMemory.getBrandFilter() || '';
+      }
+      
       return {
         cartOpen:false,
-        filters:{brand:'', query:''},
+        filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
         contact:{name:'',email:'',message:''},
@@ -485,27 +499,16 @@
         ],
         
         // Currency conversion
-        selectedCurrency: 'USD',
+        selectedCurrency: initialCurrency,
         exchangeRates: { USD: 1, AED: 3.67 },
         currencySymbols: { USD: '$', AED: 'د.إ' },
 
         // Bulk Mode
-        bulkMode: false,
-
-        loadBulkMode(){
-          try { 
-            this.bulkMode = CustomerMemory.getBulkMode();
-          } catch(e){
-            this.bulkMode = localStorage.getItem('bulkMode') === 'true';
-          }
-        },
+        bulkMode: initialBulkMode,
 
         toggleBulkMode(){
-          try { 
-            CustomerMemory.setBulkMode(this.bulkMode);
-          } catch(e){
-            localStorage.setItem('bulkMode', this.bulkMode ? 'true' : 'false');
-          }
+          // Bulk mode is now automatically saved via watcher in init()
+          // This method just toggles the value, the watcher handles persistence
         },
 
         requestBulkQuote(p){
@@ -605,43 +608,30 @@
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
           
-          // Load saved currency preference (use CustomerMemory if available)
-          let savedCurrency;
+          // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
-            savedCurrency = CustomerMemory.getCurrency();
-          } else {
-            savedCurrency = localStorage.getItem('aa_currency');
-          }
-          if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
-            this.selectedCurrency = savedCurrency;
-          }
-          this.$watch('selectedCurrency', v => {
-            localStorage.setItem('aa_currency', v);
-            if (window.CustomerMemory) {
+            // Watch currency changes
+            this.$watch('selectedCurrency', v => {
+              localStorage.setItem('aa_currency', v);
               CustomerMemory.setCurrency(v);
-            }
-          });
+            });
+            
+            // Watch brand filter changes
+            this.$watch('filters.brand', v => {
+              CustomerMemory.setBrandFilter(v);
+            });
+            
+            // Watch bulk mode changes
+            this.$watch('bulkMode', v => {
+              CustomerMemory.setBulkMode(v);
+            });
+          } else {
+            // Fallback to direct localStorage
+            this.$watch('selectedCurrency', v => localStorage.setItem('aa_currency', v));
+          }
           
           // Fetch exchange rates
           await this.fetchExchangeRates();
-        },
-        
-        // Restore user preferences from CustomerMemory
-        restorePreferences(){
-          if (!window.CustomerMemory) return;
-          
-          // Restore brand filter if set
-          const savedBrand = CustomerMemory.getBrandFilter();
-          if (savedBrand) {
-            this.filters.brand = savedBrand;
-          }
-          
-          // Watch brand filter changes
-          this.$watch('filters.brand', v => {
-            if (window.CustomerMemory) {
-              CustomerMemory.setBrandFilter(v);
-            }
-          });
         },
         
         // Show welcome back message
