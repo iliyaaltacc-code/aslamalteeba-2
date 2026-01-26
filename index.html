@@ -21,7 +21,7 @@
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init()">
+<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); loadBulkMode()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
@@ -220,18 +220,27 @@
         <h2 class="text-3xl font-extrabold">Shop Tires</h2>
         <p class="text-neutral-400">Search, filter by brand, add to cart, and place a test order.</p>
       </div>
-      <div class="flex gap-2">
-        <select x-model="selectedCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-          <option value="USD">USD ($)</option>
-          <option value="AED">AED (د.إ)</option>
-        </select>
-        <select x-model="filters.brand" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-          <option value="">All brands</option>
-          <option>Duraturn</option>
-          <option>Bridgestone</option>
-          <option>Firemax</option>
-        </select>
-        <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
+      <div class="flex flex-col gap-2">
+        <div class="flex gap-2">
+          <select x-model="selectedCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+            <option value="USD">USD ($)</option>
+            <option value="AED">AED (د.إ)</option>
+          </select>
+          <select x-model="filters.brand" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+            <option value="">All brands</option>
+            <option>Duraturn</option>
+            <option>Bridgestone</option>
+            <option>Firemax</option>
+          </select>
+          <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" x-model="bulkMode" @change="toggleBulkMode()" class="rounded border-white/10 bg-white/5 text-teal-500 focus:ring-teal-500" />
+            <span class="text-neutral-300">Bulk Mode</span>
+          </label>
+          <span class="text-neutral-500 text-xs">– Request quotes via WhatsApp</span>
+        </div>
       </div>
     </div>
 
@@ -273,7 +282,14 @@
                 <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
                 <div class="text-xs text-neutral-400" x-text="p.size"></div>
               </div>
-              <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">Add</button>
+              <button 
+                x-show="!bulkMode"
+                class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" 
+                @click="addToCart(p)">Add</button>
+              <button 
+                x-show="bulkMode"
+                class="px-4 py-2 rounded-xl bg-green-600 text-white font-bold hover:opacity-90" 
+                @click="requestBulkQuote(p)">Quote</button>
             </div>
           </div>
         </article>
@@ -464,6 +480,9 @@
         exchangeRates: { USD: 1, AED: 3.67 },
         currencySymbols: { USD: '$', AED: 'د.إ' },
 
+        // Bulk mode
+        bulkMode: false,
+
         brands:[
           {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'Value-focused lineup for passenger and SUV needs.'},
           {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'Affordable quality tires with strong touring and A/T options.'},
@@ -590,6 +609,23 @@
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
+        },
+
+        loadBulkMode(){
+          try {
+            this.bulkMode = localStorage.getItem('bulkMode') === 'true';
+          } catch(e){}
+        },
+
+        toggleBulkMode(){
+          try {
+            localStorage.setItem('bulkMode', this.bulkMode ? 'true' : 'false');
+          } catch(e){}
+        },
+
+        requestBulkQuote(p){
+          const text = `Hello! I'd like to request a bulk quote for:\n\nProduct: ${p.name}\nSize: ${p.size}\nBrand: ${p.brand}\n\nPlease provide pricing and availability for bulk orders.`;
+          window.open(`https://wa.me/971554637045?text=${encodeURIComponent(text)}`, '_blank');
         },
 
         brandProductCount(brandName){
