@@ -1,5 +1,5 @@
 // chat.js — UI FIX ONLY (FORCED DARK, OVERRIDES SITE CSS)
-// Logic, API, memory untouched
+// Logic, API, memory untouched — FIXED BUTTON WIRING
 
 (() => {
   const API_URL = "/api/chat";
@@ -99,7 +99,7 @@
       border-top: 1px solid rgba(255,255,255,.08);
     }
 
-    /* THIS IS THE IMPORTANT PART */
+    /* IMPORTANT: kill site styles for input */
     .aslama-ai-footer input {
       all: unset;
       flex: 1;
@@ -115,7 +115,7 @@
       color: #888 !important;
     }
 
-    .aslama-ai-footer button {
+    .aslama-ai-footer .aslama-ai-send {
       background: #1fd1a2 !important;
       color: #052c22 !important;
       border: none !important;
@@ -123,6 +123,21 @@
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    .aslama-ai-close {
+      all: unset;
+      cursor: pointer;
+      color: #aaa;
+      font-size: 18px;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .aslama-ai-close:hover {
+      background: rgba(255,255,255,.08);
+      color: #fff;
     }
   `;
   document.head.appendChild(style);
@@ -132,6 +147,7 @@
   // ---------------------------
   const btn = document.createElement("button");
   btn.className = "aslama-ai-btn";
+  btn.type = "button";
   btn.textContent = "AI Chat";
 
   const chat = document.createElement("div");
@@ -139,12 +155,12 @@
   chat.innerHTML = `
     <div class="aslama-ai-header">
       <span>Aslama AI Assistant</span>
-      <button class="close" style="all:unset;cursor:pointer;color:#aaa">✕</button>
+      <button type="button" class="aslama-ai-close" aria-label="Close">✕</button>
     </div>
     <div class="aslama-ai-body"></div>
     <div class="aslama-ai-footer">
-      <input placeholder="Ask about tires, sizes, brands…" />
-      <button>Send</button>
+      <input class="aslama-ai-input" placeholder="Ask about tires, sizes, brands…" />
+      <button type="button" class="aslama-ai-send">Send</button>
     </div>
   `;
 
@@ -152,19 +168,21 @@
   document.body.appendChild(chat);
 
   const body = chat.querySelector(".aslama-ai-body");
-  const input = chat.querySelector("input");
-  const sendBtn = chat.querySelector("button:last-child");
-  const closeBtn = chat.querySelector(".close");
+  const input = chat.querySelector(".aslama-ai-input");
+  const sendBtn = chat.querySelector(".aslama-ai-send");
+  const closeBtn = chat.querySelector(".aslama-ai-close");
 
-  btn.onclick = () => {
+  btn.addEventListener("click", () => {
     chat.style.display = chat.style.display === "flex" ? "none" : "flex";
     chat.style.flexDirection = "column";
     input.focus();
-  };
+  });
 
-  closeBtn.onclick = () => {
+  closeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     chat.style.display = "none";
-  };
+  });
 
   const addMsg = (cls, text) => {
     const div = document.createElement("div");
@@ -209,8 +227,15 @@
     }
   };
 
-  sendBtn.onclick = send;
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") send();
+  sendBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    send();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      send();
+    }
   });
 })();
