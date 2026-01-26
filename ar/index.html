@@ -224,7 +224,6 @@
         <select x-model="selectedCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
           <option value="USD">USD ($)</option>
           <option value="AED">AED (د.إ)</option>
-          <option value="Toman">Toman (تومان)</option>
         </select>
         <select x-model="filters.brand" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
           <option value="">كل العلامات</option>
@@ -416,8 +415,8 @@
         
         // Currency conversion
         selectedCurrency: 'USD',
-        exchangeRates: { USD: 1, AED: 3.67, IRR: 42000 },
-        currencySymbols: { USD: '$', AED: 'د.إ', Toman: 'تومان' },
+        exchangeRates: { USD: 1, AED: 3.67 },
+        currencySymbols: { USD: '$', AED: 'د.إ' },
 
         brands:[
           {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'تشكيلة اقتصادية لسيارات الركاب وSUV.'},
@@ -485,7 +484,7 @@
           
           // Load saved currency preference
           const savedCurrency = localStorage.getItem('aa_currency');
-          if (savedCurrency && ['USD', 'AED', 'Toman'].includes(savedCurrency)) {
+          if (savedCurrency && ['USD', 'AED'].includes(savedCurrency)) {
             this.selectedCurrency = savedCurrency;
           }
           this.$watch('selectedCurrency', v => localStorage.setItem('aa_currency', v));
@@ -512,9 +511,6 @@
             return usdPrice;
           } else if (this.selectedCurrency === 'AED') {
             return usdPrice * this.exchangeRates.AED;
-          } else if (this.selectedCurrency === 'Toman') {
-            // USD → IRR → Toman (divide by 10)
-            return (usdPrice * this.exchangeRates.IRR) / 10;
           }
           return usdPrice;
         },
@@ -522,11 +518,6 @@
         formatPrice(usdPrice){
           const converted = this.convertPrice(usdPrice);
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
-          
-          if (this.selectedCurrency === 'Toman') {
-            // Toman uses larger numbers, show without decimals
-            return `${Math.round(converted).toLocaleString()} ${symbol}`;
-          }
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
         },

@@ -36,8 +36,7 @@ export default async function handler(req, res) {
     // Extract only the currencies we need
     const rates = {
       USD: 1, // Base currency
-      AED: data.rates.AED || 3.67, // UAE Dirham (fallback to approximate rate)
-      IRR: data.rates.IRR || 42000 // Iranian Rial (fallback to approximate rate)
+      AED: data.rates.AED || 3.67 // UAE Dirham (fallback to approximate rate)
     };
 
     // Update cache
@@ -55,8 +54,7 @@ export default async function handler(req, res) {
     // Return fallback rates if fetch fails
     const fallbackRates = {
       USD: 1,
-      AED: 3.67, // Approximate rate (pegged)
-      IRR: 42000 // Approximate rate (varies)
+      AED: 3.67 // Approximate rate (pegged)
     };
     
     return res.status(200).json({
