@@ -1478,24 +1478,13 @@
     console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
     
     if (user) {
-      // User is signed in
-      const isPasswordUser = user.providerData.some(provider => provider.providerId === "password");
-      if (isPasswordUser && !user.emailVerified) {
-        // Email/password user without verification - redirect to auth
-        if (window.location.pathname !== "/auth.html") {
-          window.location.href = "/auth.html";
-        }
-        return;
-      }
-      
-      // Verified user or Google user - show sign out, hide sign in
+      // User is signed in - show sign out, hide sign in
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
     } else {
-      // User is signed out - redirect to auth page
-      if (window.location.pathname !== "/auth.html") {
-        window.location.href = "/auth.html";
-      }
+      // User is signed out - show sign in, hide sign out
+      signInBtn.style.display = "block";
+      signOutBtn.style.display = "none";
     }
   });
 
