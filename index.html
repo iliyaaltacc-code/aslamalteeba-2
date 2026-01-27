@@ -933,7 +933,7 @@
             const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) return;
             
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+            const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             await setDoc(cartRef, { items: this.cart }, { merge: true });
           } catch (err) {
@@ -953,7 +953,7 @@
               return;
             }
             
-            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+            const { doc, getDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             const cartSnap = await getDoc(cartRef);
             
@@ -1533,6 +1533,11 @@
   
   // 🌍 Expose Firestore globally for cart sync
   window.firebaseDB = db;
+  window.firebaseFirestoreAPI = {
+    doc,
+    getDoc,
+    setDoc
+  };
 
   // Auth state management
   const signInBtn = document.getElementById("authSignInBtn");
