@@ -222,7 +222,13 @@
         if (err.code === "auth/invalid-email") {
           status.textContent = "Invalid email address.";
         } else if (err.code === "auth/user-not-found") {
-          status.textContent = "Email not found. Please check and try again.";
+          // Use generic message to prevent email enumeration
+          status.style.color = "#86efac";
+          status.textContent = "If this email exists, a password reset link has been sent.";
+          setTimeout(() => {
+            status.textContent = "";
+            status.style.color = "#fca5a5";
+          }, 3000);
         } else if (err.code === "auth/network-request-failed") {
           status.textContent = "Network error. Please check your connection.";
         } else {
