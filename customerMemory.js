@@ -13,7 +13,8 @@
     BRAND_FILTER: 'aa_brandFilter',
     WHATSAPP_USED: 'aa_whatsappUsed',
     BULK_QUOTE_USED: 'aa_bulkQuoteUsed',
-    WELCOME_SHOWN: 'aa_welcomeShown'
+    WELCOME_SHOWN: 'aa_welcomeShown',
+    SLIDERS_DOCKED: 'aa_slidersDocked'
   };
 
   // Translations for welcome back message
@@ -163,6 +164,16 @@
       } else {
         storage.remove(STORAGE_KEYS.BRAND_FILTER);
       }
+    },
+    
+    // Sliders docked preference
+    getSlidersDocked() {
+      const value = storage.get(STORAGE_KEYS.SLIDERS_DOCKED);
+      return value === 'true';
+    },
+    
+    setSlidersDocked(docked) {
+      storage.set(STORAGE_KEYS.SLIDERS_DOCKED, docked ? 'true' : 'false');
     },
     
     // WhatsApp usage tracking

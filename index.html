@@ -20,6 +20,38 @@
     .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
+    
+    /* Rank badge and verdict animation */
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    /* Slider styling */
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
   </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
@@ -241,15 +273,133 @@
       </div>
     </div>
 
+    <!-- Interactive Tire Universe Sliders -->
+    <div 
+      id="tire-universe-sliders"
+      class="mb-12 glass rounded-3xl p-8 border-white/10 transition-all duration-700"
+      :class="slidersDocked ? 'slider-docked' : ''"
+      :style="slidersDocked ? 'position: fixed; top: 120px; right: 20px; width: 320px; z-index: 50; box-shadow: 0 20px 50px rgba(0,0,0,0.5);' : ''"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-2xl font-bold">Interactive Tire Universe</h3>
+          <p class="text-neutral-400 text-sm">Explore tires visually — adjust the sliders to see products react</p>
+        </div>
+        <button 
+          @click="toggleSlidersDocked()"
+          class="ml-4 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-sm font-semibold whitespace-nowrap"
+          :title="slidersDocked ? 'Undock Controls' : 'Dock Controls'"
+        >
+          <span x-text="slidersDocked ? '← Undock' : 'Dock →'"></span>
+        </button>
+      </div>
+      
+      <div class="max-w-3xl space-y-6" :class="slidersDocked ? '' : 'mx-auto'">
+        <!-- Slider 1: City <-> Highway -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">City</label>
+            <label class="text-sm font-semibold text-neutral-300">Highway</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingType"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 2: Budget <-> Performance -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">Budget</label>
+            <label class="text-sm font-semibold text-neutral-300">Performance</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.priority"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 3: Quiet <-> Aggressive -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">Quiet</label>
+            <label class="text-sm font-semibold text-neutral-300">Aggressive</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingStyle"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- PODIUM STAGE (separate from product grid) -->
+    <div class="mb-12 relative" style="height: 650px;">
+      <div class="absolute inset-0 glass rounded-3xl border-white/10 overflow-hidden">
+        <h3 class="text-xl font-bold text-center pt-4 pb-2">Podium Ranking</h3>
+        
+        <!-- 6 Fixed Podium Slots -->
+        <div class="relative w-full h-full">
+          <template x-for="p in products" :key="p.id">
+            <div 
+              :id="'podium-' + p.id"
+              class="absolute podium-card glass rounded-2xl overflow-hidden border-white/10"
+              :style="getPodiumSlotStyle(p)"
+              style="width: 200px; transition: all 1.4s cubic-bezier(0.22, 1, 0.36, 1);"
+            >
+              <!-- Rank Badge -->
+              <div 
+                class="absolute top-2 right-2 w-12 h-12 rounded-full flex flex-col items-center justify-center font-bold text-white shadow-lg z-10"
+                :style="{ background: getRankBadge(p).bg }"
+              >
+                <div class="text-xl" x-text="getRankBadge(p).medal"></div>
+                <div class="text-xs" x-text="getRankBadge(p).text"></div>
+              </div>
+              
+              <img :src="p.img" :alt="p.name" class="w-full h-32 object-contain bg-black/20"/>
+              <div class="p-3">
+                <h4 class="font-bold text-sm mb-1" x-text="p.name"></h4>
+                <div 
+                  class="text-xs font-semibold mb-1"
+                  :style="{ color: getVerdictText(p).color }"
+                  x-text="getVerdictText(p).text"
+                ></div>
+                <p class="text-neutral-400 text-xs" x-text="p.size"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original Product Grid (unchanged) -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
-        <article class="glass rounded-3xl overflow-hidden shine border-white/10">
+        <article 
+          class="glass rounded-3xl overflow-hidden shine border-white/10"
+        >
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
+            <div 
+              class="text-sm font-semibold"
+              :style="{ color: getVerdictText(p).color }"
+              x-text="getVerdictText(p).text"
+              style="animation: fadeInScale 0.4s ease-out 0.15s both;"
+            ></div>
+            
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
             
             <!-- Quick Questions Section -->
@@ -471,6 +621,7 @@
       let initialCurrency = 'USD';
       let initialBulkMode = false;
       let initialBrandFilter = '';
+      let initialSlidersDocked = false;
       
       try {
         // Read directly from localStorage (synchronous, guaranteed to work)
@@ -487,6 +638,11 @@
         const savedBrandFilter = localStorage.getItem('aa_brandFilter');
         if (savedBrandFilter) {
           initialBrandFilter = savedBrandFilter;
+        }
+        
+        const savedSlidersDocked = localStorage.getItem('aa_slidersDocked');
+        if (savedSlidersDocked === 'true') {
+          initialSlidersDocked = true;
         }
       } catch (e) {
         // localStorage not available, use defaults
@@ -518,6 +674,26 @@
 
         // Bulk Mode
         bulkMode: initialBulkMode,
+
+        // Sliders Docked Mode
+        slidersDocked: initialSlidersDocked,
+
+        // Interactive Tire Universe
+        tireUniverse: {
+          drivingType: 50,  // 0 = City, 100 = Highway
+          priority: 50,     // 0 = Budget, 100 = Performance
+          drivingStyle: 50, // 0 = Quiet, 100 = Aggressive
+          scores: {},       // product scores cache
+          ranks: {}         // product ranks (1-6)
+        },
+        
+        toggleSlidersDocked(){
+          this.slidersDocked = !this.slidersDocked;
+          // Persist state
+          if (window.CustomerMemory) {
+            CustomerMemory.setSlidersDocked(this.slidersDocked);
+          }
+        },
 
         toggleBulkMode(){
           // Bulk mode is now automatically saved via watcher in init()
@@ -621,6 +797,14 @@
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
           
+          // Initialize tire universe scores
+          this.updateTireScores();
+          
+          // Watch tire universe slider changes for immediate reactivity
+          this.$watch('tireUniverse.drivingType', () => this.updateTireScores());
+          this.$watch('tireUniverse.priority', () => this.updateTireScores());
+          this.$watch('tireUniverse.drivingStyle', () => this.updateTireScores());
+          
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
             // Watch currency changes
@@ -720,6 +904,294 @@
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // Interactive Tire Universe Methods
+        updateTireScores(){
+          // Build new scores object to trigger Alpine reactivity
+          const newScores = {};
+          this.products.forEach(p => {
+            newScores[p.id] = this.calculateProductScore(p);
+          });
+          
+          // RANK SNAPPING: Normalize score spread and force minimum distance
+          const sortedProducts = [...this.products].sort((a, b) => 
+            (newScores[b.id] || 0) - (newScores[a.id] || 0)
+          );
+          
+          // Force score separation: ensure minimum 8-point gaps between ranks
+          const minGap = 8;
+          for (let i = 1; i < sortedProducts.length; i++) {
+            const prevScore = newScores[sortedProducts[i-1].id];
+            const currScore = newScores[sortedProducts[i].id];
+            
+            if (prevScore - currScore < minGap) {
+              // Adjust current score to maintain minimum gap
+              newScores[sortedProducts[i].id] = prevScore - minGap;
+            }
+          }
+          
+          // Re-sort after adjustments
+          sortedProducts.sort((a, b) => 
+            (newScores[b.id] || 0) - (newScores[a.id] || 0)
+          );
+          
+          // Assign ranks - build new object to trigger Alpine reactivity
+          const newRanks = {};
+          sortedProducts.forEach((p, index) => {
+            newRanks[p.id] = index + 1; // Ranks 1-6
+          });
+          
+          // Assign both new objects in single operations to trigger reactivity
+          this.tireUniverse.scores = newScores;
+          this.tireUniverse.ranks = newRanks;
+        },
+
+        calculateProductScore(product){
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // NON-LINEAR AMPLIFICATION: Apply power curve to slider deltas from center
+          const amplifyDelta = (sliderValue) => {
+            const delta = sliderValue - 50; // Distance from center
+            const sign = Math.sign(delta);
+            const absDelta = Math.abs(delta);
+            // Power curve: small movements get amplified more
+            const amplified = sign * Math.pow(absDelta, 1.6);
+            return 50 + amplified; // Return amplified slider position
+          };
+          
+          const amplifiedDrivingType = amplifyDelta(drivingType);
+          const amplifiedPriority = amplifyDelta(priority);
+          const amplifiedDrivingStyle = amplifyDelta(drivingStyle);
+          
+          // DOMINANCE THRESHOLD: Check if any slider is ±10 from center (increased sensitivity)
+          const drivingTypeDelta = Math.abs(drivingType - 50);
+          const priorityDelta = Math.abs(priority - 50);
+          const drivingStyleDelta = Math.abs(drivingStyle - 50);
+          
+          const drivingTypeDominant = drivingTypeDelta >= 10;
+          const priorityDominant = priorityDelta >= 10;
+          const drivingStyleDominant = drivingStyleDelta >= 10;
+          
+          // Get price percentile (0-100)
+          const prices = this.products.map(p => p.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          const pricePercentile = maxPrice > minPrice 
+            ? ((product.price - minPrice) / (maxPrice - minPrice)) * 100 
+            : 50;
+          
+          // Brand category (performance tier)
+          const brandTier = {
+            'Bridgestone': 85,
+            'Firemax': 45,
+            'Duraturn': 60
+          }[product.brand] || 50;
+          
+          // Keyword matching from description
+          const desc = (product.desc || '').toLowerCase();
+          const name = (product.name || '').toLowerCase();
+          const text = desc + ' ' + name;
+          
+          // City vs Highway keywords (using AMPLIFIED slider value)
+          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring'];
+          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance'];
+          const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
+          const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingTypeScore = 100 - Math.abs(amplifiedDrivingType - (highwayScore - cityScore + 50));
+          
+          // Budget vs Performance - correlate with price percentile and brand (using AMPLIFIED value)
+          const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
+          const priorityScore = 100 - Math.abs(amplifiedPriority - performanceIndicator);
+          
+          // Quiet vs Aggressive keywords (using AMPLIFIED value)
+          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring'];
+          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive'];
+          const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
+          const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingStyleScore = 100 - Math.abs(amplifiedDrivingStyle - (aggressiveScore - quietScore + 50));
+          
+          // DOMINANCE-BASED WEIGHTING
+          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
+          
+          if (drivingTypeDominant || priorityDominant || drivingStyleDominant) {
+            // When a dimension is dominant, boost its weight significantly
+            weights = { drivingType: 0.15, priority: 0.15, drivingStyle: 0.15 };
+            
+            if (drivingTypeDominant) weights.drivingType = 0.55;
+            if (priorityDominant) weights.priority = 0.55;
+            if (drivingStyleDominant) weights.drivingStyle = 0.55;
+            
+            // Normalize
+            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
+            weights.drivingType /= totalWeight;
+            weights.priority /= totalWeight;
+            weights.drivingStyle /= totalWeight;
+          }
+          
+          // Weighted average with dynamic weights
+          const finalScore = (drivingTypeScore * weights.drivingType) + 
+                            (priorityScore * weights.priority) + 
+                            (drivingStyleScore * weights.drivingStyle);
+          
+          return Math.max(0, Math.min(100, finalScore));
+        },
+
+        getPodiumSlotStyle(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          // 6 FIXED PODIUM SLOTS using absolute positioning
+          // Centered horizontally, different vertical positions
+          const containerWidth = 1000; // approximate podium stage width
+          const cardWidth = 200;
+          const centerX = (containerWidth - cardWidth) / 2;
+          
+          const podiumSlots = {
+            // Tier 1 - Winner (#1) - Center, highest
+            1: { 
+              top: 80,
+              left: centerX,
+              scale: 1.25,
+              opacity: 1.0,
+              zIndex: 110,
+              tier: 1,
+              delay: 0.6 // Settles last
+            },
+            // Tier 2 - Runners-up (#2-3) - Left/right, slightly lower
+            2: { 
+              top: 160,
+              left: centerX - 240,
+              scale: 1.08,
+              opacity: 0.95,
+              zIndex: 108,
+              tier: 2,
+              delay: 0.3
+            },
+            3: { 
+              top: 160,
+              left: centerX + 240,
+              scale: 1.08,
+              opacity: 0.95,
+              zIndex: 108,
+              tier: 2,
+              delay: 0.3
+            },
+            // Tier 3 - Lower (#4-6) - Row at bottom
+            4: { 
+              top: 400,
+              left: centerX - 240,
+              scale: 0.90,
+              opacity: 0.75,
+              zIndex: 105,
+              tier: 3,
+              delay: 0
+            },
+            5: { 
+              top: 400,
+              left: centerX,
+              scale: 0.90,
+              opacity: 0.70,
+              zIndex: 105,
+              tier: 3,
+              delay: 0
+            },
+            6: { 
+              top: 400,
+              left: centerX + 240,
+              scale: 0.90,
+              opacity: 0.65,
+              zIndex: 105,
+              tier: 3,
+              delay: 0
+            }
+          };
+          
+          const slot = podiumSlots[rank] || podiumSlots[3];
+          
+          // Enhanced glow for top 3
+          let boxShadow = 'none';
+          if (rank === 1) {
+            boxShadow = '0 0 25px rgba(0, 224, 164, 0.7)';
+          } else if (rank === 2 || rank === 3) {
+            boxShadow = '0 0 15px rgba(0, 224, 164, 0.4)';
+          }
+          
+          // Desaturate Tier 3
+          const filter = slot.tier === 3 ? 'saturate(0.7) brightness(0.85)' : 'none';
+          
+          return {
+            top: `${slot.top}px`,
+            left: `${slot.left}px`,
+            transform: `scale(${slot.scale})`,
+            opacity: slot.opacity,
+            zIndex: slot.zIndex,
+            boxShadow: boxShadow,
+            filter: filter,
+            transitionDelay: `${slot.delay}s`
+          };
+        },
+
+        getRankBadge(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const badges = {
+            1: { text: '#1', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', medal: '🥇' },
+            2: { text: '#2', bg: 'linear-gradient(135deg, #C0C0C0, #A8A8A8)', medal: '🥈' },
+            3: { text: '#3', bg: 'linear-gradient(135deg, #CD7F32, #8B4513)', medal: '🥉' },
+            4: { text: '#4', bg: 'linear-gradient(135deg, #708090, #556B2F)', medal: '' },
+            5: { text: '#5', bg: 'linear-gradient(135deg, #FF8C00, #FF6347)', medal: '' },
+            6: { text: '#6', bg: 'linear-gradient(135deg, #DC143C, #8B0000)', medal: '' }
+          };
+          
+          return badges[rank] || badges[3];
+        },
+
+        getVerdictText(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const verdicts = {
+            1: { text: 'Best match for your driving', color: '#059669' },
+            2: { text: 'Very strong alternative', color: '#10B981' },
+            3: { text: 'Acceptable match', color: '#F59E0B' },
+            4: { text: 'Not ideal for your use', color: '#FB923C' },
+            5: { text: 'Poor match', color: '#EF4444' },
+            6: { text: 'Wrong choice for your driving', color: '#991B1B' }
+          };
+          
+          return verdicts[rank] || verdicts[3];
+        },
+
+        getProductExplanation(product){
+          const score = this.tireUniverse.scores[product.id] || 50;
+          
+          // Only show explanation for highly aligned products
+          if (score < 65) return '';
+          
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // Determine primary alignment
+          const explanations = [];
+          
+          if (drivingType > 65) {
+            explanations.push('Better match for highway driving');
+          } else if (drivingType < 35) {
+            explanations.push('Better match for city driving');
+          }
+          
+          if (priority > 65) {
+            explanations.push('Aligned with performance focus');
+          } else if (priority < 35) {
+            explanations.push('Aligned with budget priority');
+          }
+          
+          if (drivingStyle > 65) {
+            explanations.push('Suited for aggressive driving');
+          } else if (drivingStyle < 35) {
+            explanations.push('Suited for quiet comfort');
+          }
+          
+          // Return the most relevant explanation
+          return explanations[0] || 'Well-aligned with your preferences';
         },
 
         // Generate product subject for questions

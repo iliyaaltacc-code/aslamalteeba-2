@@ -19,6 +19,38 @@
     .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
+    
+    /* Rank badge and verdict animation */
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    /* Slider styling */
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
   </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
@@ -241,15 +273,93 @@
       </div>
     </div>
 
+    <!-- Interactive Tire Universe -->
+    <div class="mb-12 glass rounded-3xl p-8 border-white/10">
+      <h3 class="text-2xl font-bold mb-2 text-center">جهان تعاملی تایرها</h3>
+      <p class="text-neutral-400 text-sm text-center mb-8">تایرها را بصری کاوش کنید — اسلایدرها را تنظیم کنید و واکنش محصولات را ببینید</p>
+      
+      <div class="max-w-3xl mx-auto space-y-6">
+        <!-- Slider 1: Highway <-> City (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">بزرگراه</label>
+            <label class="text-sm font-semibold text-neutral-300">شهری</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingType"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 2: Performance <-> Budget (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">عملکرد</label>
+            <label class="text-sm font-semibold text-neutral-300">بودجه</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.priority"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 3: Aggressive <-> Quiet (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">ورزشی</label>
+            <label class="text-sm font-semibold text-neutral-300">آرام</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingStyle"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+      </div>
+    </div>
+
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
-        <article class="glass rounded-3xl overflow-hidden shine border-white/10">
+        <article 
+          class="glass rounded-3xl overflow-hidden shine border-white/10 relative"
+          :style="getProductStyle(p)"
+        >
+          <!-- Rank Badge (top-left corner for RTL) -->
+          <div 
+            class="absolute top-3 left-3 w-14 h-14 rounded-full flex flex-col items-center justify-center font-bold text-white shadow-lg z-10"
+            :style="{ background: getRankBadge(p).bg }"
+            style="animation: fadeInScale 0.4s ease-out 0.15s both;"
+          >
+            <div class="text-2xl" x-text="getRankBadge(p).medal"></div>
+            <div class="text-sm" x-text="getRankBadge(p).text"></div>
+          </div>
+          
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
+            
+            <!-- Verdict Text (under product name) -->
+            <div 
+              class="text-sm font-semibold text-right"
+              :style="{ color: getVerdictTextFa(p).color }"
+              x-text="getVerdictTextFa(p).text"
+              style="animation: fadeInScale 0.4s ease-out 0.15s both;"
+            ></div>
+            
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
             
             <!-- Quick Questions Section (Persian) -->
@@ -461,6 +571,15 @@
         // Bulk Mode
         bulkMode: initialBulkMode,
 
+        // Interactive Tire Universe
+        tireUniverse: {
+          drivingType: 50,  // 0 = City, 100 = Highway
+          priority: 50,     // 0 = Budget, 100 = Performance
+          drivingStyle: 50, // 0 = Quiet, 100 = Aggressive
+          scores: {},       // product scores cache
+          ranks: {}         // product ranks (1-6)
+        },
+
         toggleBulkMode(){
           // Bulk mode is now automatically saved via watcher in init()
           // This method just toggles the value, the watcher handles persistence
@@ -563,6 +682,9 @@
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
           
+          // Initialize tire universe scores
+          this.updateTireScores();
+          
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
             // Watch currency changes
@@ -662,6 +784,248 @@
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // Interactive Tire Universe Methods
+        updateTireScores(){
+          // Recalculate scores for all products
+          this.products.forEach(p => {
+            this.tireUniverse.scores[p.id] = this.calculateProductScore(p);
+          });
+          
+          // Calculate ranks (1-6) based on scores
+          const sortedProducts = [...this.products].sort((a, b) => 
+            (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
+          );
+          this.tireUniverse.ranks = {};
+          sortedProducts.forEach((p, index) => {
+            this.tireUniverse.ranks[p.id] = index + 1; // Ranks 1-6
+          });
+        },
+
+        calculateProductScore(product){
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // Check if any slider is at extreme (authority rule)
+          const drivingTypeExtreme = drivingType <= 10 || drivingType >= 90;
+          const priorityExtreme = priority <= 10 || priority >= 90;
+          const drivingStyleExtreme = drivingStyle <= 10 || drivingStyle >= 90;
+          
+          // Get price percentile (0-100)
+          const prices = this.products.map(p => p.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          const pricePercentile = maxPrice > minPrice 
+            ? ((product.price - minPrice) / (maxPrice - minPrice)) * 100 
+            : 50;
+          
+          // Brand category (performance tier)
+          const brandTier = {
+            'Bridgestone': 85,
+            'Firemax': 45,
+            'Duraturn': 60
+          }[product.brand] || 50;
+          
+          // Keyword matching from description
+          const desc = (product.desc || '').toLowerCase();
+          const name = (product.name || '').toLowerCase();
+          const text = desc + ' ' + name;
+          
+          // City vs Highway keywords (Persian + English)
+          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring', 'شهری', 'راحت', 'آرام'];
+          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance', 'بزرگراه', 'سرعت', 'ثبات'];
+          const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
+          const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingTypeScore = 100 - Math.abs(drivingType - (highwayScore - cityScore + 50));
+          
+          // Budget vs Performance - correlate with price percentile and brand
+          const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
+          const priorityScore = 100 - Math.abs(priority - performanceIndicator);
+          
+          // Quiet vs Aggressive keywords (Persian + English)
+          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring', 'آرام', 'راحت'];
+          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive', 'ورزشی', 'عملکرد'];
+          const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
+          const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
+          
+          // SLIDER AUTHORITY RULE: If a slider is at extreme, that dimension dominates
+          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
+          
+          if (drivingTypeExtreme || priorityExtreme || drivingStyleExtreme) {
+            weights = { drivingType: 0.1, priority: 0.1, drivingStyle: 0.1 };
+            
+            if (drivingTypeExtreme) weights.drivingType = 0.5;
+            if (priorityExtreme) weights.priority = 0.5;
+            if (drivingStyleExtreme) weights.drivingStyle = 0.5;
+            
+            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
+            weights.drivingType /= totalWeight;
+            weights.priority /= totalWeight;
+            weights.drivingStyle /= totalWeight;
+          }
+          
+          // Weighted average with dynamic weights
+          const finalScore = (drivingTypeScore * weights.drivingType) + 
+                            (priorityScore * weights.priority) + 
+                            (drivingStyleScore * weights.drivingStyle);
+          
+          return Math.max(0, Math.min(100, finalScore));
+        },
+
+        getProductStyle(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          // FIXED PODIUM TIERS (literal winners' podium) - RTL mirrored
+          const podiumTiers = {
+            // Tier 1 - Winner
+            1: { 
+              translateY: -120, 
+              translateX: 0, 
+              scale: 1.20, 
+              opacity: 1.0, 
+              zIndex: 110,
+              tier: 1,
+              animationDelay: '0.6s'
+            },
+            // Tier 2 - Runners-up (mirrored for RTL)
+            2: { 
+              translateY: -70, 
+              translateX: 80, 
+              scale: 1.05, 
+              opacity: 0.95, 
+              zIndex: 108,
+              tier: 2,
+              animationDelay: '0.3s'
+            },
+            3: { 
+              translateY: -70, 
+              translateX: -80, 
+              scale: 1.05, 
+              opacity: 0.95, 
+              zIndex: 108,
+              tier: 2,
+              animationDelay: '0.3s'
+            },
+            // Tier 3 - Lower relevance (mirrored for RTL)
+            4: { 
+              translateY: 40, 
+              translateX: 60, 
+              scale: 0.92, 
+              opacity: 0.75, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            },
+            5: { 
+              translateY: 40, 
+              translateX: 0, 
+              scale: 0.92, 
+              opacity: 0.70, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            },
+            6: { 
+              translateY: 40, 
+              translateX: -60, 
+              scale: 0.92, 
+              opacity: 0.65, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            }
+          };
+          
+          const style = podiumTiers[rank] || podiumTiers[3];
+          
+          // Enhanced glow for Tier 1 and 2 only
+          let glowIntensity = 0;
+          let glowColor = 'rgba(0, 224, 164, 0)';
+          
+          if (rank === 1) {
+            glowIntensity = 20;
+            glowColor = 'rgba(0, 224, 164, 0.6)';
+          } else if (rank === 2 || rank === 3) {
+            glowIntensity = 10;
+            glowColor = 'rgba(0, 224, 164, 0.3)';
+          }
+          
+          // Desaturate Tier 3
+          const filter = style.tier === 3 ? 'saturate(0.75)' : 'none';
+          
+          return {
+            opacity: style.opacity.toFixed(2),
+            transform: `translateY(${style.translateY}px) translateX(${style.translateX}px) scale(${style.scale.toFixed(3)})`,
+            boxShadow: glowIntensity > 0 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
+            zIndex: style.zIndex,
+            filter: filter,
+            transitionDelay: style.animationDelay,
+            transition: 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)'
+          };
+        },
+
+        getRankBadge(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const badges = {
+            1: { text: '#1', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', medal: '🥇' },
+            2: { text: '#2', bg: 'linear-gradient(135deg, #C0C0C0, #A8A8A8)', medal: '🥈' },
+            3: { text: '#3', bg: 'linear-gradient(135deg, #CD7F32, #8B4513)', medal: '🥉' },
+            4: { text: '#4', bg: 'linear-gradient(135deg, #708090, #556B2F)', medal: '' },
+            5: { text: '#5', bg: 'linear-gradient(135deg, #FF8C00, #FF6347)', medal: '' },
+            6: { text: '#6', bg: 'linear-gradient(135deg, #DC143C, #8B0000)', medal: '' }
+          };
+          
+          return badges[rank] || badges[3];
+        },
+
+        getVerdictTextFa(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const verdicts = {
+            1: { text: 'بهترین انتخاب برای رانندگی شما', color: '#059669' },
+            2: { text: 'جایگزین بسیار قوی', color: '#10B981' },
+            3: { text: 'تطابق قابل قبول', color: '#F59E0B' },
+            4: { text: 'برای استفاده شما ایده‌آل نیست', color: '#FB923C' },
+            5: { text: 'تطابق ضعیف', color: '#EF4444' },
+            6: { text: 'انتخاب اشتباه برای رانندگی شما', color: '#991B1B' }
+          };
+          
+          return verdicts[rank] || verdicts[3];
+        },
+
+        getProductExplanationFa(product){
+          const score = this.tireUniverse.scores[product.id] || 50;
+          
+          // Only show explanation for highly aligned products
+          if (score < 65) return '';
+          
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // Determine primary alignment (Persian translations)
+          const explanations = [];
+          
+          if (drivingType > 65) {
+            explanations.push('بهتر برای رانندگی در بزرگراه');
+          } else if (drivingType < 35) {
+            explanations.push('بهتر برای رانندگی شهری');
+          }
+          
+          if (priority > 65) {
+            explanations.push('متناسب با تمرکز بر عملکرد');
+          } else if (priority < 35) {
+            explanations.push('متناسب با اولویت بودجه');
+          }
+          
+          if (drivingStyle > 65) {
+            explanations.push('مناسب برای رانندگی ورزشی');
+          } else if (drivingStyle < 35) {
+            explanations.push('مناسب برای آرامش و راحتی');
+          }
+          
+          // Return the most relevant explanation
+          return explanations[0] || 'متناسب با ترجیحات شما';
         },
 
         // Generate product subject for questions (Persian)
