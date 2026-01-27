@@ -51,6 +51,22 @@
       border: none;
       box-shadow: 0 2px 8px rgba(0,224,164,0.4);
     }
+    
+    /* Fix Persian button text shaping */
+    a[href="/fa/"] {
+      letter-spacing: normal !important;
+      font-kerning: normal;
+      font-feature-settings: "kern" 1, "liga" 1;
+      white-space: nowrap;
+      font-family: Tajawal, system-ui, -apple-system, sans-serif;
+    }
+    
+    /* Fix phone number display for RTL */
+    .phone-number {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+    }
   </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
@@ -93,7 +109,7 @@
         </a>
 
         <a href="tel:+971554637045" class="px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
-          +971 55 463 7045
+          <span id="phone-display" class="phone-number">+971 55 463 7045</span>
         </a>
       </div>
     </div>
@@ -1397,5 +1413,18 @@
     }
   </script>
   <script src="/chat.js" defer></script>
+  
+  <!-- Convert phone number to Persian numerals -->
+  <script>
+    (function() {
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      const phoneEl = document.getElementById('phone-display');
+      if (phoneEl) {
+        const text = phoneEl.textContent;
+        const persianText = text.replace(/\d/g, digit => persianDigits[digit]);
+        phoneEl.textContent = persianText;
+      }
+    })();
+  </script>
 </body>
 </html>
