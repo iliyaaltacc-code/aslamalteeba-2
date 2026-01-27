@@ -313,7 +313,7 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingType"
-            @input.debounce.150ms="updateTireScores()"
+            @input="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -329,7 +329,7 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.priority"
-            @input.debounce.150ms="updateTireScores()"
+            @input="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -345,7 +345,7 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingStyle"
-            @input.debounce.150ms="updateTireScores()"
+            @input="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -766,6 +766,11 @@
           // Initialize tire universe scores
           this.updateTireScores();
           
+          // Watch tire universe slider changes for immediate reactivity
+          this.$watch('tireUniverse.drivingType', () => this.updateTireScores());
+          this.$watch('tireUniverse.priority', () => this.updateTireScores());
+          this.$watch('tireUniverse.drivingStyle', () => this.updateTireScores());
+          
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
             // Watch currency changes
@@ -953,6 +958,9 @@
           // Assign both new objects in single operations to trigger reactivity
           this.tireUniverse.scores = newScores;
           this.tireUniverse.ranks = newRanks;
+          
+          // Force reactivity flush for RTL layout
+          this.tireUniverse = { ...this.tireUniverse };
         },
 
         calculateProductScore(product){
