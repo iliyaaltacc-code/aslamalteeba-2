@@ -1420,5 +1420,52 @@
     }
   </script>
  <script src="/chat.js" defer></script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    sendEmailVerification,
+    GoogleAuthProvider,
+    signInWithPopup,
+    setPersistence,
+    browserLocalPersistence
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
+    authDomain: "aslamalteeba-2.firebaseapp.com",
+    projectId: "aslamalteeba-2",
+    storageBucket: "aslamalteeba-2.firebasestorage.app",
+    messagingSenderId: "1004820564683",
+    appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 🔒 Make "stay signed in" the default
+  setPersistence(auth, browserLocalPersistence);
+
+  // 🌍 Expose auth globally so chat.js can see it later
+  window.firebaseAuth = auth;
+  window.firebaseAuthAPI = {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    sendEmailVerification,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged
+  };
+
+  // ✅ Test: log auth state
+  onAuthStateChanged(auth, (user) => {
+    console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
+  });
+</script>
 </body>
 </html>
