@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign In / Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: white;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: black;
+    }
+
+    .secondary {
+      background: transparent;
+      color: #a5b4fc;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .switch {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+      color: #93c5fd;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 13px;
+      text-align: center;
+      color: #fca5a5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1 id="title">Sign In</h1>
+
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+
+    <button class="primary" id="submitBtn">Sign In</button>
+    <button class="secondary" id="googleBtn">Continue with Google</button>
+
+    <div class="switch" id="toggleMode">
+      Don’t have an account? Create one
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <!-- FIREBASE AUTH -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      sendEmailVerification,
+      GoogleAuthProvider,
+      signInWithPopup,
+      setPersistence,
+      browserLocalPersistence,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
+      authDomain: "aslamalteeba-2.firebaseapp.com",
+      projectId: "aslamalteeba-2",
+      storageBucket: "aslamalteeba-2.firebasestorage.app",
+      messagingSenderId: "1004820564683",
+      appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    setPersistence(auth, browserLocalPersistence);
+
+    let mode = "signin";
+
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const submitBtn = document.getElementById("submitBtn");
+    const toggleMode = document.getElementById("toggleMode");
+    const status = document.getElementById("status");
+    const title = document.getElementById("title");
+    const googleBtn = document.getElementById("googleBtn");
+
+    toggleMode.onclick = () => {
+      mode = mode === "signin" ? "signup" : "signin";
+      title.textContent = mode === "signin" ? "Sign In" : "Create Account";
+      submitBtn.textContent = mode === "signin" ? "Sign In" : "Sign Up";
+      toggleMode.textContent =
+        mode === "signin"
+          ? "Don’t have an account? Create one"
+          : "Already have an account? Sign in";
+      status.textContent = "";
+    };
+
+    submitBtn.onclick = async () => {
+      status.textContent = "";
+
+      try {
+        if (mode === "signup") {
+          const res = await createUserWithEmailAndPassword(auth, email.value, password.value);
+          await sendEmailVerification(res.user);
+          status.textContent = "Verification email sent. Check your inbox.";
+        } else {
+          await signInWithEmailAndPassword(auth, email.value, password.value);
+        }
+      } catch (err) {
+        status.textContent = err.message;
+      }
+    };
+
+    googleBtn.onclick = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        status.textContent = err.message;
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        window.location.href = "/";
+      }
+    });
+  </script>
+</body>
+</html>
