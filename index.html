@@ -908,38 +908,43 @@
 
         // Interactive Tire Universe Methods
         updateTireScores(){
-          // Recalculate scores for all products
+          // Build new scores object to trigger Alpine reactivity
+          const newScores = {};
           this.products.forEach(p => {
-            this.tireUniverse.scores[p.id] = this.calculateProductScore(p);
+            newScores[p.id] = this.calculateProductScore(p);
           });
           
           // RANK SNAPPING: Normalize score spread and force minimum distance
           const sortedProducts = [...this.products].sort((a, b) => 
-            (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
+            (newScores[b.id] || 0) - (newScores[a.id] || 0)
           );
           
           // Force score separation: ensure minimum 8-point gaps between ranks
           const minGap = 8;
           for (let i = 1; i < sortedProducts.length; i++) {
-            const prevScore = this.tireUniverse.scores[sortedProducts[i-1].id];
-            const currScore = this.tireUniverse.scores[sortedProducts[i].id];
+            const prevScore = newScores[sortedProducts[i-1].id];
+            const currScore = newScores[sortedProducts[i].id];
             
             if (prevScore - currScore < minGap) {
               // Adjust current score to maintain minimum gap
-              this.tireUniverse.scores[sortedProducts[i].id] = prevScore - minGap;
+              newScores[sortedProducts[i].id] = prevScore - minGap;
             }
           }
           
           // Re-sort after adjustments
           sortedProducts.sort((a, b) => 
-            (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
+            (newScores[b.id] || 0) - (newScores[a.id] || 0)
           );
           
-          // Assign ranks
-          this.tireUniverse.ranks = {};
+          // Assign ranks - build new object to trigger Alpine reactivity
+          const newRanks = {};
           sortedProducts.forEach((p, index) => {
-            this.tireUniverse.ranks[p.id] = index + 1; // Ranks 1-6
+            newRanks[p.id] = index + 1; // Ranks 1-6
           });
+          
+          // Assign both new objects in single operations to trigger reactivity
+          this.tireUniverse.scores = newScores;
+          this.tireUniverse.ranks = newRanks;
         },
 
         calculateProductScore(product){
