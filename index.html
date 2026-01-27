@@ -883,7 +883,7 @@
           // Pyramid hierarchy mapping
           // Vertical translation: high scores float up, low scores sink down
           // Map 0-100 score to -40px (top) to +40px (bottom)
-          const translateY = (1 - normalized) * 40 - 20; // Center around 0
+          const translateY = (1 - normalized) * 80 - 40; // -40 to +40
           
           // Opacity: 0.5 to 1.0 (more dramatic range)
           const opacity = 0.5 + (normalized * 0.5);
