@@ -21,6 +21,18 @@
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
     
+    /* Rank badge and verdict animation */
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
     /* Slider styling */
     .slider::-webkit-slider-thumb {
       appearance: none;
@@ -320,22 +332,34 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
         <article 
-          class="glass rounded-3xl overflow-hidden shine border-white/10 transition-all duration-500 ease-out"
+          class="glass rounded-3xl overflow-hidden shine border-white/10 relative"
           :style="getProductStyle(p)"
         >
+          <!-- Rank Badge (top-right corner) -->
+          <div 
+            class="absolute top-3 right-3 w-14 h-14 rounded-full flex flex-col items-center justify-center font-bold text-white shadow-lg z-10"
+            :style="{ background: getRankBadge(p).bg }"
+            style="animation: fadeInScale 0.4s ease-out 0.15s both;"
+          >
+            <div class="text-2xl" x-text="getRankBadge(p).medal"></div>
+            <div class="text-sm" x-text="getRankBadge(p).text"></div>
+          </div>
+          
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
-            <!-- Alignment explanation -->
-            <div 
-              x-show="getProductExplanation(p)" 
-              x-transition
-              class="text-xs text-emerald-300 mb-1 italic"
-              x-text="getProductExplanation(p)"
-            ></div>
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
+            
+            <!-- Verdict Text (under product name) -->
+            <div 
+              class="text-sm font-semibold"
+              :style="{ color: getVerdictText(p).color }"
+              x-text="getVerdictText(p).text"
+              style="animation: fadeInScale 0.4s ease-out 0.15s both;"
+            ></div>
+            
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
             
             <!-- Quick Questions Section -->
@@ -610,7 +634,8 @@
           drivingType: 50,  // 0 = City, 100 = Highway
           priority: 50,     // 0 = Budget, 100 = Performance
           drivingStyle: 50, // 0 = Quiet, 100 = Aggressive
-          scores: {}        // product scores cache
+          scores: {},       // product scores cache
+          ranks: {}         // product ranks (1-6)
         },
 
         toggleBulkMode(){
@@ -825,6 +850,15 @@
           this.products.forEach(p => {
             this.tireUniverse.scores[p.id] = this.calculateProductScore(p);
           });
+          
+          // Calculate ranks (1-6) based on scores
+          const sortedProducts = [...this.products].sort((a, b) => 
+            (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
+          );
+          this.tireUniverse.ranks = {};
+          sortedProducts.forEach((p, index) => {
+            this.tireUniverse.ranks[p.id] = index + 1; // Ranks 1-6
+          });
         },
 
         calculateProductScore(product){
@@ -875,36 +909,65 @@
         },
 
         getProductStyle(product){
-          const score = this.tireUniverse.scores[product.id] || 50;
+          const rank = this.tireUniverse.ranks[product.id] || 3;
           
-          // Normalize score to 0-1 range
-          const normalized = score / 100;
+          // Rank-based podium mapping (dramatic differences)
+          const rankStyles = {
+            1: { translateY: -90, translateX: 0, scale: 1.10, opacity: 1.0, zIndex: 106 },
+            2: { translateY: -55, translateX: -15, scale: 1.06, opacity: 0.97, zIndex: 105 },
+            3: { translateY: -20, translateX: 15, scale: 1.03, opacity: 0.94, zIndex: 104 },
+            4: { translateY: 20, translateX: -20, scale: 0.99, opacity: 0.85, zIndex: 103 },
+            5: { translateY: 55, translateX: 20, scale: 0.95, opacity: 0.72, zIndex: 102 },
+            6: { translateY: 90, translateX: 0, scale: 0.90, opacity: 0.60, zIndex: 101 }
+          };
           
-          // Pyramid hierarchy mapping
-          // Vertical translation: high scores float up, low scores sink down
-          // Map 0-100 score to -40px (top) to +40px (bottom)
-          const translateY = (1 - normalized) * 80 - 40; // -40 to +40
+          const style = rankStyles[rank] || rankStyles[3];
           
-          // Opacity: 0.5 to 1.0 (more dramatic range)
-          const opacity = 0.5 + (normalized * 0.5);
+          // Enhanced glow for top 3
+          const glowIntensity = rank <= 3 ? (4 - rank) * 8 : 0;
+          const glowColor = `rgba(0, 224, 164, ${(4 - rank) * 0.15})`;
           
-          // Scale: 1.0 to 1.05 (increased range for hierarchy)
-          const scale = 1.0 + (normalized * 0.05);
-          
-          // Z-index: higher scores appear on top
-          const zIndex = Math.round(score);
-          
-          // Glow intensity (stronger for top products)
-          const glowIntensity = normalized * 12;
-          const glowColor = `rgba(0, 224, 164, ${normalized * 0.4})`;
+          // Slight desaturation for rank 6
+          const filter = rank === 6 ? 'saturate(0.7)' : 'none';
           
           return {
-            opacity: opacity.toFixed(2),
-            transform: `translateY(${translateY.toFixed(1)}px) scale(${scale.toFixed(3)})`,
-            boxShadow: score > 65 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
-            zIndex: zIndex,
-            transition: 'all 0.7s ease-in-out'
+            opacity: style.opacity.toFixed(2),
+            transform: `translateY(${style.translateY}px) translateX(${style.translateX}px) scale(${style.scale.toFixed(3)})`,
+            boxShadow: rank <= 3 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
+            zIndex: style.zIndex,
+            filter: filter,
+            transition: 'all 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)'
           };
+        },
+
+        getRankBadge(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const badges = {
+            1: { text: '#1', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', medal: '🥇' },
+            2: { text: '#2', bg: 'linear-gradient(135deg, #C0C0C0, #A8A8A8)', medal: '🥈' },
+            3: { text: '#3', bg: 'linear-gradient(135deg, #CD7F32, #8B4513)', medal: '🥉' },
+            4: { text: '#4', bg: 'linear-gradient(135deg, #708090, #556B2F)', medal: '' },
+            5: { text: '#5', bg: 'linear-gradient(135deg, #FF8C00, #FF6347)', medal: '' },
+            6: { text: '#6', bg: 'linear-gradient(135deg, #DC143C, #8B0000)', medal: '' }
+          };
+          
+          return badges[rank] || badges[3];
+        },
+
+        getVerdictText(product){
+          const rank = this.tireUniverse.ranks[product.id] || 3;
+          
+          const verdicts = {
+            1: { text: 'Best match for your driving', color: '#059669' },
+            2: { text: 'Very strong alternative', color: '#10B981' },
+            3: { text: 'Acceptable match', color: '#F59E0B' },
+            4: { text: 'Not ideal for your use', color: '#FB923C' },
+            5: { text: 'Poor match', color: '#EF4444' },
+            6: { text: 'Wrong choice for your driving', color: '#991B1B' }
+          };
+          
+          return verdicts[rank] || verdicts[3];
         },
 
         getProductExplanation(product){
