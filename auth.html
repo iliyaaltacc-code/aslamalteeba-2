@@ -78,6 +78,19 @@
       text-align: center;
       color: #fca5a5;
     }
+
+    .forgot-password {
+      margin-top: 8px;
+      text-align: right;
+      font-size: 13px;
+      cursor: pointer;
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -87,6 +100,8 @@
 
     <input id="email" type="email" placeholder="Email" />
     <input id="password" type="password" placeholder="Password" />
+    
+    <div class="forgot-password" id="forgotPassword">Forgot password?</div>
 
     <button class="primary" id="submitBtn">Sign In</button>
     <button class="secondary" id="googleBtn">Continue with Google</button>
@@ -106,6 +121,7 @@
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       sendEmailVerification,
+      sendPasswordResetEmail,
       GoogleAuthProvider,
       signInWithPopup,
       setPersistence,
@@ -136,6 +152,7 @@
     const status = document.getElementById("status");
     const title = document.getElementById("title");
     const googleBtn = document.getElementById("googleBtn");
+    const forgotPassword = document.getElementById("forgotPassword");
 
     toggleMode.onclick = () => {
       mode = mode === "signin" ? "signup" : "signin";
@@ -170,6 +187,56 @@
         await signInWithPopup(auth, provider);
       } catch (err) {
         status.textContent = err.message;
+      }
+    };
+
+    forgotPassword.onclick = async () => {
+      status.textContent = "";
+      
+      if (!email.value) {
+        status.textContent = "Please enter your email address.";
+        return;
+      }
+
+      // Disable the forgot password link while processing
+      forgotPassword.style.pointerEvents = "none";
+      forgotPassword.style.opacity = "0.5";
+      status.textContent = "Sending password reset email...";
+
+      try {
+        await sendPasswordResetEmail(auth, email.value);
+        status.style.color = "#86efac"; // Green color for success
+        status.textContent = "Password reset email sent. Check your inbox.";
+        
+        // Reset state after 3 seconds
+        setTimeout(() => {
+          status.textContent = "";
+          status.style.color = "#fca5a5"; // Back to default red
+          forgotPassword.style.pointerEvents = "auto";
+          forgotPassword.style.opacity = "1";
+        }, 3000);
+      } catch (err) {
+        status.style.color = "#fca5a5"; // Red color for error
+        
+        // Provide user-friendly error messages
+        if (err.code === "auth/invalid-email") {
+          status.textContent = "Invalid email address.";
+        } else if (err.code === "auth/user-not-found") {
+          // Use generic message to prevent email enumeration
+          status.style.color = "#86efac";
+          status.textContent = "If this email exists, a password reset link has been sent.";
+          setTimeout(() => {
+            status.textContent = "";
+            status.style.color = "#fca5a5";
+          }, 3000);
+        } else if (err.code === "auth/network-request-failed") {
+          status.textContent = "Network error. Please check your connection.";
+        } else {
+          status.textContent = err.message;
+        }
+        
+        forgotPassword.style.pointerEvents = "auto";
+        forgotPassword.style.opacity = "1";
       }
     };
 
