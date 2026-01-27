@@ -176,7 +176,8 @@
     onAuthStateChanged(auth, (user) => {
       if (user) {
         // Check if user needs email verification
-        if (user.providerData[0]?.providerId === "password" && !user.emailVerified) {
+        const isPasswordUser = user.providerData.some(provider => provider.providerId === "password");
+        if (isPasswordUser && !user.emailVerified) {
           // Email/password user without verification - stay on auth page
           status.textContent = "Please verify your email to continue.";
         } else {

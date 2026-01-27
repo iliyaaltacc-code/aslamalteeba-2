@@ -1479,9 +1479,12 @@
     
     if (user) {
       // User is signed in
-      if (user.providerData[0]?.providerId === "password" && !user.emailVerified) {
+      const isPasswordUser = user.providerData.some(provider => provider.providerId === "password");
+      if (isPasswordUser && !user.emailVerified) {
         // Email/password user without verification - redirect to auth
-        window.location.href = "/auth.html";
+        if (window.location.pathname !== "/auth.html") {
+          window.location.href = "/auth.html";
+        }
         return;
       }
       
@@ -1490,7 +1493,9 @@
       signOutBtn.style.display = "block";
     } else {
       // User is signed out - redirect to auth page
-      window.location.href = "/auth.html";
+      if (window.location.pathname !== "/auth.html") {
+        window.location.href = "/auth.html";
+      }
     }
   });
 
