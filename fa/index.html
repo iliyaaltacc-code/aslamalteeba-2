@@ -1498,11 +1498,11 @@
   let alpineReady = false;
   let pendingAuthUser = null;
 
-  document.addEventListener('alpine:init', () => {
+  document.addEventListener('alpine:init', async () => {
     alpineReady = true;
     // If auth state resolved before Alpine, process it now
     if (pendingAuthUser !== null) {
-      handleAuthState(pendingAuthUser);
+      await handleAuthState(pendingAuthUser);
       pendingAuthUser = null;
     }
   });
