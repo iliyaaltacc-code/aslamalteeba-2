@@ -859,9 +859,6 @@
           if (existing) existing.qty++;
           else this.cart.push({...p, qty:1});
           this.cartOpen = true;
-          
-          // Sync cart to Firestore
-          this.syncCartToFirestore();
         },
 
         subtotal(){
