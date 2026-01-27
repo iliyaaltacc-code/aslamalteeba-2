@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
+      authDomain: "aslamalteeba-2.firebaseapp.com",
+      projectId: "aslamalteeba-2",
+      storageBucket: "aslamalteeba-2.firebasestorage.app",
+      messagingSenderId: "1004820564683",
+      appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "/auth.html";
+      } else {
+        document.getElementById("email").textContent = user.email;
+      }
+    });
+
+    window.signOutUser = async () => {
+      await signOut(auth);
+      window.location.href = "/";
+    };
+
+    window.resetPassword = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      await sendPasswordResetEmail(auth, user.email);
+      alert("Password reset email sent.");
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0b0b0b;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 24px;
+      border-radius: 16px;
+      width: 320px;
+      text-align: center;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    .danger {
+      background: #c0392b;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Profile</h2>
+    <p id="email">Loading…</p>
+
+    <button onclick="resetPassword()">Change Password</button>
+    <button class="danger" onclick="signOutUser()">Sign Out</button>
+  </div>
+</body>
+</html>
