@@ -677,6 +677,9 @@
           {role:'assistant', content:'مرحباً بك في Aslama Alteeba. كيف يمكننا المساعدة في الإطارات أو المقاسات أو التوفر؟'}
         ],
         
+        // Cart sync debounce timer
+        _cartSyncTimer: null,
+        
         // Currency conversion
         selectedCurrency: initialCurrency,
         exchangeRates: { USD: 1, AED: 3.67 },
@@ -806,9 +809,14 @@
           // Load cart from Firestore (or localStorage as fallback)
           await this.loadCartFromFirestore();
           
-          // Watch cart changes and sync to Firestore
+          // Watch cart changes and sync to Firestore with debouncing
           this.$watch('cart', () => {
-            this.syncCartToFirestore();
+            // Clear existing timer
+            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
+            // Set new timer to sync after 500ms of no changes
+            this._cartSyncTimer = setTimeout(() => {
+              this.syncCartToFirestore();
+            }, 500);
           });
           
           // Initialize tire universe scores
