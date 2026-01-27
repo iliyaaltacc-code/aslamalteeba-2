@@ -747,9 +747,13 @@
         productQuestions: {},
 
         async init(){
-          const saved = localStorage.getItem('aa_cart');
-          if (saved) this.cart = JSON.parse(saved);
-          this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
+          // Load cart from Firestore (or localStorage as fallback)
+          await this.loadCartFromFirestore();
+          
+          // Watch cart changes and sync to Firestore
+          this.$watch('cart', () => {
+            this.syncCartToFirestore();
+          });
           
           // Initialize tire universe scores
           this.updateTireScores();
@@ -845,14 +849,64 @@
         },
 
         addToCart(p){
+          // AUTH GATE: Require authentication before adding to cart
+          if (!window.firebaseAuth?.currentUser) {
+            window.location.href = '/auth.html';
+            return;
+          }
+          
           const existing = this.cart.find(i => i.id === p.id);
           if (existing) existing.qty++;
           else this.cart.push({...p, qty:1});
           this.cartOpen = true;
+          
+          // Sync cart to Firestore
+          this.syncCartToFirestore();
         },
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+        
+        // Cart Firestore sync functions
+        async syncCartToFirestore(){
+          try {
+            const user = window.firebaseAuth?.currentUser;
+            if (!user || !window.firebaseDB) return;
+            
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+            const cartRef = doc(window.firebaseDB, 'carts', user.uid);
+            await setDoc(cartRef, { items: this.cart }, { merge: true });
+          } catch (err) {
+            console.error('Failed to sync cart to Firestore:', err);
+            // Fallback to localStorage on error
+            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+          }
+        },
+        
+        async loadCartFromFirestore(){
+          try {
+            const user = window.firebaseAuth?.currentUser;
+            if (!user || !window.firebaseDB) {
+              // Not authenticated, try localStorage fallback
+              const saved = localStorage.getItem('aa_cart');
+              if (saved) this.cart = JSON.parse(saved);
+              return;
+            }
+            
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+            const cartRef = doc(window.firebaseDB, 'carts', user.uid);
+            const cartSnap = await getDoc(cartRef);
+            
+            if (cartSnap.exists() && cartSnap.data().items) {
+              this.cart = cartSnap.data().items;
+            }
+          } catch (err) {
+            console.error('Failed to load cart from Firestore:', err);
+            // Fallback to localStorage on error
+            const saved = localStorage.getItem('aa_cart');
+            if (saved) this.cart = JSON.parse(saved);
+          }
         },
 
         // Interactive Tire Universe Methods
@@ -1369,6 +1423,103 @@
     }
   </script>
   <script src="/chat.js" defer></script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    sendEmailVerification,
+    GoogleAuthProvider,
+    signInWithPopup,
+    setPersistence,
+    browserLocalPersistence
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
+    authDomain: "aslamalteeba-2.firebaseapp.com",
+    projectId: "aslamalteeba-2",
+    storageBucket: "aslamalteeba-2.firebasestorage.app",
+    messagingSenderId: "1004820564683",
+    appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // 🔒 Make "stay signed in" the default
+  setPersistence(auth, browserLocalPersistence);
+
+  // 🌍 Expose auth globally so chat.js can see it later
+  window.firebaseAuth = auth;
+  window.firebaseAuthAPI = {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    sendEmailVerification,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged
+  };
+  
+  // 🌍 Expose Firestore globally for cart sync
+  window.firebaseDB = db;
+
+  // Auth state management
+  const signInBtn = document.getElementById("authSignInBtn");
+  const signOutBtn = document.getElementById("authSignOutBtn");
+
+  onAuthStateChanged(auth, async (user) => {
+    console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
+    
+    if (user) {
+      // User is signed in - show sign out, hide sign in
+      signInBtn.style.display = "none";
+      signOutBtn.style.display = "block";
+      
+      // Load cart from Firestore when user signs in
+      const appStateElement = document.querySelector('[x-data]');
+      if (appStateElement && appStateElement.__x) {
+        const appData = appStateElement.__x.$data;
+        if (appData && typeof appData.loadCartFromFirestore === 'function') {
+          await appData.loadCartFromFirestore();
+        }
+      }
+    } else {
+      // User is signed out - show sign in, hide sign out
+      signInBtn.style.display = "block";
+      signOutBtn.style.display = "none";
+      
+      // Clear cart when user signs out
+      const appStateElement = document.querySelector('[x-data]');
+      if (appStateElement && appStateElement.__x) {
+        const appData = appStateElement.__x.$data;
+        if (appData && Array.isArray(appData.cart)) {
+          appData.cart = [];
+        }
+      }
+    }
+  });
+
+  // Sign out handler
+  signOutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
+  });
+  </script>
   
   <!-- Convert phone number digits to Persian numerals -->
   <script>
