@@ -19,6 +19,26 @@
     .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
+    
+    /* Slider styling */
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
   </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
@@ -241,11 +261,77 @@
       </div>
     </div>
 
+    <!-- Interactive Tire Universe -->
+    <div class="mb-12 glass rounded-3xl p-8 border-white/10">
+      <h3 class="text-2xl font-bold mb-2 text-center">عالم الإطارات التفاعلي</h3>
+      <p class="text-neutral-400 text-sm text-center mb-8">استكشف الإطارات بصرياً — اضبط الأزرار لمشاهدة تفاعل المنتجات</p>
+      
+      <div class="max-w-3xl mx-auto space-y-6">
+        <!-- Slider 1: Highway <-> City (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">طريق سريع</label>
+            <label class="text-sm font-semibold text-neutral-300">مدينة</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingType"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 2: Performance <-> Budget (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">أداء</label>
+            <label class="text-sm font-semibold text-neutral-300">ميزانية</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.priority"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+
+        <!-- Slider 3: Aggressive <-> Quiet (reversed for RTL) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-sm font-semibold text-neutral-300">رياضي</label>
+            <label class="text-sm font-semibold text-neutral-300">هادئ</label>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            x-model.number="tireUniverse.drivingStyle"
+            @input.debounce.150ms="updateTireScores()"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+        </div>
+      </div>
+    </div>
+
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
-        <article class="glass rounded-3xl overflow-hidden shine border-white/10">
+        <article 
+          class="glass rounded-3xl overflow-hidden shine border-white/10 transition-all duration-500 ease-out"
+          :style="getProductStyle(p)"
+        >
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
+            <!-- Alignment explanation -->
+            <div 
+              x-show="getProductExplanationAr(p)" 
+              x-transition
+              class="text-xs text-emerald-300 mb-1 italic"
+              x-text="getProductExplanationAr(p)"
+            ></div>
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
@@ -496,6 +582,14 @@
         // Bulk Mode
         bulkMode: initialBulkMode,
 
+        // Interactive Tire Universe
+        tireUniverse: {
+          drivingType: 50,  // 0 = City, 100 = Highway
+          priority: 50,     // 0 = Budget, 100 = Performance
+          drivingStyle: 50, // 0 = Quiet, 100 = Aggressive
+          scores: {}        // product scores cache
+        },
+
         toggleBulkMode(){
           // Bulk mode is now automatically saved via watcher in init()
           // This method just toggles the value, the watcher handles persistence
@@ -598,6 +692,9 @@
           if (saved) this.cart = JSON.parse(saved);
           this.$watch('cart', v => localStorage.setItem('aa_cart', JSON.stringify(v)));
           
+          // Initialize tire universe scores
+          this.updateTireScores();
+          
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
             // Watch currency changes
@@ -697,6 +794,118 @@
 
         subtotal(){
           return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        },
+
+        // Interactive Tire Universe Methods
+        updateTireScores(){
+          // Recalculate scores for all products
+          this.products.forEach(p => {
+            this.tireUniverse.scores[p.id] = this.calculateProductScore(p);
+          });
+        },
+
+        calculateProductScore(product){
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // Get price percentile (0-100)
+          const prices = this.products.map(p => p.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          const pricePercentile = maxPrice > minPrice 
+            ? ((product.price - minPrice) / (maxPrice - minPrice)) * 100 
+            : 50;
+          
+          // Brand category (performance tier)
+          const brandTier = {
+            'Bridgestone': 85,
+            'Firemax': 45,
+            'Duraturn': 60
+          }[product.brand] || 50;
+          
+          // Keyword matching from description
+          const desc = (product.desc || '').toLowerCase();
+          const name = (product.name || '').toLowerCase();
+          const text = desc + ' ' + name;
+          
+          // City vs Highway keywords
+          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring', 'مدينة', 'راحة', 'هادئ'];
+          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance', 'طريق', 'سرعة', 'ثبات'];
+          const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
+          const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingTypeScore = 100 - Math.abs(drivingType - (highwayScore - cityScore + 50));
+          
+          // Budget vs Performance - correlate with price percentile and brand
+          const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
+          const priorityScore = 100 - Math.abs(priority - performanceIndicator);
+          
+          // Quiet vs Aggressive keywords
+          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring', 'هادئ', 'راحة'];
+          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive', 'رياضي', 'أداء'];
+          const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
+          const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
+          const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
+          
+          // Weighted average
+          const finalScore = (drivingTypeScore * 0.33) + (priorityScore * 0.34) + (drivingStyleScore * 0.33);
+          
+          return Math.max(0, Math.min(100, finalScore));
+        },
+
+        getProductStyle(product){
+          const score = this.tireUniverse.scores[product.id] || 50;
+          
+          // Normalize score to 0-1 range
+          const normalized = score / 100;
+          
+          // Opacity: 0.6 to 1.0
+          const opacity = 0.6 + (normalized * 0.4);
+          
+          // Scale: 1.0 to 1.03
+          const scale = 1.0 + (normalized * 0.03);
+          
+          // Glow intensity
+          const glowIntensity = normalized * 8;
+          const glowColor = `rgba(0, 224, 164, ${normalized * 0.3})`;
+          
+          return {
+            opacity: opacity.toFixed(2),
+            transform: `scale(${scale.toFixed(3)})`,
+            boxShadow: score > 60 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
+            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+          };
+        },
+
+        getProductExplanationAr(product){
+          const score = this.tireUniverse.scores[product.id] || 50;
+          
+          // Only show explanation for highly aligned products
+          if (score < 65) return '';
+          
+          const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // Determine primary alignment (Arabic translations)
+          const explanations = [];
+          
+          if (drivingType > 65) {
+            explanations.push('مناسب أكثر للقيادة على الطرق السريعة');
+          } else if (drivingType < 35) {
+            explanations.push('مناسب أكثر للقيادة في المدينة');
+          }
+          
+          if (priority > 65) {
+            explanations.push('متوافق مع التركيز على الأداء');
+          } else if (priority < 35) {
+            explanations.push('متوافق مع أولوية الميزانية');
+          }
+          
+          if (drivingStyle > 65) {
+            explanations.push('مناسب للقيادة الرياضية');
+          } else if (drivingStyle < 35) {
+            explanations.push('مناسب للراحة الهادئة');
+          }
+          
+          // Return the most relevant explanation
+          return explanations[0] || 'متوافق جيداً مع تفضيلاتك';
         },
 
         // Generate product subject for questions (Arabic)
