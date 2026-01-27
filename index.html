@@ -306,7 +306,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingType"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -322,7 +321,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.priority"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -338,7 +336,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingStyle"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -962,14 +959,14 @@
           const amplifiedPriority = amplifyDelta(priority);
           const amplifiedDrivingStyle = amplifyDelta(drivingStyle);
           
-          // DOMINANCE THRESHOLD: Check if any slider is ±15 from center
+          // DOMINANCE THRESHOLD: Check if any slider is ±10 from center (increased sensitivity)
           const drivingTypeDelta = Math.abs(drivingType - 50);
           const priorityDelta = Math.abs(priority - 50);
           const drivingStyleDelta = Math.abs(drivingStyle - 50);
           
-          const drivingTypeDominant = drivingTypeDelta >= 15;
-          const priorityDominant = priorityDelta >= 15;
-          const drivingStyleDominant = drivingStyleDelta >= 15;
+          const drivingTypeDominant = drivingTypeDelta >= 10;
+          const priorityDominant = priorityDelta >= 10;
+          const drivingStyleDominant = drivingStyleDelta >= 10;
           
           // Get price percentile (0-100)
           const prices = this.products.map(p => p.price);
