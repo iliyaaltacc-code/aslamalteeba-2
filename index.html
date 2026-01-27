@@ -880,21 +880,30 @@
           // Normalize score to 0-1 range
           const normalized = score / 100;
           
-          // Opacity: 0.6 to 1.0
-          const opacity = 0.6 + (normalized * 0.4);
+          // Pyramid hierarchy mapping
+          // Vertical translation: high scores float up, low scores sink down
+          // Map 0-100 score to -40px (top) to +40px (bottom)
+          const translateY = (1 - normalized) * 40 - 20; // Center around 0
           
-          // Scale: 1.0 to 1.03
-          const scale = 1.0 + (normalized * 0.03);
+          // Opacity: 0.5 to 1.0 (more dramatic range)
+          const opacity = 0.5 + (normalized * 0.5);
           
-          // Glow intensity
-          const glowIntensity = normalized * 8;
-          const glowColor = `rgba(0, 224, 164, ${normalized * 0.3})`;
+          // Scale: 1.0 to 1.05 (increased range for hierarchy)
+          const scale = 1.0 + (normalized * 0.05);
+          
+          // Z-index: higher scores appear on top
+          const zIndex = Math.round(score);
+          
+          // Glow intensity (stronger for top products)
+          const glowIntensity = normalized * 12;
+          const glowColor = `rgba(0, 224, 164, ${normalized * 0.4})`;
           
           return {
             opacity: opacity.toFixed(2),
-            transform: `scale(${scale.toFixed(3)})`,
+            transform: `translateY(${translateY.toFixed(1)}px) scale(${scale.toFixed(3)})`,
             boxShadow: score > 65 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
-            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+            zIndex: zIndex,
+            transition: 'all 0.7s ease-in-out'
           };
         },
 
