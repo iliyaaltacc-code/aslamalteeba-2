@@ -313,7 +313,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingType"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -329,7 +328,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.priority"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -345,7 +343,6 @@
             min="0" 
             max="100" 
             x-model.number="tireUniverse.drivingStyle"
-            @input.debounce.150ms="updateTireScores()"
             class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
@@ -766,6 +763,11 @@
           // Initialize tire universe scores
           this.updateTireScores();
           
+          // Watch tire universe slider changes for immediate reactivity
+          this.$watch('tireUniverse.drivingType', () => this.updateTireScores());
+          this.$watch('tireUniverse.priority', () => this.updateTireScores());
+          this.$watch('tireUniverse.drivingStyle', () => this.updateTireScores());
+          
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
             // Watch currency changes
@@ -953,6 +955,9 @@
           // Assign both new objects in single operations to trigger reactivity
           this.tireUniverse.scores = newScores;
           this.tireUniverse.ranks = newRanks;
+          
+          // Force reactivity flush for RTL layout
+          this.tireUniverse = { ...this.tireUniverse };
         },
 
         calculateProductScore(product){
@@ -1489,7 +1494,20 @@
   const signInBtn = document.getElementById("authSignInBtn");
   const signOutBtn = document.getElementById("authSignOutBtn");
 
-  onAuthStateChanged(auth, async (user) => {
+  // Wait for Alpine to initialize before handling auth state
+  let alpineReady = false;
+  let pendingAuthUser = null;
+
+  document.addEventListener('alpine:init', async () => {
+    alpineReady = true;
+    // If auth state resolved before Alpine, process it now
+    if (pendingAuthUser !== null) {
+      await handleAuthState(pendingAuthUser);
+      pendingAuthUser = null;
+    }
+  });
+
+  async function handleAuthState(user) {
     console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
     
     if (user) {
@@ -1497,12 +1515,14 @@
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
       
-      // Load cart from Firestore when user signs in
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function') {
-          await appData.loadCartFromFirestore();
+      // Load cart from Firestore when user signs in (only if Alpine is ready)
+      if (alpineReady) {
+        const appStateElement = document.querySelector('[x-data]');
+        if (appStateElement && appStateElement.__x) {
+          const appData = appStateElement.__x.$data;
+          if (appData && typeof appData.loadCartFromFirestore === 'function') {
+            await appData.loadCartFromFirestore();
+          }
         }
       }
     } else {
@@ -1510,14 +1530,25 @@
       signInBtn.style.display = "block";
       signOutBtn.style.display = "none";
       
-      // Clear cart when user signs out
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        if (appData && Array.isArray(appData.cart)) {
-          appData.cart = [];
+      // Clear cart when user signs out (only if Alpine is ready)
+      if (alpineReady) {
+        const appStateElement = document.querySelector('[x-data]');
+        if (appStateElement && appStateElement.__x) {
+          const appData = appStateElement.__x.$data;
+          if (appData && Array.isArray(appData.cart)) {
+            appData.cart = [];
+          }
         }
       }
+    }
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    // If Alpine is ready, handle immediately; otherwise, defer until Alpine initializes
+    if (alpineReady) {
+      await handleAuthState(user);
+    } else {
+      pendingAuthUser = user;
     }
   });
 
