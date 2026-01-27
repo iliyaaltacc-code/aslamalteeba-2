@@ -329,30 +329,57 @@
       </div>
     </div>
 
+    <!-- PODIUM STAGE (separate from product grid) -->
+    <div class="mb-12 relative" style="height: 580px;">
+      <div class="absolute inset-0 glass rounded-3xl border-white/10 overflow-hidden">
+        <h3 class="text-xl font-bold text-center pt-4 pb-2">Podium Ranking</h3>
+        
+        <!-- 6 Fixed Podium Slots -->
+        <div class="relative w-full h-full">
+          <template x-for="p in products" :key="p.id">
+            <div 
+              :id="'podium-' + p.id"
+              class="absolute podium-card glass rounded-2xl overflow-hidden border-white/10"
+              :style="getPodiumSlotStyle(p)"
+              style="width: 200px; transition: all 1.4s cubic-bezier(0.22, 1, 0.36, 1);"
+            >
+              <!-- Rank Badge -->
+              <div 
+                class="absolute top-2 right-2 w-12 h-12 rounded-full flex flex-col items-center justify-center font-bold text-white shadow-lg z-10"
+                :style="{ background: getRankBadge(p).bg }"
+              >
+                <div class="text-xl" x-text="getRankBadge(p).medal"></div>
+                <div class="text-xs" x-text="getRankBadge(p).text"></div>
+              </div>
+              
+              <img :src="p.img" :alt="p.name" class="w-full h-32 object-contain bg-black/20"/>
+              <div class="p-3">
+                <h4 class="font-bold text-sm mb-1" x-text="p.name"></h4>
+                <div 
+                  class="text-xs font-semibold mb-1"
+                  :style="{ color: getVerdictText(p).color }"
+                  x-text="getVerdictText(p).text"
+                ></div>
+                <p class="text-neutral-400 text-xs" x-text="p.size"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original Product Grid (unchanged) -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
         <article 
-          class="glass rounded-3xl overflow-hidden shine border-white/10 relative"
-          :style="getProductStyle(p)"
+          class="glass rounded-3xl overflow-hidden shine border-white/10"
         >
-          <!-- Rank Badge (top-right corner) -->
-          <div 
-            class="absolute top-3 right-3 w-14 h-14 rounded-full flex flex-col items-center justify-center font-bold text-white shadow-lg z-10"
-            :style="{ background: getRankBadge(p).bg }"
-            style="animation: fadeInScale 0.4s ease-out 0.15s both;"
-          >
-            <div class="text-2xl" x-text="getRankBadge(p).medal"></div>
-            <div class="text-sm" x-text="getRankBadge(p).text"></div>
-          </div>
-          
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
             </div>
-            
-            <!-- Verdict Text (under product name) -->
             <div 
               class="text-sm font-semibold"
               :style="{ color: getVerdictText(p).color }"
@@ -864,11 +891,6 @@
         calculateProductScore(product){
           const { drivingType, priority, drivingStyle } = this.tireUniverse;
           
-          // Check if any slider is at extreme (authority rule)
-          const drivingTypeExtreme = drivingType <= 10 || drivingType >= 90;
-          const priorityExtreme = priority <= 10 || priority >= 90;
-          const drivingStyleExtreme = drivingStyle <= 10 || drivingStyle >= 90;
-          
           // Get price percentile (0-100)
           const prices = this.products.map(p => p.price);
           const minPrice = Math.min(...prices);
@@ -907,125 +929,103 @@
           const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
           const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
           
-          // SLIDER AUTHORITY RULE: If a slider is at extreme, that dimension dominates
-          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
-          
-          if (drivingTypeExtreme || priorityExtreme || drivingStyleExtreme) {
-            // Reset to zero, then boost extreme dimensions
-            weights = { drivingType: 0.1, priority: 0.1, drivingStyle: 0.1 };
-            
-            if (drivingTypeExtreme) weights.drivingType = 0.5;
-            if (priorityExtreme) weights.priority = 0.5;
-            if (drivingStyleExtreme) weights.drivingStyle = 0.5;
-            
-            // Normalize if multiple extremes
-            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
-            weights.drivingType /= totalWeight;
-            weights.priority /= totalWeight;
-            weights.drivingStyle /= totalWeight;
-          }
-          
-          // Weighted average with dynamic weights
-          const finalScore = (drivingTypeScore * weights.drivingType) + 
-                            (priorityScore * weights.priority) + 
-                            (drivingStyleScore * weights.drivingStyle);
+          // Weighted average
+          const finalScore = (drivingTypeScore * 0.33) + (priorityScore * 0.34) + (drivingStyleScore * 0.33);
           
           return Math.max(0, Math.min(100, finalScore));
         },
 
-        getProductStyle(product){
+        getPodiumSlotStyle(product){
           const rank = this.tireUniverse.ranks[product.id] || 3;
           
-          // FIXED PODIUM TIERS (literal winners' podium)
-          // Tier 1: Winner (Rank #1) - Center top
-          // Tier 2: Runners-up (Ranks #2-3) - Left/right of winner
-          // Tier 3: Lower relevance (Ranks #4-6) - Clearly below
+          // 6 FIXED PODIUM SLOTS using absolute positioning
+          // Centered horizontally, different vertical positions
+          const containerWidth = 1000; // approximate podium stage width
+          const cardWidth = 200;
+          const centerX = (containerWidth - cardWidth) / 2;
           
-          const podiumTiers = {
-            // Tier 1 - Winner
+          const podiumSlots = {
+            // Tier 1 - Winner (#1) - Center, highest
             1: { 
-              translateY: -120, 
-              translateX: 0, 
-              scale: 1.20, 
-              opacity: 1.0, 
+              top: 80,
+              left: centerX,
+              scale: 1.25,
+              opacity: 1.0,
               zIndex: 110,
               tier: 1,
-              animationDelay: '0.6s' // Settles last (hero moment)
+              delay: 0.6 // Settles last
             },
-            // Tier 2 - Runners-up
+            // Tier 2 - Runners-up (#2-3) - Left/right, slightly lower
             2: { 
-              translateY: -70, 
-              translateX: -80, 
-              scale: 1.05, 
-              opacity: 0.95, 
+              top: 160,
+              left: centerX - 240,
+              scale: 1.08,
+              opacity: 0.95,
               zIndex: 108,
               tier: 2,
-              animationDelay: '0.3s' // Second
+              delay: 0.3
             },
             3: { 
-              translateY: -70, 
-              translateX: 80, 
-              scale: 1.05, 
-              opacity: 0.95, 
+              top: 160,
+              left: centerX + 240,
+              scale: 1.08,
+              opacity: 0.95,
               zIndex: 108,
               tier: 2,
-              animationDelay: '0.3s' // Second
+              delay: 0.3
             },
-            // Tier 3 - Lower relevance
+            // Tier 3 - Lower (#4-6) - Row at bottom
             4: { 
-              translateY: 40, 
-              translateX: -60, 
-              scale: 0.92, 
-              opacity: 0.75, 
+              top: 340,
+              left: centerX - 240,
+              scale: 0.90,
+              opacity: 0.75,
               zIndex: 105,
               tier: 3,
-              animationDelay: '0s' // Moves first
+              delay: 0
             },
             5: { 
-              translateY: 40, 
-              translateX: 0, 
-              scale: 0.92, 
-              opacity: 0.70, 
+              top: 340,
+              left: centerX,
+              scale: 0.90,
+              opacity: 0.70,
               zIndex: 105,
               tier: 3,
-              animationDelay: '0s' // Moves first
+              delay: 0
             },
             6: { 
-              translateY: 40, 
-              translateX: 60, 
-              scale: 0.92, 
-              opacity: 0.65, 
+              top: 340,
+              left: centerX + 240,
+              scale: 0.90,
+              opacity: 0.65,
               zIndex: 105,
               tier: 3,
-              animationDelay: '0s' // Moves first
+              delay: 0
             }
           };
           
-          const style = podiumTiers[rank] || podiumTiers[3];
+          const slot = podiumSlots[rank] || podiumSlots[3];
           
-          // Enhanced glow for Tier 1 and 2 only
-          let glowIntensity = 0;
-          let glowColor = 'rgba(0, 224, 164, 0)';
-          
+          // Enhanced glow for top 3
+          let boxShadow = 'none';
           if (rank === 1) {
-            glowIntensity = 20; // Strong glow for winner
-            glowColor = 'rgba(0, 224, 164, 0.6)';
+            boxShadow = '0 0 25px rgba(0, 224, 164, 0.7)';
           } else if (rank === 2 || rank === 3) {
-            glowIntensity = 10; // Medium glow for runners-up
-            glowColor = 'rgba(0, 224, 164, 0.3)';
+            boxShadow = '0 0 15px rgba(0, 224, 164, 0.4)';
           }
           
           // Desaturate Tier 3
-          const filter = style.tier === 3 ? 'saturate(0.75)' : 'none';
+          const filter = slot.tier === 3 ? 'saturate(0.7) brightness(0.85)' : 'none';
           
           return {
-            opacity: style.opacity.toFixed(2),
-            transform: `translateY(${style.translateY}px) translateX(${style.translateX}px) scale(${style.scale.toFixed(3)})`,
-            boxShadow: glowIntensity > 0 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
-            zIndex: style.zIndex,
+            top: `${slot.top}px`,
+            left: `${slot.left}px`,
+            transform: `scale(${slot.scale})`,
+            opacity: slot.opacity,
+            zIndex: slot.zIndex,
+            boxShadow: boxShadow,
             filter: filter,
-            transitionDelay: style.animationDelay,
-            transition: 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)'
+            transitionDelay: `${slot.delay}s`
           };
         },
 
