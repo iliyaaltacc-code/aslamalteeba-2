@@ -330,7 +330,7 @@
     </div>
 
     <!-- PODIUM STAGE (separate from product grid) -->
-    <div class="mb-12 relative" style="height: 580px;">
+    <div class="mb-12 relative" style="height: 650px;">
       <div class="absolute inset-0 glass rounded-3xl border-white/10 overflow-hidden">
         <h3 class="text-xl font-bold text-center pt-4 pb-2">Podium Ranking</h3>
         
@@ -878,10 +878,29 @@
             this.tireUniverse.scores[p.id] = this.calculateProductScore(p);
           });
           
-          // Calculate ranks (1-6) based on scores
+          // RANK SNAPPING: Normalize score spread and force minimum distance
           const sortedProducts = [...this.products].sort((a, b) => 
             (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
           );
+          
+          // Force score separation: ensure minimum 8-point gaps between ranks
+          const minGap = 8;
+          for (let i = 1; i < sortedProducts.length; i++) {
+            const prevScore = this.tireUniverse.scores[sortedProducts[i-1].id];
+            const currScore = this.tireUniverse.scores[sortedProducts[i].id];
+            
+            if (prevScore - currScore < minGap) {
+              // Adjust current score to maintain minimum gap
+              this.tireUniverse.scores[sortedProducts[i].id] = prevScore - minGap;
+            }
+          }
+          
+          // Re-sort after adjustments
+          sortedProducts.sort((a, b) => 
+            (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0)
+          );
+          
+          // Assign ranks
           this.tireUniverse.ranks = {};
           sortedProducts.forEach((p, index) => {
             this.tireUniverse.ranks[p.id] = index + 1; // Ranks 1-6
@@ -890,6 +909,29 @@
 
         calculateProductScore(product){
           const { drivingType, priority, drivingStyle } = this.tireUniverse;
+          
+          // NON-LINEAR AMPLIFICATION: Apply power curve to slider deltas from center
+          const amplifyDelta = (sliderValue) => {
+            const delta = sliderValue - 50; // Distance from center
+            const sign = Math.sign(delta);
+            const absDelta = Math.abs(delta);
+            // Power curve: small movements get amplified more
+            const amplified = sign * Math.pow(absDelta, 1.6);
+            return 50 + amplified; // Return amplified slider position
+          };
+          
+          const amplifiedDrivingType = amplifyDelta(drivingType);
+          const amplifiedPriority = amplifyDelta(priority);
+          const amplifiedDrivingStyle = amplifyDelta(drivingStyle);
+          
+          // DOMINANCE THRESHOLD: Check if any slider is ±15 from center
+          const drivingTypeDelta = Math.abs(drivingType - 50);
+          const priorityDelta = Math.abs(priority - 50);
+          const drivingStyleDelta = Math.abs(drivingStyle - 50);
+          
+          const drivingTypeDominant = drivingTypeDelta >= 15;
+          const priorityDominant = priorityDelta >= 15;
+          const drivingStyleDominant = drivingStyleDelta >= 15;
           
           // Get price percentile (0-100)
           const prices = this.products.map(p => p.price);
@@ -911,26 +953,46 @@
           const name = (product.name || '').toLowerCase();
           const text = desc + ' ' + name;
           
-          // City vs Highway keywords
+          // City vs Highway keywords (using AMPLIFIED slider value)
           const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring'];
           const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance'];
           const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
           const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingTypeScore = 100 - Math.abs(drivingType - (highwayScore - cityScore + 50));
+          const drivingTypeScore = 100 - Math.abs(amplifiedDrivingType - (highwayScore - cityScore + 50));
           
-          // Budget vs Performance - correlate with price percentile and brand
+          // Budget vs Performance - correlate with price percentile and brand (using AMPLIFIED value)
           const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
-          const priorityScore = 100 - Math.abs(priority - performanceIndicator);
+          const priorityScore = 100 - Math.abs(amplifiedPriority - performanceIndicator);
           
-          // Quiet vs Aggressive keywords
+          // Quiet vs Aggressive keywords (using AMPLIFIED value)
           const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring'];
           const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive'];
           const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
           const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
+          const drivingStyleScore = 100 - Math.abs(amplifiedDrivingStyle - (aggressiveScore - quietScore + 50));
           
-          // Weighted average
-          const finalScore = (drivingTypeScore * 0.33) + (priorityScore * 0.34) + (drivingStyleScore * 0.33);
+          // DOMINANCE-BASED WEIGHTING
+          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
+          
+          if (drivingTypeDominant || priorityDominant || drivingStyleDominant) {
+            // When a dimension is dominant, boost its weight significantly
+            weights = { drivingType: 0.15, priority: 0.15, drivingStyle: 0.15 };
+            
+            if (drivingTypeDominant) weights.drivingType = 0.55;
+            if (priorityDominant) weights.priority = 0.55;
+            if (drivingStyleDominant) weights.drivingStyle = 0.55;
+            
+            // Normalize
+            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
+            weights.drivingType /= totalWeight;
+            weights.priority /= totalWeight;
+            weights.drivingStyle /= totalWeight;
+          }
+          
+          // Weighted average with dynamic weights
+          const finalScore = (drivingTypeScore * weights.drivingType) + 
+                            (priorityScore * weights.priority) + 
+                            (drivingStyleScore * weights.drivingStyle);
           
           return Math.max(0, Math.min(100, finalScore));
         },
@@ -976,7 +1038,7 @@
             },
             // Tier 3 - Lower (#4-6) - Row at bottom
             4: { 
-              top: 340,
+              top: 400,
               left: centerX - 240,
               scale: 0.90,
               opacity: 0.75,
@@ -985,7 +1047,7 @@
               delay: 0
             },
             5: { 
-              top: 340,
+              top: 400,
               left: centerX,
               scale: 0.90,
               opacity: 0.70,
@@ -994,7 +1056,7 @@
               delay: 0
             },
             6: { 
-              top: 340,
+              top: 400,
               left: centerX + 240,
               scale: 0.90,
               opacity: 0.65,
