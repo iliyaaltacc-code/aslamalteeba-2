@@ -610,8 +610,6 @@
           // Persist state
           if (window.CustomerMemory) {
             CustomerMemory.setSlidersDocked(this.slidersDocked);
-          } else {
-            localStorage.setItem('aa_slidersDocked', JSON.stringify(this.slidersDocked));
           }
         },
 
