@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="../customerMemory.js"></script>
@@ -54,11 +55,14 @@
     
     /* Fix Persian button text shaping */
     a[href="/fa/"] {
-      letter-spacing: normal !important;
-      font-kerning: normal;
-      font-feature-settings: "kern" 1, "liga" 1;
+      font-family: Vazirmatn, sans-serif !important;
+      letter-spacing: 0 !important;
+      word-spacing: 0 !important;
+      font-variant-ligatures: common-ligatures contextual;
+      font-feature-settings: "liga" 1, "clig" 1, "calt" 1, "ccmp" 1;
+      text-rendering: optimizeLegibility;
       white-space: nowrap;
-      font-family: Tajawal, system-ui, -apple-system, sans-serif;
+      direction: rtl;
     }
     
     /* Fix phone number display for RTL */
