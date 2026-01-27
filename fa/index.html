@@ -868,10 +868,28 @@
         calculateProductScore(product){
           const { drivingType, priority, drivingStyle } = this.tireUniverse;
           
-          // Check if any slider is at extreme (authority rule)
-          const drivingTypeExtreme = drivingType <= 10 || drivingType >= 90;
-          const priorityExtreme = priority <= 10 || priority >= 90;
-          const drivingStyleExtreme = drivingStyle <= 10 || drivingStyle >= 90;
+          // NON-LINEAR AMPLIFICATION: Apply power curve to slider deltas from center
+          const amplifyDelta = (sliderValue) => {
+            const delta = sliderValue - 50; // Distance from center
+            const sign = Math.sign(delta);
+            const absDelta = Math.abs(delta);
+            // Power curve: small movements get amplified more
+            const amplified = sign * Math.pow(absDelta, 1.6);
+            return 50 + amplified; // Return amplified slider position
+          };
+          
+          const amplifiedDrivingType = amplifyDelta(drivingType);
+          const amplifiedPriority = amplifyDelta(priority);
+          const amplifiedDrivingStyle = amplifyDelta(drivingStyle);
+          
+          // DOMINANCE THRESHOLD: Check if any slider is ±10 from center (increased sensitivity)
+          const drivingTypeDelta = Math.abs(drivingType - 50);
+          const priorityDelta = Math.abs(priority - 50);
+          const drivingStyleDelta = Math.abs(drivingStyle - 50);
+          
+          const drivingTypeDominant = drivingTypeDelta >= 10;
+          const priorityDominant = priorityDelta >= 10;
+          const drivingStyleDominant = drivingStyleDelta >= 10;
           
           // Get price percentile (0-100)
           const prices = this.products.map(p => p.price);
@@ -893,34 +911,36 @@
           const name = (product.name || '').toLowerCase();
           const text = desc + ' ' + name;
           
-          // City vs Highway keywords (Persian + English)
-          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring', 'شهری', 'راحت', 'آرام'];
-          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance', 'بزرگراه', 'سرعت', 'ثبات'];
+          // City vs Highway keywords (using AMPLIFIED slider value)
+          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring'];
+          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance'];
           const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
           const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingTypeScore = 100 - Math.abs(drivingType - (highwayScore - cityScore + 50));
+          const drivingTypeScore = 100 - Math.abs(amplifiedDrivingType - (highwayScore - cityScore + 50));
           
-          // Budget vs Performance - correlate with price percentile and brand
+          // Budget vs Performance - correlate with price percentile and brand (using AMPLIFIED value)
           const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
-          const priorityScore = 100 - Math.abs(priority - performanceIndicator);
+          const priorityScore = 100 - Math.abs(amplifiedPriority - performanceIndicator);
           
-          // Quiet vs Aggressive keywords (Persian + English)
-          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring', 'آرام', 'راحت'];
-          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive', 'ورزشی', 'عملکرد'];
+          // Quiet vs Aggressive keywords (using AMPLIFIED value)
+          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring'];
+          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive'];
           const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
           const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
+          const drivingStyleScore = 100 - Math.abs(amplifiedDrivingStyle - (aggressiveScore - quietScore + 50));
           
-          // SLIDER AUTHORITY RULE: If a slider is at extreme, that dimension dominates
+          // DOMINANCE-BASED WEIGHTING
           let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
           
-          if (drivingTypeExtreme || priorityExtreme || drivingStyleExtreme) {
-            weights = { drivingType: 0.1, priority: 0.1, drivingStyle: 0.1 };
+          if (drivingTypeDominant || priorityDominant || drivingStyleDominant) {
+            // When a dimension is dominant, boost its weight significantly
+            weights = { drivingType: 0.15, priority: 0.15, drivingStyle: 0.15 };
             
-            if (drivingTypeExtreme) weights.drivingType = 0.5;
-            if (priorityExtreme) weights.priority = 0.5;
-            if (drivingStyleExtreme) weights.drivingStyle = 0.5;
+            if (drivingTypeDominant) weights.drivingType = 0.55;
+            if (priorityDominant) weights.priority = 0.55;
+            if (drivingStyleDominant) weights.drivingStyle = 0.55;
             
+            // Normalize
             const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
             weights.drivingType /= totalWeight;
             weights.priority /= totalWeight;
