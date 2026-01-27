@@ -806,6 +806,11 @@
         calculateProductScore(product){
           const { drivingType, priority, drivingStyle } = this.tireUniverse;
           
+          // Check if any slider is at extreme (authority rule)
+          const drivingTypeExtreme = drivingType <= 10 || drivingType >= 90;
+          const priorityExtreme = priority <= 10 || priority >= 90;
+          const drivingStyleExtreme = drivingStyle <= 10 || drivingStyle >= 90;
+          
           // Get price percentile (0-100)
           const prices = this.products.map(p => p.price);
           const minPrice = Math.min(...prices);
@@ -844,8 +849,26 @@
           const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
           const drivingStyleScore = 100 - Math.abs(drivingStyle - (aggressiveScore - quietScore + 50));
           
-          // Weighted average
-          const finalScore = (drivingTypeScore * 0.33) + (priorityScore * 0.34) + (drivingStyleScore * 0.33);
+          // SLIDER AUTHORITY RULE: If a slider is at extreme, that dimension dominates
+          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
+          
+          if (drivingTypeExtreme || priorityExtreme || drivingStyleExtreme) {
+            weights = { drivingType: 0.1, priority: 0.1, drivingStyle: 0.1 };
+            
+            if (drivingTypeExtreme) weights.drivingType = 0.5;
+            if (priorityExtreme) weights.priority = 0.5;
+            if (drivingStyleExtreme) weights.drivingStyle = 0.5;
+            
+            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
+            weights.drivingType /= totalWeight;
+            weights.priority /= totalWeight;
+            weights.drivingStyle /= totalWeight;
+          }
+          
+          // Weighted average with dynamic weights
+          const finalScore = (drivingTypeScore * weights.drivingType) + 
+                            (priorityScore * weights.priority) + 
+                            (drivingStyleScore * weights.drivingStyle);
           
           return Math.max(0, Math.min(100, finalScore));
         },
@@ -853,32 +876,92 @@
         getProductStyle(product){
           const rank = this.tireUniverse.ranks[product.id] || 3;
           
-          // Rank-based podium mapping (dramatic differences)
-          const rankStyles = {
-            1: { translateY: -90, translateX: 0, scale: 1.10, opacity: 1.0, zIndex: 106 },
-            2: { translateY: -55, translateX: 15, scale: 1.06, opacity: 0.97, zIndex: 105 },
-            3: { translateY: -20, translateX: -15, scale: 1.03, opacity: 0.94, zIndex: 104 },
-            4: { translateY: 20, translateX: 20, scale: 0.99, opacity: 0.85, zIndex: 103 },
-            5: { translateY: 55, translateX: -20, scale: 0.95, opacity: 0.72, zIndex: 102 },
-            6: { translateY: 90, translateX: 0, scale: 0.90, opacity: 0.60, zIndex: 101 }
+          // FIXED PODIUM TIERS (literal winners' podium) - RTL mirrored
+          const podiumTiers = {
+            // Tier 1 - Winner
+            1: { 
+              translateY: -120, 
+              translateX: 0, 
+              scale: 1.20, 
+              opacity: 1.0, 
+              zIndex: 110,
+              tier: 1,
+              animationDelay: '0.6s'
+            },
+            // Tier 2 - Runners-up (mirrored for RTL)
+            2: { 
+              translateY: -70, 
+              translateX: 80, 
+              scale: 1.05, 
+              opacity: 0.95, 
+              zIndex: 108,
+              tier: 2,
+              animationDelay: '0.3s'
+            },
+            3: { 
+              translateY: -70, 
+              translateX: -80, 
+              scale: 1.05, 
+              opacity: 0.95, 
+              zIndex: 108,
+              tier: 2,
+              animationDelay: '0.3s'
+            },
+            // Tier 3 - Lower relevance (mirrored for RTL)
+            4: { 
+              translateY: 40, 
+              translateX: 60, 
+              scale: 0.92, 
+              opacity: 0.75, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            },
+            5: { 
+              translateY: 40, 
+              translateX: 0, 
+              scale: 0.92, 
+              opacity: 0.70, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            },
+            6: { 
+              translateY: 40, 
+              translateX: -60, 
+              scale: 0.92, 
+              opacity: 0.65, 
+              zIndex: 105,
+              tier: 3,
+              animationDelay: '0s'
+            }
           };
           
-          const style = rankStyles[rank] || rankStyles[3];
+          const style = podiumTiers[rank] || podiumTiers[3];
           
-          // Enhanced glow for top 3
-          const glowIntensity = rank <= 3 ? (4 - rank) * 8 : 0;
-          const glowColor = `rgba(0, 224, 164, ${(4 - rank) * 0.15})`;
+          // Enhanced glow for Tier 1 and 2 only
+          let glowIntensity = 0;
+          let glowColor = 'rgba(0, 224, 164, 0)';
           
-          // Slight desaturation for rank 6
-          const filter = rank === 6 ? 'saturate(0.7)' : 'none';
+          if (rank === 1) {
+            glowIntensity = 20;
+            glowColor = 'rgba(0, 224, 164, 0.6)';
+          } else if (rank === 2 || rank === 3) {
+            glowIntensity = 10;
+            glowColor = 'rgba(0, 224, 164, 0.3)';
+          }
+          
+          // Desaturate Tier 3
+          const filter = style.tier === 3 ? 'saturate(0.75)' : 'none';
           
           return {
             opacity: style.opacity.toFixed(2),
             transform: `translateY(${style.translateY}px) translateX(${style.translateX}px) scale(${style.scale.toFixed(3)})`,
-            boxShadow: rank <= 3 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
+            boxShadow: glowIntensity > 0 ? `0 0 ${glowIntensity}px ${glowColor}` : 'none',
             zIndex: style.zIndex,
             filter: filter,
-            transition: 'all 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)'
+            transitionDelay: style.animationDelay,
+            transition: 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)'
           };
         },
 
