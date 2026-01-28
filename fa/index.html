@@ -1537,6 +1537,18 @@
       console.error("Sign out error:", err);
     }
   });
+
+  // Profile icon click handler - checks auth state at click time
+  window.handleProfileClick = function() {
+    const user = window.firebaseAuth?.currentUser;
+    if (user) {
+      // User is signed in - go to profile page
+      window.location.href = "/fa/profile.html";
+    } else {
+      // User is signed out - go to auth page
+      window.location.href = "/auth.html";
+    }
+  };
   </script>
   
   <!-- Convert phone number digits to Persian numerals -->

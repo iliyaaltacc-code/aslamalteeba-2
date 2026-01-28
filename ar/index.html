@@ -112,6 +112,14 @@
           🇮🇷 فارسی
         </a>
 
+        <!-- Profile Icon (always visible) -->
+        <button id="profileIcon" onclick="handleProfileClick()" class="w-10 h-10 rounded-full bg-white/10 border border-white/10 hover:bg-white/15 flex items-center justify-center" title="الحساب" aria-label="الذهاب إلى الحساب أو تسجيل الدخول">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          </svg>
+        </button>
+
         <!-- Auth buttons (controlled by Firebase) -->
         <a href="/auth.html" id="authSignInBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           تسجيل الدخول / الحساب
@@ -1585,6 +1593,18 @@
       console.error("Sign out error:", err);
     }
   });
+
+  // Profile icon click handler - checks auth state at click time
+  window.handleProfileClick = function() {
+    const user = window.firebaseAuth?.currentUser;
+    if (user) {
+      // User is signed in - go to profile page
+      window.location.href = "/ar/profile.html";
+    } else {
+      // User is signed out - go to auth page
+      window.location.href = "/auth.html";
+    }
+  };
 </script>
   
   <!-- Convert phone number digits to Persian numerals -->
