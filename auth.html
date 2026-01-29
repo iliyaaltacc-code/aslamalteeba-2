@@ -242,14 +242,13 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Check if user needs email verification
         const isPasswordUser = user.providerData.some(provider => provider.providerId === "password");
         if (isPasswordUser && !user.emailVerified) {
-          // Email/password user without verification - stay on auth page
           status.textContent = "Please verify your email to continue.";
         } else {
-          // Verified email/password user or Google user - redirect to home
-          window.location.href = "/";
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 150);
         }
       }
     });
