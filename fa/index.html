@@ -758,7 +758,7 @@
           // Load cart from Firestore (or localStorage as fallback)
           await this.loadCartFromFirestore();
           
-          // Watch cart changes and sync to Firestore with debouncing
+          // Watch cart changes and sync to Firestore immediately
           this.$watch('cart', () => {
             this.syncCartToFirestore();
           });
