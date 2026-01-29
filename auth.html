@@ -214,6 +214,8 @@
       try {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
+        // Redirect after successful OAuth sign-in
+        window.location.href = "/";
       } catch (err) {
         status.textContent = err.message;
       }
@@ -223,6 +225,8 @@
       try {
         const provider = new OAuthProvider('microsoft.com');
         await signInWithPopup(auth, provider);
+        // Redirect after successful OAuth sign-in
+        window.location.href = "/";
       } catch (err) {
         status.textContent = err.message;
       }
