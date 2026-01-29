@@ -198,31 +198,27 @@
         return;
       }
 
-      // Disable the forgot password link while processing
       forgotPassword.style.pointerEvents = "none";
       forgotPassword.style.opacity = "0.5";
       status.textContent = "Sending password reset email...";
 
       try {
         await sendPasswordResetEmail(auth, email.value);
-        status.style.color = "#86efac"; // Green color for success
+        status.style.color = "#86efac";
         status.textContent = "Password reset email sent. Check your inbox.";
         
-        // Reset state after 3 seconds
         setTimeout(() => {
           status.textContent = "";
-          status.style.color = "#fca5a5"; // Back to default red
+          status.style.color = "#fca5a5";
           forgotPassword.style.pointerEvents = "auto";
           forgotPassword.style.opacity = "1";
         }, 3000);
       } catch (err) {
-        status.style.color = "#fca5a5"; // Red color for error
+        status.style.color = "#fca5a5";
         
-        // Provide user-friendly error messages
         if (err.code === "auth/invalid-email") {
           status.textContent = "Invalid email address.";
         } else if (err.code === "auth/user-not-found") {
-          // Use generic message to prevent email enumeration
           status.style.color = "#86efac";
           status.textContent = "If this email exists, a password reset link has been sent.";
           setTimeout(() => {
@@ -247,7 +243,7 @@
           status.textContent = "Please verify your email to continue.";
         } else {
           setTimeout(() => {
-            window.location.href = "/";
+            window.location.replace("/");
           }, 150);
         }
       }
