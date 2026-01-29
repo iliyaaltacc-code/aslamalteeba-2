@@ -683,9 +683,6 @@
           {role:'assistant', content:'Welcome to Aslama Alteeba. How can the team help with tires, sizing, or availability?'}
         ],
         
-        // Cart sync debounce timer
-        _cartSyncTimer: null,
-        
         // Currency conversion
         selectedCurrency: initialCurrency,
         exchangeRates: { USD: 1, AED: 3.67 },
@@ -815,14 +812,9 @@
           // Load cart from Firestore (or localStorage as fallback)
           await this.loadCartFromFirestore();
           
-          // Watch cart changes and sync to Firestore with debouncing
+          // Watch cart changes and sync to Firestore immediately
           this.$watch('cart', () => {
-            // Clear existing timer
-            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
-            // Set new timer to sync after 500ms of no changes
-            this._cartSyncTimer = setTimeout(() => {
-              this.syncCartToFirestore();
-            }, 500);
+            this.syncCartToFirestore();
           });
           
           // Initialize tire universe scores
@@ -948,7 +940,7 @@
             
             const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-            await setDoc(cartRef, { items: this.cart }, { merge: true });
+            await setDoc(cartRef, { items: this.cart });
           } catch (err) {
             console.error('Failed to sync cart to Firestore:', err);
             // Fallback to localStorage on error
