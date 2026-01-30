@@ -1603,11 +1603,11 @@
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
       
-      // Load cart from Firestore when user signs in
+      // Load cart from Firestore when user signs in (only if not already loaded)
       const appStateElement = document.querySelector('[x-data]');
       if (appStateElement && appStateElement.__x) {
         const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function') {
+        if (appData && typeof appData.loadCartFromFirestore === 'function' && !appData._cartLoadedOnce) {
           await appData.loadCartFromFirestore();
         }
       }
@@ -1626,11 +1626,12 @@
             await appData.loadCartFromFirestore();
           }
         } else if (appData && appData._cartLoadedOnce) {
-          // User just signed out - clear cart and localStorage, do NOT reload
+          // User just signed out - clear cart and localStorage, reset flag for next sign-in
           if (Array.isArray(appData.cart)) {
             appData.cart = [];
           }
           localStorage.removeItem('aa_cart');
+          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
         }
       }
     }
