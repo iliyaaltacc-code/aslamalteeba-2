@@ -735,7 +735,7 @@
         ],
 
         cart:[],
-        _cartLoadedFromFirestore: false, // Flag to prevent double-loading
+        _cartLoadedOnce: false, // Flag to prevent multiple cart loads per page session
 
         // Question generation templates (Persian)
         questionTemplates: {
@@ -918,8 +918,8 @@
         },
         
         async loadCartFromFirestore(){
-          // Prevent double-loading (only load once per session after auth state confirmed)
-          if (this._cartLoadedFromFirestore) return;
+          // Prevent multiple loads per page session
+          if (this._cartLoadedOnce) return;
           
           try {
             const user = window.firebaseAuth?.currentUser;
@@ -927,7 +927,7 @@
               // Not authenticated, try localStorage fallback
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
-              this._cartLoadedFromFirestore = true;
+              this._cartLoadedOnce = true;
               return;
             }
             
@@ -943,7 +943,7 @@
               this.cart = [];
             }
             
-            this._cartLoadedFromFirestore = true;
+            this._cartLoadedOnce = true;
           } catch (err) {
             console.error('Failed to load cart from Firestore:', err);
             // For authenticated users on error, keep cart empty (Firestore is truth)
@@ -955,7 +955,7 @@
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
             }
-            this._cartLoadedFromFirestore = true;
+            this._cartLoadedOnce = true;
           }
         },
 
@@ -1557,18 +1557,23 @@
       signInBtn.style.display = "block";
       signOutBtn.style.display = "none";
       
-      // Clear cart when user signs out
       const appStateElement = document.querySelector('[x-data]');
       if (appStateElement && appStateElement.__x) {
         const appData = appStateElement.__x.$data;
-        if (appData && Array.isArray(appData.cart)) {
-          appData.cart = [];
-          appData._cartLoadedFromFirestore = false; // Reset flag for next sign-in
+        
+        // On initial page load (flag not set), load cart from localStorage
+        if (appData && !appData._cartLoadedOnce) {
+          if (typeof appData.loadCartFromFirestore === 'function') {
+            await appData.loadCartFromFirestore();
+          }
+        } else if (appData && appData._cartLoadedOnce) {
+          // User just signed out - clear cart and localStorage, do NOT reload
+          if (Array.isArray(appData.cart)) {
+            appData.cart = [];
+          }
+          localStorage.removeItem('aa_cart');
         }
       }
-      
-      // Clear localStorage on sign-out
-      localStorage.removeItem('aa_cart');
     }
   });
 
