@@ -1612,6 +1612,14 @@
     // 🛡️ Firebase boot failure - log but keep UI visible
     console.error('Firebase initialization error:', bootError);
     // UI remains functional even if auth fails to initialize
+    
+    // Ensure critical functions are available even on Firebase failure
+    if (!window.handleProfileClick) {
+      window.handleProfileClick = function() {
+        // Fallback: always go to auth page if Firebase failed
+        window.location.href = "/auth.html";
+      };
+    }
   }
   </script>
   
