@@ -768,18 +768,19 @@
           // Watch cart changes with JSON signature to catch ALL mutations
           // (push, splice, qty changes, etc.)
           this.$watch(() => JSON.stringify(this.cart), () => {
-            // Update localStorage immediately ONLY if not authenticated
             const user = window.firebaseAuth?.currentUser;
-            if (!user) {
-              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-            }
             
-            // Clear existing timer
-            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
-            // Set new timer to sync to Firestore after 500ms of no changes
-            this._cartSyncTimer = setTimeout(() => {
+            if (!user) {
+              // Guest user: write to localStorage OR remove key if empty
+              if (this.cart.length === 0) {
+                localStorage.removeItem('aa_cart');
+              } else {
+                localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+              }
+            } else {
+              // Authenticated user: overwrite Firestore doc
               this.syncCartToFirestore();
-            }, 500);
+            }
           });
           
           // Initialize tire universe scores
@@ -895,18 +896,12 @@
         // Cart Firestore sync functions
         async syncCartToFirestore(){
           const user = window.firebaseAuth?.currentUser;
-          
-          // Update localStorage ONLY if not authenticated
-          if (!user) {
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-          }
+          if (!user || !window.firebaseDB) return;
           
           // Clear any previous error
           this.cartSyncError = '';
           
           try {
-            if (!user || !window.firebaseDB) return;
-            
             const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             // Overwrite (NO merge) to ensure removals are persisted
@@ -924,34 +919,34 @@
           try {
             const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) {
-              // Not authenticated, try localStorage fallback
+              // Guest user: load from localStorage ONLY
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
               this._cartLoadedOnce = true;
               return;
             }
             
+            // Authenticated user: load from Firestore ONLY
             const { doc, getDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             const cartSnap = await getDoc(cartRef);
             
             if (cartSnap.exists() && cartSnap.data().items) {
-              // Firestore is the source of truth for authenticated users
               this.cart = cartSnap.data().items;
             } else {
-              // No Firestore doc, start with empty cart (never use localStorage for authenticated users)
+              // No Firestore doc, start with empty cart
               this.cart = [];
             }
             
             this._cartLoadedOnce = true;
           } catch (err) {
             console.error('Failed to load cart from Firestore:', err);
-            // For authenticated users on error, keep cart empty (Firestore is truth)
+            // On error, keep cart empty for authenticated users
             const user = window.firebaseAuth?.currentUser;
             if (user) {
               this.cart = [];
             } else {
-              // Only use localStorage for unauthenticated users
+              // For guest users, try localStorage
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
             }
@@ -1567,12 +1562,12 @@
             await appData.loadCartFromFirestore();
           }
         } else if (appData && appData._cartLoadedOnce) {
-          // User just signed out - clear cart and localStorage, reset flag for next sign-in
+          // User just signed out - clear cart, reset flag, remove localStorage key
           if (Array.isArray(appData.cart)) {
             appData.cart = [];
           }
           localStorage.removeItem('aa_cart');
-          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
+          appData._cartLoadedOnce = false;
         }
       }
     }
