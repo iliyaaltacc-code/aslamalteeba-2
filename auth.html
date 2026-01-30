@@ -123,15 +123,6 @@
       </svg>
       Continue with Google
     </button>
-    <button class="secondary" id="microsoftBtn">
-      <svg class="provider-logo" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path fill="#f35325" d="M0 0h11v11H0z"/>
-        <path fill="#81bc06" d="M12 0h11v11H12z"/>
-        <path fill="#05a6f0" d="M0 12h11v11H0z"/>
-        <path fill="#ffba08" d="M12 12h11v11H12z"/>
-      </svg>
-      Continue with Microsoft
-    </button>
 
     <div class="switch" id="toggleMode">
       Don’t have an account? Create one
@@ -150,7 +141,6 @@
       sendEmailVerification,
       sendPasswordResetEmail,
       GoogleAuthProvider,
-      OAuthProvider,
       signInWithPopup,
       setPersistence,
       browserLocalPersistence,
@@ -180,7 +170,6 @@
     const status = document.getElementById("status");
     const title = document.getElementById("title");
     const googleBtn = document.getElementById("googleBtn");
-    const microsoftBtn = document.getElementById("microsoftBtn");
     const forgotPassword = document.getElementById("forgotPassword");
 
     toggleMode.onclick = () => {
@@ -234,44 +223,6 @@
     googleBtn.onclick = async () => {
       try {
         const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-        // Redirect after successful OAuth sign-in
-        window.location.href = "/";
-      } catch (err) {
-        // Handle auth/operation-not-allowed specifically
-        if (err.code === 'auth/operation-not-allowed') {
-          status.textContent = "Authentication provider not enabled or domain not authorized. Please check Firebase Console configuration.";
-        } else if (err.code === 'auth/popup-closed-by-user') {
-          status.textContent = "Sign-in cancelled.";
-        } else {
-          status.textContent = err.message;
-        }
-      }
-    };
-
-    // =====================================================================
-    // MICROSOFT OAUTH SIGN-IN
-    // =====================================================================
-    // REQUIRED FIREBASE CONSOLE CONFIGURATION:
-    //
-    // 1. Enable Microsoft Sign-In Provider:
-    //    Firebase Console → Authentication → Sign-in method → Microsoft
-    //    - Toggle "Enable"
-    //    - You may need to configure Microsoft Azure AD app (see Firebase docs)
-    //    - Save
-    //
-    // 2. Add Authorized Domains:
-    //    Firebase Console → Authentication → Settings → Authorized domains
-    //    - localhost (for local development)
-    //    - 127.0.0.1 (for local development)
-    //    - Your production domain (e.g., yourapp.com)
-    //    - Any preview/staging domains (e.g., *.vercel.app)
-    //
-    // If you see "auth/operation-not-allowed", check the above configuration.
-    // =====================================================================
-    microsoftBtn.onclick = async () => {
-      try {
-        const provider = new OAuthProvider('microsoft.com');
         await signInWithPopup(auth, provider);
         // Redirect after successful OAuth sign-in
         window.location.href = "/";
