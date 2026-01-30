@@ -734,8 +734,16 @@
           {id:'fir-2', brand:'Firemax', name:'Firemax FM316', size:'205/55R16', price:58.00, img:'https://www.tiremaxx.ca/public/upload/product/pattern_rc-upload-1688577203434-12.webp', desc:'تایر سواری اقتصادی.'}
         ],
 
+        // Phase 1: Alpine app state with cart persistence
         cart:[],
-        _cartLoadedOnce: false, // Flag to prevent multiple cart loads per page session
+        cartHydrated: false,       // true after cart loaded from storage
+        cartWatcherReady: false,   // prevents multiple watcher registrations
+        authReady: false,          // true after first auth state resolved
+        currentUid: null,          // tracks current signed-in user
+        isSavingCart: false,       // optional safety flag
+        cartSaveError: '',
+        cartLoadError: '',
+        _cartLoadedOnce: false,    // backwards compatibility flag
 
         // Question generation templates (Persian)
         questionTemplates: {
@@ -762,28 +770,16 @@
         productQuestions: {},
 
         async init(){
-          // DON'T load cart here - wait for auth state to be confirmed
-          // Cart will be loaded by onAuthStateChanged callback
-          
-          // Watch cart changes with JSON signature to catch ALL mutations
-          // (push, splice, qty changes, etc.)
-          this.$watch(() => JSON.stringify(this.cart), () => {
-            // Update localStorage immediately ONLY if not authenticated
-            const user = window.firebaseAuth?.currentUser;
-            if (!user) {
-              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-            }
-            
-            // Clear existing timer
-            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
-            // Set new timer to sync to Firestore after 500ms of no changes
-            this._cartSyncTimer = setTimeout(() => {
-              this.syncCartToFirestore();
-            }, 500);
-          });
+          // Phase 1: DO NOT load cart here - auth listener will handle it
+          // DO NOT set up cart watcher here - enableCartWatcherOnce() will handle it
           
           // Initialize tire universe scores
           this.updateTireScores();
+          
+          // Watch tire universe slider changes for immediate reactivity
+          this.$watch('tireUniverse.drivingType', () => this.updateTireScores());
+          this.$watch('tireUniverse.priority', () => this.updateTireScores());
+          this.$watch('tireUniverse.drivingStyle', () => this.updateTireScores());
           
           // Set up watchers for CustomerMemory preferences
           if (window.CustomerMemory) {
@@ -809,6 +805,88 @@
           
           // Fetch exchange rates
           await this.fetchExchangeRates();
+        },
+        
+        // Phase 1: Cart hydration methods
+        hydrateCartForGuest(){
+          try {
+            const saved = localStorage.getItem('aa_cart');
+            if (saved) {
+              this.cart = JSON.parse(saved);
+            } else {
+              this.cart = [];
+            }
+            this.cartHydrated = true;
+            this._cartLoadedOnce = true;
+            this.cartLoadError = '';
+          } catch (err) {
+            console.error('Failed to hydrate guest cart:', err);
+            this.cartLoadError = 'Failed to load cart from localStorage';
+            this.cart = [];
+            this.cartHydrated = true;
+            this._cartLoadedOnce = true;
+          }
+        },
+        
+        async hydrateCartForUser(uid){
+          try {
+            if (!window.firebaseDB || !window.firebaseFirestoreAPI) {
+              throw new Error('Firestore not available');
+            }
+            
+            const { doc, getDoc } = window.firebaseFirestoreAPI;
+            const cartRef = doc(window.firebaseDB, 'carts', uid);
+            const cartSnap = await getDoc(cartRef);
+            
+            if (cartSnap.exists() && cartSnap.data().items) {
+              this.cart = cartSnap.data().items;
+            } else {
+              this.cart = [];
+            }
+            this.cartHydrated = true;
+            this._cartLoadedOnce = true;
+            this.cartLoadError = '';
+          } catch (err) {
+            console.error('Failed to hydrate user cart:', err);
+            this.cartLoadError = 'Failed to load cart from Firestore';
+            this.cart = [];
+            this.cartHydrated = true;
+            this._cartLoadedOnce = true;
+          }
+        },
+        
+        persistCart(){
+          // Only persist if cart has been hydrated
+          if (!this.cartHydrated) return;
+          
+          try {
+            if (this.currentUid === null) {
+              // Guest mode: use localStorage
+              if (this.cart.length === 0) {
+                localStorage.removeItem('aa_cart');
+              } else {
+                localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+              }
+              this.cartSaveError = '';
+            } else {
+              // Authenticated mode: use Firestore
+              this.syncCartToFirestore();
+            }
+          } catch (err) {
+            console.error('Failed to persist cart:', err);
+            this.cartSaveError = 'Failed to save cart';
+          }
+        },
+        
+        enableCartWatcherOnce(){
+          if (this.cartWatcherReady) return;
+          
+          // Register ONE watcher only
+          this.$watch(() => JSON.stringify(this.cart), () => {
+            this.persistCart();
+          });
+          
+          this.cartWatcherReady = true;
         },
         
         // Show welcome back message
@@ -894,29 +972,29 @@
         
         // Cart Firestore sync functions
         async syncCartToFirestore(){
+          // Only sync if authenticated
           const user = window.firebaseAuth?.currentUser;
-          
-          // Update localStorage ONLY if not authenticated
-          if (!user) {
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-          }
-          
-          // Clear any previous error
-          this.cartSyncError = '';
+          if (!user || !window.firebaseDB) return;
           
           try {
-            if (!user || !window.firebaseDB) return;
+            this.isSavingCart = true;
+            this.cartSaveError = '';
             
             const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             // Overwrite (NO merge) to ensure removals are persisted
             await setDoc(cartRef, { items: this.cart, updatedAt: Date.now() });
+            
+            this.isSavingCart = false;
           } catch (err) {
             console.error('Failed to sync cart to Firestore:', err);
-            this.cartSyncError = 'Cart sync failed';
+            this.cartSaveError = 'Cart sync failed';
+            this.isSavingCart = false;
           }
         },
         
+        // DEPRECATED: Legacy method kept for backwards compatibility
+        // Use hydrateCartForGuest() or hydrateCartForUser(uid) instead
         async loadCartFromFirestore(){
           // Prevent multiple loads per page session
           if (this._cartLoadedOnce) return;
@@ -1474,125 +1552,200 @@
       }
     }
   </script>
-  <script src="/chat.js" defer></script>
+ <script src="/chat.js" defer></script>
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import {
-    getAuth,
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    sendEmailVerification,
-    GoogleAuthProvider,
-    signInWithPopup,
-    setPersistence,
-    browserLocalPersistence
-  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc
-  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
-    authDomain: "aslamalteeba-2.firebaseapp.com",
-    projectId: "aslamalteeba-2",
-    storageBucket: "aslamalteeba-2.firebasestorage.app",
-    messagingSenderId: "1004820564683",
-    appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // 🔒 Make "stay signed in" the default
-  setPersistence(auth, browserLocalPersistence);
-
-  // 🌍 Expose auth globally so chat.js can see it later
-  window.firebaseAuth = auth;
-  window.firebaseAuthAPI = {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    sendEmailVerification,
-    GoogleAuthProvider,
-    signInWithPopup,
-    onAuthStateChanged
-  };
-  
-  // 🌍 Expose Firestore globally for cart sync
-  window.firebaseDB = db;
-  window.firebaseFirestoreAPI = {
-    doc,
-    getDoc,
-    setDoc
-  };
-
-  // Auth state management
-  const signInBtn = document.getElementById("authSignInBtn");
-  const signOutBtn = document.getElementById("authSignOutBtn");
-
-  onAuthStateChanged(auth, async (user) => {
-    console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
-    
-    if (user) {
-      // User is signed in - show sign out, hide sign in
-      signInBtn.style.display = "none";
-      signOutBtn.style.display = "block";
-      
-      // Load cart from Firestore when user signs in (only if not already loaded)
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function' && !appData._cartLoadedOnce) {
-          await appData.loadCartFromFirestore();
-        }
-      }
-    } else {
-      // User is signed out - show sign in, hide sign out
-      signInBtn.style.display = "block";
-      signOutBtn.style.display = "none";
-      
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        
-        // On initial page load (flag not set), load cart from localStorage
-        if (appData && !appData._cartLoadedOnce) {
-          if (typeof appData.loadCartFromFirestore === 'function') {
-            await appData.loadCartFromFirestore();
-          }
-        } else if (appData && appData._cartLoadedOnce) {
-          // User just signed out - clear cart and localStorage, reset flag for next sign-in
-          if (Array.isArray(appData.cart)) {
-            appData.cart = [];
-          }
-          localStorage.removeItem('aa_cart');
-          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
-        }
-      }
-    }
+  // Phase 0: Render safety - global error capture
+  window.__BOOT_ERRORS__ = [];
+  window.addEventListener('error', (e) => {
+    window.__BOOT_ERRORS__.push({ type: 'error', message: e.message, stack: e.error?.stack });
+    console.error('Boot error:', e.message, e.error);
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    window.__BOOT_ERRORS__.push({ type: 'unhandledrejection', reason: e.reason });
+    console.error('Unhandled rejection:', e.reason);
   });
 
-  // Sign out handler
-  signOutBtn.addEventListener("click", async () => {
-    try {
-      // Clear Firestore cart BEFORE signing out
-      const user = window.firebaseAuth?.currentUser;
-      if (user && window.firebaseDB) {
-        const { doc, setDoc } = window.firebaseFirestoreAPI;
-        const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-        await setDoc(cartRef, { items: [], updatedAt: Date.now() });
+  // Phase 4: Prevent blank screen - Firebase init with error handling
+  let auth = null;
+  let db = null;
+  window.__FIREBASE_DISABLED__ = false;
+
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js");
+    const {
+      getAuth,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      sendEmailVerification,
+      GoogleAuthProvider,
+      signInWithPopup,
+      setPersistence,
+      browserLocalPersistence
+    } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js");
+    const {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } = await import("https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
+      authDomain: "aslamalteeba-2.firebaseapp.com",
+      projectId: "aslamalteeba-2",
+      storageBucket: "aslamalteeba-2.firebasestorage.app",
+      messagingSenderId: "1004820564683",
+      appId: "1:1004820564683:web:9833a031e3fa62a365e94e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // 🔒 Make "stay signed in" the default
+    await setPersistence(auth, browserLocalPersistence);
+
+    // 🌍 Expose auth globally so chat.js can see it later
+    window.firebaseAuth = auth;
+    window.firebaseAuthAPI = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      sendEmailVerification,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged
+    };
+    
+    // 🌍 Expose Firestore globally for cart sync
+    window.firebaseDB = db;
+    window.firebaseFirestoreAPI = {
+      doc,
+      getDoc,
+      setDoc
+    };
+  } catch (err) {
+    console.error('Firebase initialization failed:', err);
+    window.__FIREBASE_DISABLED__ = true;
+    window.__BOOT_ERRORS__.push({ type: 'firebase_init', error: err.message });
+    // Set dummy objects to prevent crashes
+    window.firebaseAuth = null;
+    window.firebaseDB = null;
+    window.firebaseAuthAPI = {};
+    window.firebaseFirestoreAPI = {};
+  }
+
+  // Phase 2: Auth state management (non-blocking)
+  // Setup after DOMContentLoaded to ensure Alpine is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const signInBtn = document.getElementById("authSignInBtn");
+    const signOutBtn = document.getElementById("authSignOutBtn");
+
+    // Phase 2: Auth wiring - non-blocking callback
+    const setupAuthListener = () => {
+      if (!auth || window.__FIREBASE_DISABLED__) {
+        // Firebase disabled - show graceful fallback
+        if (signInBtn) signInBtn.style.display = "block";
+        if (signOutBtn) signOutBtn.style.display = "none";
+        
+        // Hydrate guest cart immediately
+        const appStateElement = document.querySelector('[x-data]');
+        if (appStateElement && appStateElement.__x) {
+          const appData = appStateElement.__x.$data;
+          if (appData) {
+            appData.hydrateCartForGuest();
+            appData.enableCartWatcherOnce();
+          }
+        }
+        return;
+      }
+
+      const { onAuthStateChanged } = window.firebaseAuthAPI;
+      
+      // Non-async callback - update UI immediately, schedule cart hydration
+      onAuthStateChanged(auth, (user) => {
+        console.log("AUTH STATE:", user ? user.email : "SIGNED OUT");
+        
+        const appStateElement = document.querySelector('[x-data]');
+        if (!appStateElement || !appStateElement.__x) return;
+        const appData = appStateElement.__x.$data;
+        if (!appData) return;
+        
+        if (user) {
+          // User is signed in - update UI immediately
+          if (signInBtn) signInBtn.style.display = "none";
+          if (signOutBtn) signOutBtn.style.display = "block";
+          
+          // Update state immediately
+          appData.currentUid = user.uid;
+          appData.authReady = true;
+          
+          // Schedule cart hydration in microtask (non-blocking)
+          queueMicrotask(async () => {
+            try {
+              await appData.hydrateCartForUser(user.uid);
+              appData.enableCartWatcherOnce();
+            } catch (err) {
+              console.error('Error hydrating cart for user:', err);
+            }
+          });
+        } else {
+          // User is signed out - update UI immediately
+          if (signInBtn) signInBtn.style.display = "block";
+          if (signOutBtn) signOutBtn.style.display = "none";
+          
+          // Update state immediately
+          appData.currentUid = null;
+          appData.authReady = true;
+          
+          // Schedule cart hydration in microtask (non-blocking)
+          queueMicrotask(async () => {
+            try {
+              appData.hydrateCartForGuest();
+              appData.enableCartWatcherOnce();
+            } catch (err) {
+              console.error('Error hydrating guest cart:', err);
+            }
+          });
+        }
+      });
+    };
+
+    // Wait a bit for Alpine to be ready
+    setTimeout(setupAuthListener, 100);
+  });
+
+  // Phase 3: Sign out handler
+  document.addEventListener('DOMContentLoaded', () => {
+    const signOutBtn = document.getElementById("authSignOutBtn");
+    if (!signOutBtn) return;
+    
+    signOutBtn.addEventListener("click", async () => {
+      if (window.__FIREBASE_DISABLED__ || !auth) {
+        console.warn('Firebase disabled, cannot sign out');
+        return;
       }
       
-      await signOut(auth);
-    } catch (err) {
-      console.error("Sign out error:", err);
-    }
+      try {
+        // Clear Firestore cart BEFORE signing out
+        const user = window.firebaseAuth?.currentUser;
+        if (user && window.firebaseDB) {
+          const { doc, setDoc } = window.firebaseFirestoreAPI;
+          const cartRef = doc(window.firebaseDB, 'carts', user.uid);
+          await setDoc(cartRef, { items: [], updatedAt: Date.now() });
+        }
+        
+        const { signOut } = window.firebaseAuthAPI;
+        await signOut(auth);
+        
+        // Note: We do NOT clear guest localStorage cart here
+        // Guest cart stays separate from auth cart
+      } catch (err) {
+        console.error("Sign out error:", err);
+      }
+    });
   });
 
   // Profile icon click handler - checks auth state at click time
@@ -1606,7 +1759,29 @@
       window.location.href = "/auth.html";
     }
   };
-  </script>
+
+  // Phase 5: Debug helper for cart state inspection
+  window.__debugCart = function() {
+    const appStateElement = document.querySelector('[x-data]');
+    if (!appStateElement || !appStateElement.__x) {
+      return { error: 'Alpine not ready' };
+    }
+    const appData = appStateElement.__x.$data;
+    return {
+      cart: appData.cart,
+      cartLength: appData.cart.length,
+      hydrated: appData.cartHydrated,
+      watcherReady: appData.cartWatcherReady,
+      authReady: appData.authReady,
+      uid: appData.currentUid,
+      isSaving: appData.isSavingCart,
+      saveError: appData.cartSaveError,
+      loadError: appData.cartLoadError,
+      firebaseDisabled: window.__FIREBASE_DISABLED__,
+      bootErrors: window.__BOOT_ERRORS__
+    };
+  };
+</script>
   
   <!-- Convert phone number digits to Persian numerals -->
   <script>
