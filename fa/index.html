@@ -500,6 +500,11 @@
         <button class="p-2 rounded-lg bg-white/5" @click="cartOpen=false">✕</button>
       </div>
 
+      <!-- Cart sync status -->
+      <div x-show="cartSyncError" class="mb-3 px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-sm text-red-300">
+        <span x-text="cartSyncError"></span>
+      </div>
+
       <template x-if="cart.length===0">
         <p class="text-neutral-400">سبد خرید خالی است.</p>
       </template>
@@ -613,6 +618,7 @@
       
       return {
         cartOpen:false,
+        cartSyncError:'',
         filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
@@ -758,9 +764,18 @@
           // Load cart from Firestore (or localStorage as fallback)
           await this.loadCartFromFirestore();
           
-          // Watch cart changes and sync to Firestore immediately
-          this.$watch('cart', () => {
-            this.syncCartToFirestore();
+          // Watch cart changes with JSON signature to catch ALL mutations
+          // (push, splice, qty changes, etc.)
+          this.$watch(() => JSON.stringify(this.cart), () => {
+            // Update localStorage immediately
+            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+            
+            // Clear existing timer
+            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
+            // Set new timer to sync to Firestore after 500ms of no changes
+            this._cartSyncTimer = setTimeout(() => {
+              this.syncCartToFirestore();
+            }, 500);
           });
           
           // Initialize tire universe scores
@@ -875,17 +890,24 @@
         
         // Cart Firestore sync functions
         async syncCartToFirestore(){
+          // Always update localStorage first
+          localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+          
+          // Clear any previous error
+          this.cartSyncError = '';
+          
           try {
             const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) return;
             
             const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-            await setDoc(cartRef, { items: this.cart });
+            // Overwrite (NO merge) to ensure removals are persisted
+            await setDoc(cartRef, { items: this.cart, updatedAt: Date.now() });
           } catch (err) {
             console.error('Failed to sync cart to Firestore:', err);
-            // Fallback to localStorage on error
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+            this.cartSyncError = 'Cart sync failed';
+            // localStorage already updated above as fallback
           }
         },
         
@@ -904,7 +926,14 @@
             const cartSnap = await getDoc(cartRef);
             
             if (cartSnap.exists() && cartSnap.data().items) {
+              // Firestore is the source of truth
               this.cart = cartSnap.data().items;
+              // Update localStorage to match Firestore (prevent stale data)
+              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+            } else {
+              // No Firestore doc, try localStorage fallback
+              const saved = localStorage.getItem('aa_cart');
+              if (saved) this.cart = JSON.parse(saved);
             }
           } catch (err) {
             console.error('Failed to load cart from Firestore:', err);
@@ -1361,6 +1390,8 @@
             await this.sendTwoEmails(params);
             alert('✅ سفارش با موفقیت ثبت شد!');
             this.cart = [];
+            // Explicitly sync empty cart to Firestore
+            await this.syncCartToFirestore();
             this.cartOpen = false;
             this.checkout = {name:'',email:'',phone:'',vehicle:''};
           } catch(err){
