@@ -72,10 +72,10 @@
       border: none;
       cursor: pointer;
       transition: all 0.2s;
-      border-right: 1px solid rgba(255,255,255,0.1);
+      border-inline-end: 1px solid rgba(255,255,255,0.1);
     }
     .time-machine-btn:last-child {
-      border-right: none;
+      border-inline-end: none;
     }
     .time-machine-btn:hover {
       background: rgba(255,255,255,0.08);
@@ -479,12 +479,14 @@
                 
                 <!-- Compact Time Machine Control for Podium -->
                 <div class="mt-2">
-                  <div class="time-machine-control text-xs">
+                  <div class="time-machine-control text-xs" role="group" aria-label="محاكاة عمر الإطار">
                     <button 
                       class="time-machine-btn"
                       :class="{ 'active': getTireAge(p.id) === 'new' }"
                       @click="setTireAge(p.id, 'new')"
                       type="button"
+                      role="radio"
+                      :aria-checked="getTireAge(p.id) === 'new'"
                       style="padding: 0.25rem 0.5rem;"
                     >
                       جديد
@@ -494,15 +496,19 @@
                       :class="{ 'active': getTireAge(p.id) === 'year1' }"
                       @click="setTireAge(p.id, 'year1')"
                       type="button"
+                      role="radio"
+                      :aria-checked="getTireAge(p.id) === 'year1'"
                       style="padding: 0.25rem 0.5rem;"
                     >
-                      سنة
+                      ١ سنة
                     </button>
                     <button 
                       class="time-machine-btn"
                       :class="{ 'active': getTireAge(p.id) === 'year3' }"
                       @click="setTireAge(p.id, 'year3')"
                       type="button"
+                      role="radio"
+                      :aria-checked="getTireAge(p.id) === 'year3'"
                       style="padding: 0.25rem 0.5rem;"
                     >
                       ٣ سنوات
@@ -531,12 +537,14 @@
             <!-- Tire Time Machine Control -->
             <div class="mb-2">
               <div class="text-xs font-semibold text-neutral-400 mb-1">آلة الزمن للإطارات</div>
-              <div class="time-machine-control">
+              <div class="time-machine-control" role="group" aria-label="محاكاة عمر الإطار">
                 <button 
                   class="time-machine-btn"
                   :class="{ 'active': getTireAge(p.id) === 'new' }"
                   @click="setTireAge(p.id, 'new')"
                   type="button"
+                  role="radio"
+                  :aria-checked="getTireAge(p.id) === 'new'"
                 >
                   جديد
                 </button>
@@ -545,6 +553,8 @@
                   :class="{ 'active': getTireAge(p.id) === 'year1' }"
                   @click="setTireAge(p.id, 'year1')"
                   type="button"
+                  role="radio"
+                  :aria-checked="getTireAge(p.id) === 'year1'"
                 >
                   بعد سنة
                 </button>
@@ -553,6 +563,8 @@
                   :class="{ 'active': getTireAge(p.id) === 'year3' }"
                   @click="setTireAge(p.id, 'year3')"
                   type="button"
+                  role="radio"
+                  :aria-checked="getTireAge(p.id) === 'year3'"
                 >
                   بعد 3 سنوات
                 </button>
