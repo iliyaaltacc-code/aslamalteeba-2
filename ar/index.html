@@ -97,14 +97,10 @@
         <a href="#shipping" class="hover:text-white">الشحن</a>
         <a href="#brands" class="hover:text-white">العلامات التجارية</a>
         <a href="#intro" class="hover:text-white">بريد التعريف</a>
-        <a href="#shop" class="hover:text-white">المتجر</a>
+        <a href="#shop" class="hover:text-white">تصفح</a>
         <a href="#contact" class="hover:text-white">اتصل بنا</a>
       </nav>
       <div class="flex items-center gap-2">
-        <button class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" @click="cartOpen=true">
-          سلة الشراء <span class="ml-1 text-emerald-400 font-bold" x-text="cart.length"></span>
-        </button>
-
         <a href="/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇬🇧 English
         </a>
@@ -140,7 +136,7 @@
     <div>
       <h2 class="text-5xl font-extrabold mb-4 leading-tight">إطارات ممتازة.<br><span class="text-emerald-400">جودة الإمارات.</span></h2>
       <p class="text-lg text-neutral-300 mb-6">تقدم أسلمة الطيبة إطارات عالية الجودة في جميع أنحاء الإمارات. شراكات مع Duraturn و Bridgestone و Firemax تضمن السلامة والراحة والاعتمادية.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">تسوق الإطارات</a>
+      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">تصفح الإطارات</a>
     </div>
     <div>
       <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="عرض إطارات">
@@ -286,8 +282,8 @@
   <section id="shop" class="max-w-7xl mx-auto px-4 py-20">
     <div class="flex items-end justify-between gap-4 mb-6">
       <div>
-        <h2 class="text-3xl font-extrabold">متجر الإطارات</h2>
-        <p class="text-neutral-400">ابحث، صفِ حسب العلامة، أضف إلى السلة، وأرسل طلباً تجريبياً.</p>
+        <h2 class="text-3xl font-extrabold">تصفح الإطارات</h2>
+        <p class="text-neutral-400">ابحث وصفِ حسب العلامة لعرض كتالوج منتجاتنا.</p>
         <p class="text-amber-400 text-sm mt-1" x-show="bulkMode" x-cloak>لطلبات الجملة والاستفسارات عن أسعار الجملة</p>
       </div>
       <div class="flex gap-2 items-center">
@@ -473,7 +469,6 @@
                     <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
                     <div class="text-xs text-neutral-400" x-text="p.size"></div>
                   </div>
-                  <button class="px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="addToCart(p)">إضافة</button>
                 </div>
               </template>
               
@@ -512,69 +507,6 @@
     © <span x-text="new Date().getFullYear()"></span> Aslama Alteeba. جميع الحقوق محفوظة.
   </footer>
 
-  <!-- CART DRAWER -->
-  <div class="fixed inset-0 z-50" x-show="cartOpen" x-transition>
-    <div class="absolute inset-0 bg-black/60" @click="cartOpen=false"></div>
-    <aside class="absolute left-0 top-0 bottom-0 w-full max-w-md bg-neutral-900 border-r border-white/10 p-5 overflow-y-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-extrabold">سلة الشراء الخاصة بك</h3>
-        <button class="p-2 rounded-lg bg-white/5" @click="cartOpen=false">✕</button>
-      </div>
-
-      <!-- Cart sync status -->
-      <div x-show="cartSyncError" class="mb-3 px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-sm text-red-300">
-        <span x-text="cartSyncError"></span>
-      </div>
-
-      <template x-if="cart.length===0">
-        <p class="text-neutral-400">السلة فارغة.</p>
-      </template>
-
-      <div class="space-y-3">
-        <template x-for="(item, idx) in cart" :key="item.id + '-' + idx">
-          <div class="flex gap-3 items-center glass rounded-2xl p-3">
-            <img :src="item.img" :alt="item.name" class="w-16 h-16 rounded-xl object-contain bg-black/30"/>
-            <div class="flex-1">
-              <div class="font-semibold" x-text="item.name"></div>
-              <div class="text-xs text-neutral-400" x-text="item.size + ' • ' + item.brand"></div>
-              <div class="text-sm" x-text="formatPrice(item.price)"></div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button class="px-2 py-1 bg-white/10 rounded" @click="item.qty = Math.max(1, item.qty-1)">-</button>
-              <span x-text="item.qty"></span>
-              <button class="px-2 py-1 bg-white/10 rounded" @click="item.qty++">+</button>
-              <button class="px-2 py-1 bg-white/10 rounded" title="إزالة" @click="cart.splice(idx,1)">×</button>
-            </div>
-          </div>
-        </template>
-      </div>
-
-      <div class="mt-6 p-4 glass rounded-2xl space-y-2">
-        <div class="flex items-center justify-between text-sm">
-          <span>الإجمالي الفرعي</span>
-          <span x-text="formatPrice(subtotal())"></span>
-        </div>
-        <div class="flex items-center justify-between text-sm text-neutral-400">
-          <span>الضريبة (5% تجريبية)</span>
-          <span x-text="formatPrice(subtotal()*0.05)"></span>
-        </div>
-        <div class="flex items-center justify-between font-bold pt-1">
-          <span>الإجمالي</span>
-          <span x-text="formatPrice(subtotal()*1.05)"></span>
-        </div>
-      </div>
-
-      <form class="mt-6 space-y-3" @submit.prevent="placeOrder()">
-        <h4 class="font-bold">إتمام الشراء</h4>
-        <input required x-model="checkout.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="الاسم الكامل"/>
-        <input required x-model="checkout.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="البريد الإلكتروني للتأكيد"/>
-        <input x-model="checkout.phone" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="رقم الهاتف (اختياري)"/>
-        <input x-model="checkout.vehicle" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="المركبة (اختياري)"/>
-        <button class="w-full px-5 py-3 rounded-2xl brand-gradient text-black font-bold" :disabled="cart.length===0">إرسال طلب تجريبي</button>
-        <p class="text-xs text-neutral-400">سيتم إرسال بريدين: واحد لنا وواحد لك. لا حاجة لتطبيق البريد.</p>
-      </form>
-    </aside>
-  </div>
 
   
 
@@ -673,13 +605,10 @@
       }
       
       return {
-        cartOpen:false,
-        cartSyncError:'',
         filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
         contact:{name:'',email:'',message:''},
-        checkout:{name:'',email:'',phone:'',vehicle:''},
         intro:{name:'',email:'',phone:''},
         introSuccess:false,
         introError:'',
@@ -790,9 +719,6 @@
           {id:'fir-2', brand:'Firemax', name:'Firemax FM316', size:'205/55R16', price:58.00, img:'https://www.tiremaxx.ca/public/upload/product/pattern_rc-upload-1688577203434-12.webp', desc:'إطار ركاب اقتصادي.'}
         ],
 
-        cart:[],
-        _cartLoadedOnce: false, // Flag to prevent multiple cart loads per page session
-
         // Question generation templates (Arabic)
         questionTemplates: {
           intents: [
@@ -818,26 +744,6 @@
         productQuestions: {},
 
         async init(){
-          // DON'T load cart here - wait for auth state to be confirmed
-          // Cart will be loaded by onAuthStateChanged callback
-          
-          // Watch cart changes with JSON signature to catch ALL mutations
-          // (push, splice, qty changes, etc.)
-          this.$watch(() => JSON.stringify(this.cart), () => {
-            // Update localStorage immediately ONLY if not authenticated
-            const user = window.firebaseAuth?.currentUser;
-            if (!user) {
-              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-            }
-            
-            // Clear existing timer
-            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
-            // Set new timer to sync to Firestore after 500ms of no changes
-            this._cartSyncTimer = setTimeout(() => {
-              this.syncCartToFirestore();
-            }, 500);
-          });
-          
           // Initialize tire universe scores
           this.updateTireScores();
           
@@ -929,90 +835,6 @@
             const queryMatch = !q || (p.name + ' ' + p.size).toLowerCase().includes(q);
             return brandMatch && queryMatch;
           });
-        },
-
-        addToCart(p){
-          // AUTH GATE: Require authentication before adding to cart
-          if (!window.firebaseAuth?.currentUser) {
-            window.location.href = '/auth.html';
-            return;
-          }
-          
-          const existing = this.cart.find(i => i.id === p.id);
-          if (existing) existing.qty++;
-          else this.cart.push({...p, qty:1});
-          this.cartOpen = true;
-        },
-
-        subtotal(){
-          return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-        },
-        
-        // Cart Firestore sync functions
-        async syncCartToFirestore(){
-          const user = window.firebaseAuth?.currentUser;
-          
-          // Update localStorage ONLY if not authenticated
-          if (!user) {
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-          }
-          
-          // Clear any previous error
-          this.cartSyncError = '';
-          
-          try {
-            if (!user || !window.firebaseDB) return;
-            
-            const { doc, setDoc } = window.firebaseFirestoreAPI;
-            const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-            // Overwrite (NO merge) to ensure removals are persisted
-            await setDoc(cartRef, { items: this.cart, updatedAt: Date.now() });
-          } catch (err) {
-            console.error('Failed to sync cart to Firestore:', err);
-            this.cartSyncError = 'Cart sync failed';
-          }
-        },
-        
-        async loadCartFromFirestore(){
-          // Prevent multiple loads per page session
-          if (this._cartLoadedOnce) return;
-          
-          try {
-            const user = window.firebaseAuth?.currentUser;
-            if (!user || !window.firebaseDB) {
-              // Not authenticated, try localStorage fallback
-              const saved = localStorage.getItem('aa_cart');
-              if (saved) this.cart = JSON.parse(saved);
-              this._cartLoadedOnce = true;
-              return;
-            }
-            
-            const { doc, getDoc } = window.firebaseFirestoreAPI;
-            const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-            const cartSnap = await getDoc(cartRef);
-            
-            if (cartSnap.exists() && cartSnap.data().items) {
-              // Firestore is the source of truth for authenticated users
-              this.cart = cartSnap.data().items;
-            } else {
-              // No Firestore doc, start with empty cart (never use localStorage for authenticated users)
-              this.cart = [];
-            }
-            
-            this._cartLoadedOnce = true;
-          } catch (err) {
-            console.error('Failed to load cart from Firestore:', err);
-            // For authenticated users on error, keep cart empty (Firestore is truth)
-            const user = window.firebaseAuth?.currentUser;
-            if (user) {
-              this.cart = [];
-            } else {
-              // Only use localStorage for unauthenticated users
-              const saved = localStorage.getItem('aa_cart');
-              if (saved) this.cart = JSON.parse(saved);
-            }
-            this._cartLoadedOnce = true;
-          }
         },
 
         // Interactive Tire Universe Methods
@@ -1440,38 +1262,6 @@
           }
         },
 
-        // ORDER
-        async placeOrder(){
-          if (this.cart.length===0) return;
-          const lines = this.cart.map(i => `${i.qty}x ${i.name} (${i.size}) — $${(i.price*i.qty).toFixed(2)}`).join('\n');
-          const sub = this.subtotal(), vat=sub*0.05, total=sub+vat;
-          const params = {
-            subject_line: `طلب — ${this.checkout.name}`,
-            from_name: this.checkout.name,
-            from_email: this.checkout.email,
-            customer_email: this.checkout.email,
-            message: 'تم إنشاء طلب جديد عبر الموقع (وضع تجريبي).',
-            order_lines: lines,
-            order_subtotal: `$${sub.toFixed(2)}`,
-            order_vat: `$${vat.toFixed(2)}`,
-            order_total: `$${total.toFixed(2)}`,
-            customer_phone: this.checkout.phone || 'N/A',
-            customer_vehicle: this.checkout.vehicle || 'N/A'
-          };
-          try {
-            await this.sendTwoEmails(params);
-            alert('✅ تم إرسال الطلب بنجاح!');
-            this.cart = [];
-            // Explicitly sync empty cart to Firestore
-            await this.syncCartToFirestore();
-            this.cartOpen = false;
-            this.checkout = {name:'',email:'',phone:'',vehicle:''};
-          } catch(err){
-            console.error(err);
-            alert('❌ حدث خطأ أثناء إرسال الطلب: ' + (err?.text || err?.message || 'غير معروف'));
-          }
-        },
-
         // INTRO EMAIL (uses dedicated template)
         async sendIntro(){
           this.introSuccess = false; this.introError = '';
@@ -1580,7 +1370,7 @@
     onAuthStateChanged
   };
 
-  // 🌍 Expose Firestore globally for cart sync
+  // 🌍 Expose Firestore globally
   window.firebaseDB = db;
   window.firebaseFirestoreAPI = {
     doc,
@@ -1599,52 +1389,16 @@
       // User is signed in - show sign out, hide sign in
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
-      
-      // Load cart from Firestore when user signs in (only if not already loaded)
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function' && !appData._cartLoadedOnce) {
-          await appData.loadCartFromFirestore();
-        }
-      }
     } else {
       // User is signed out - show sign in, hide sign out
       signInBtn.style.display = "block";
       signOutBtn.style.display = "none";
-      
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        
-        // On initial page load (flag not set), load cart from localStorage
-        if (appData && !appData._cartLoadedOnce) {
-          if (typeof appData.loadCartFromFirestore === 'function') {
-            await appData.loadCartFromFirestore();
-          }
-        } else if (appData && appData._cartLoadedOnce) {
-          // User just signed out - clear cart and localStorage, reset flag for next sign-in
-          if (Array.isArray(appData.cart)) {
-            appData.cart = [];
-          }
-          localStorage.removeItem('aa_cart');
-          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
-        }
-      }
     }
   });
 
   // Sign out handler
   signOutBtn.addEventListener("click", async () => {
     try {
-      // Clear Firestore cart BEFORE signing out
-      const user = window.firebaseAuth?.currentUser;
-      if (user && window.firebaseDB) {
-        const { doc, setDoc } = window.firebaseFirestoreAPI;
-        const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-        await setDoc(cartRef, { items: [], updatedAt: Date.now() });
-      }
-      
       await signOut(auth);
     } catch (err) {
       console.error("Sign out error:", err);
