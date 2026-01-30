@@ -1555,6 +1555,8 @@
     setDoc
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+  // 🛡️ Boot-error capture: Ensure UI never renders blank on auth failures
+  try {
   const firebaseConfig = {
     apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
     authDomain: "aslamalteeba-2.firebaseapp.com",
@@ -1665,6 +1667,11 @@
       window.location.href = "/auth.html";
     }
   };
+  } catch (bootError) {
+    // 🛡️ Firebase boot failure - log but keep UI visible
+    console.error('Firebase initialization error:', bootError);
+    // UI remains functional even if auth fails to initialize
+  }
 </script>
 </body>
 </html>
