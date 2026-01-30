@@ -789,7 +789,7 @@
         ],
 
         cart:[],
-        _cartLoadedOnce: false, // Flag to prevent multiple cart loads per page session
+        cartHydrated: false, // Flag to indicate cart has been loaded from storage
 
         // Question generation templates
         questionTemplates: {
@@ -816,26 +816,6 @@
         productQuestions: {},
 
         async init(){
-          // DON'T load cart here - wait for auth state to be confirmed
-          // Cart will be loaded by onAuthStateChanged callback
-          
-          // Watch cart changes with JSON signature to catch ALL mutations
-          // (push, splice, qty changes, etc.)
-          this.$watch(() => JSON.stringify(this.cart), () => {
-            // Update localStorage immediately ONLY if not authenticated
-            const user = window.firebaseAuth?.currentUser;
-            if (!user) {
-              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-            }
-            
-            // Clear existing timer
-            if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
-            // Set new timer to sync to Firestore after 500ms of no changes
-            this._cartSyncTimer = setTimeout(() => {
-              this.syncCartToFirestore();
-            }, 500);
-          });
-          
           // Initialize tire universe scores
           this.updateTireScores();
           
@@ -868,6 +848,28 @@
           
           // Fetch exchange rates
           await this.fetchExchangeRates();
+        },
+        
+        // Setup cart watcher - called AFTER cart is loaded
+        setupCartWatcher(){
+          this.$watch(() => JSON.stringify(this.cart), () => {
+            // Only sync if cart has been hydrated from storage
+            if (!this.cartHydrated) return;
+            
+            const user = window.firebaseAuth?.currentUser;
+            
+            if (!user) {
+              // Guest user: write to localStorage OR remove key if empty
+              if (this.cart.length === 0) {
+                localStorage.removeItem('aa_cart');
+              } else {
+                localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+              }
+            } else {
+              // Authenticated user: overwrite Firestore doc
+              this.syncCartToFirestore();
+            }
+          });
         },
         
         // Show welcome back message
@@ -954,18 +956,12 @@
         // Cart Firestore sync functions
         async syncCartToFirestore(){
           const user = window.firebaseAuth?.currentUser;
-          
-          // Update localStorage ONLY if not authenticated
-          if (!user) {
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
-          }
+          if (!user || !window.firebaseDB) return;
           
           // Clear any previous error
           this.cartSyncError = '';
           
           try {
-            if (!user || !window.firebaseDB) return;
-            
             const { doc, setDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             // Overwrite (NO merge) to ensure removals are persisted
@@ -977,44 +973,54 @@
         },
         
         async loadCartFromFirestore(){
-          // Prevent multiple loads per page session
-          if (this._cartLoadedOnce) return;
+          // Prevent multiple loads
+          if (this.cartHydrated) return;
+          
+          const user = window.firebaseAuth?.currentUser;
           
           try {
-            const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) {
-              // Not authenticated, try localStorage fallback
+              // Guest user: load from localStorage ONLY
               const saved = localStorage.getItem('aa_cart');
-              if (saved) this.cart = JSON.parse(saved);
-              this._cartLoadedOnce = true;
+              if (saved) {
+                this.cart = JSON.parse(saved);
+              }
+              this.cartHydrated = true;
+              // Setup watcher after cart is loaded
+              this.setupCartWatcher();
               return;
             }
             
+            // Authenticated user: load from Firestore ONLY
             const { doc, getDoc } = window.firebaseFirestoreAPI;
             const cartRef = doc(window.firebaseDB, 'carts', user.uid);
             const cartSnap = await getDoc(cartRef);
             
             if (cartSnap.exists() && cartSnap.data().items) {
-              // Firestore is the source of truth for authenticated users
               this.cart = cartSnap.data().items;
             } else {
-              // No Firestore doc, start with empty cart (never use localStorage for authenticated users)
+              // No Firestore doc, start with empty cart
               this.cart = [];
             }
             
-            this._cartLoadedOnce = true;
+            this.cartHydrated = true;
+            // Setup watcher after cart is loaded
+            this.setupCartWatcher();
           } catch (err) {
             console.error('Failed to load cart from Firestore:', err);
-            // For authenticated users on error, keep cart empty (Firestore is truth)
-            const user = window.firebaseAuth?.currentUser;
+            // On error, keep cart empty for authenticated users
             if (user) {
               this.cart = [];
             } else {
-              // Only use localStorage for unauthenticated users
+              // For guest users, try localStorage
               const saved = localStorage.getItem('aa_cart');
-              if (saved) this.cart = JSON.parse(saved);
+              if (saved) {
+                this.cart = JSON.parse(saved);
+              }
             }
-            this._cartLoadedOnce = true;
+            this.cartHydrated = true;
+            // Setup watcher even on error
+            this.setupCartWatcher();
           }
         },
 
@@ -1602,39 +1608,34 @@
       // User is signed in - show sign out, hide sign in
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
-      
-      // Load cart from Firestore when user signs in (only if not already loaded)
-      const appStateElement = document.querySelector('[x-data]');
-      if (appStateElement && appStateElement.__x) {
-        const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function' && !appData._cartLoadedOnce) {
-          await appData.loadCartFromFirestore();
-        }
-      }
     } else {
       // User is signed out - show sign in, hide sign out
       signInBtn.style.display = "block";
       signOutBtn.style.display = "none";
       
+      // On sign out, clear cart and localStorage
       const appStateElement = document.querySelector('[x-data]');
       if (appStateElement && appStateElement.__x) {
         const appData = appStateElement.__x.$data;
-        
-        // On initial page load (flag not set), load cart from localStorage
-        if (appData && !appData._cartLoadedOnce) {
-          if (typeof appData.loadCartFromFirestore === 'function') {
-            await appData.loadCartFromFirestore();
-          }
-        } else if (appData && appData._cartLoadedOnce) {
-          // User just signed out - clear cart and localStorage, reset flag for next sign-in
-          if (Array.isArray(appData.cart)) {
-            appData.cart = [];
-          }
+        if (appData && appData.cartHydrated) {
+          // User just signed out - clear cart and localStorage
+          appData.cart = [];
           localStorage.removeItem('aa_cart');
-          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
+          appData.cartHydrated = false;
         }
       }
     }
+    
+    // Defer cart loading to not block UI rendering
+    setTimeout(() => {
+      const appStateElement = document.querySelector('[x-data]');
+      if (appStateElement && appStateElement.__x) {
+        const appData = appStateElement.__x.$data;
+        if (appData && typeof appData.loadCartFromFirestore === 'function') {
+          appData.loadCartFromFirestore();
+        }
+      }
+    }, 0);
   });
 
   // Sign out handler
