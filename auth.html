@@ -187,6 +187,10 @@
     const phoneNumber = document.getElementById("phoneNumber");
     const verificationCode = document.getElementById("verificationCode");
 
+    let confirmationResult = null;
+    let recaptchaVerifier = null;
+    let phoneAuthStep = 0;
+
     toggleMode.onclick = () => {
       if (phoneAuthStep > 0) {
         phoneAuthStep = 0;
@@ -322,10 +326,6 @@
       }
     };
 
-    let confirmationResult = null;
-    let recaptchaVerifier = null;
-    let phoneAuthStep = 0;
-
     phoneBtn.onclick = async () => {
       status.textContent = "";
       status.style.color = "#fca5a5";
@@ -341,9 +341,14 @@
         toggleMode.textContent = "Back to other sign-in options";
         
         if (!recaptchaVerifier) {
-          recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-            size: "invisible"
-          });
+          try {
+            recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+              size: "invisible"
+            });
+          } catch (err) {
+            status.textContent = "Failed to initialize reCAPTCHA. Please refresh the page.";
+            return;
+          }
         }
         
         phoneAuthStep = 1;
@@ -369,6 +374,10 @@
         } catch (err) {
           phoneBtn.disabled = false;
           status.style.color = "#fca5a5";
+          if (recaptchaVerifier) {
+            recaptchaVerifier.clear();
+            recaptchaVerifier = null;
+          }
           if (err.code === "auth/invalid-phone-number") {
             status.textContent = "Invalid phone number format.";
           } else if (err.code === "auth/too-many-requests") {
