@@ -735,6 +735,7 @@
         ],
 
         cart:[],
+        _cartLoadedOnce: false, // Flag to prevent multiple cart loads per page session
 
         // Question generation templates (Persian)
         questionTemplates: {
@@ -761,14 +762,17 @@
         productQuestions: {},
 
         async init(){
-          // Load cart from Firestore (or localStorage as fallback)
-          await this.loadCartFromFirestore();
+          // DON'T load cart here - wait for auth state to be confirmed
+          // Cart will be loaded by onAuthStateChanged callback
           
           // Watch cart changes with JSON signature to catch ALL mutations
           // (push, splice, qty changes, etc.)
           this.$watch(() => JSON.stringify(this.cart), () => {
-            // Update localStorage immediately
-            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+            // Update localStorage immediately ONLY if not authenticated
+            const user = window.firebaseAuth?.currentUser;
+            if (!user) {
+              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+            }
             
             // Clear existing timer
             if (this._cartSyncTimer) clearTimeout(this._cartSyncTimer);
@@ -890,14 +894,17 @@
         
         // Cart Firestore sync functions
         async syncCartToFirestore(){
-          // Always update localStorage first
-          localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+          const user = window.firebaseAuth?.currentUser;
+          
+          // Update localStorage ONLY if not authenticated
+          if (!user) {
+            localStorage.setItem('aa_cart', JSON.stringify(this.cart));
+          }
           
           // Clear any previous error
           this.cartSyncError = '';
           
           try {
-            const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) return;
             
             const { doc, setDoc } = window.firebaseFirestoreAPI;
@@ -907,17 +914,20 @@
           } catch (err) {
             console.error('Failed to sync cart to Firestore:', err);
             this.cartSyncError = 'Cart sync failed';
-            // localStorage already updated above as fallback
           }
         },
         
         async loadCartFromFirestore(){
+          // Prevent multiple loads per page session
+          if (this._cartLoadedOnce) return;
+          
           try {
             const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) {
               // Not authenticated, try localStorage fallback
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
+              this._cartLoadedOnce = true;
               return;
             }
             
@@ -926,20 +936,26 @@
             const cartSnap = await getDoc(cartRef);
             
             if (cartSnap.exists() && cartSnap.data().items) {
-              // Firestore is the source of truth
+              // Firestore is the source of truth for authenticated users
               this.cart = cartSnap.data().items;
-              // Update localStorage to match Firestore (prevent stale data)
-              localStorage.setItem('aa_cart', JSON.stringify(this.cart));
             } else {
-              // No Firestore doc, try localStorage fallback
+              // No Firestore doc, start with empty cart (never use localStorage for authenticated users)
+              this.cart = [];
+            }
+            
+            this._cartLoadedOnce = true;
+          } catch (err) {
+            console.error('Failed to load cart from Firestore:', err);
+            // For authenticated users on error, keep cart empty (Firestore is truth)
+            const user = window.firebaseAuth?.currentUser;
+            if (user) {
+              this.cart = [];
+            } else {
+              // Only use localStorage for unauthenticated users
               const saved = localStorage.getItem('aa_cart');
               if (saved) this.cart = JSON.parse(saved);
             }
-          } catch (err) {
-            console.error('Failed to load cart from Firestore:', err);
-            // Fallback to localStorage on error
-            const saved = localStorage.getItem('aa_cart');
-            if (saved) this.cart = JSON.parse(saved);
+            this._cartLoadedOnce = true;
           }
         },
 
@@ -1528,11 +1544,11 @@
       signInBtn.style.display = "none";
       signOutBtn.style.display = "block";
       
-      // Load cart from Firestore when user signs in
+      // Load cart from Firestore when user signs in (only if not already loaded)
       const appStateElement = document.querySelector('[x-data]');
       if (appStateElement && appStateElement.__x) {
         const appData = appStateElement.__x.$data;
-        if (appData && typeof appData.loadCartFromFirestore === 'function') {
+        if (appData && typeof appData.loadCartFromFirestore === 'function' && !appData._cartLoadedOnce) {
           await appData.loadCartFromFirestore();
         }
       }
@@ -1541,12 +1557,22 @@
       signInBtn.style.display = "block";
       signOutBtn.style.display = "none";
       
-      // Clear cart when user signs out
       const appStateElement = document.querySelector('[x-data]');
       if (appStateElement && appStateElement.__x) {
         const appData = appStateElement.__x.$data;
-        if (appData && Array.isArray(appData.cart)) {
-          appData.cart = [];
+        
+        // On initial page load (flag not set), load cart from localStorage
+        if (appData && !appData._cartLoadedOnce) {
+          if (typeof appData.loadCartFromFirestore === 'function') {
+            await appData.loadCartFromFirestore();
+          }
+        } else if (appData && appData._cartLoadedOnce) {
+          // User just signed out - clear cart and localStorage, reset flag for next sign-in
+          if (Array.isArray(appData.cart)) {
+            appData.cart = [];
+          }
+          localStorage.removeItem('aa_cart');
+          appData._cartLoadedOnce = false; // Reset flag to allow loading on next sign-in
         }
       }
     }
@@ -1555,6 +1581,14 @@
   // Sign out handler
   signOutBtn.addEventListener("click", async () => {
     try {
+      // Clear Firestore cart BEFORE signing out
+      const user = window.firebaseAuth?.currentUser;
+      if (user && window.firebaseDB) {
+        const { doc, setDoc } = window.firebaseFirestoreAPI;
+        const cartRef = doc(window.firebaseDB, 'carts', user.uid);
+        await setDoc(cartRef, { items: [], updatedAt: Date.now() });
+      }
+      
       await signOut(auth);
     } catch (err) {
       console.error("Sign out error:", err);
