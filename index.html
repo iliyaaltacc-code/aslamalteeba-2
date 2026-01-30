@@ -1373,7 +1373,7 @@
     onAuthStateChanged
   };
   
-  // 🌍 Expose Firestore globally for cart sync
+  // 🌍 Expose Firestore globally
   window.firebaseDB = db;
   window.firebaseFirestoreAPI = {
     doc,
@@ -1402,14 +1402,6 @@
   // Sign out handler
   signOutBtn.addEventListener("click", async () => {
     try {
-      // Clear Firestore cart BEFORE signing out
-      const user = window.firebaseAuth?.currentUser;
-      if (user && window.firebaseDB) {
-        const { doc, setDoc } = window.firebaseFirestoreAPI;
-        const cartRef = doc(window.firebaseDB, 'carts', user.uid);
-        await setDoc(cartRef, { items: [], updatedAt: Date.now() });
-      }
-      
       await signOut(auth);
     } catch (err) {
       console.error("Sign out error:", err);
