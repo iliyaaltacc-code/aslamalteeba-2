@@ -188,6 +188,29 @@
     const verificationCode = document.getElementById("verificationCode");
 
     toggleMode.onclick = () => {
+      if (phoneAuthStep > 0) {
+        phoneAuthStep = 0;
+        email.style.display = "block";
+        password.style.display = "block";
+        forgotPassword.style.display = "block";
+        submitBtn.style.display = "block";
+        googleBtn.style.display = "block";
+        phoneNumber.style.display = "none";
+        verificationCode.style.display = "none";
+        phoneNumber.value = "";
+        verificationCode.value = "";
+        phoneBtn.textContent = "Continue with Phone Number";
+        phoneBtn.disabled = false;
+        toggleMode.textContent = mode === "signin" ? "Don't have an account? Create one" : "Already have an account? Sign in";
+        status.textContent = "";
+        status.style.color = "#fca5a5";
+        if (recaptchaVerifier) {
+          recaptchaVerifier.clear();
+          recaptchaVerifier = null;
+        }
+        return;
+      }
+      
       mode = mode === "signin" ? "signup" : "signin";
       title.textContent = mode === "signin" ? "Sign In" : "Create Account";
       submitBtn.textContent = mode === "signin" ? "Sign In" : "Sign Up";
@@ -313,9 +336,9 @@
         forgotPassword.style.display = "none";
         submitBtn.style.display = "none";
         googleBtn.style.display = "none";
-        toggleMode.style.display = "none";
         phoneNumber.style.display = "block";
         phoneBtn.textContent = "Send Verification Code";
+        toggleMode.textContent = "Back to other sign-in options";
         
         if (!recaptchaVerifier) {
           recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
@@ -333,15 +356,18 @@
           return;
         }
 
+        phoneBtn.disabled = true;
         try {
           confirmationResult = await signInWithPhoneNumber(auth, phoneNumber.value, recaptchaVerifier);
           phoneNumber.style.display = "none";
           verificationCode.style.display = "block";
           phoneBtn.textContent = "Verify Code";
+          phoneBtn.disabled = false;
           status.style.color = "#86efac";
           status.textContent = "Verification code sent to your phone.";
           phoneAuthStep = 2;
         } catch (err) {
+          phoneBtn.disabled = false;
           status.style.color = "#fca5a5";
           if (err.code === "auth/invalid-phone-number") {
             status.textContent = "Invalid phone number format.";
@@ -357,9 +383,11 @@
           return;
         }
 
+        phoneBtn.disabled = true;
         try {
           await confirmationResult.confirm(verificationCode.value);
         } catch (err) {
+          phoneBtn.disabled = false;
           status.style.color = "#fca5a5";
           if (err.code === "auth/invalid-verification-code") {
             status.textContent = "Invalid verification code.";
@@ -375,10 +403,9 @@
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const isPasswordUser = user.providerData.some(provider => provider.providerId === "password");
-        const isPhoneUser = user.providerData.some(provider => provider.providerId === "phone");
         if (isPasswordUser && !user.emailVerified) {
           status.textContent = "Please verify your email to continue.";
-        } else if (isPhoneUser || !isPasswordUser || user.emailVerified) {
+        } else {
           setTimeout(() => {
             window.location.replace("/");
           }, 150);
