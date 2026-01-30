@@ -824,6 +824,9 @@
           // Watch cart changes with JSON signature to catch ALL mutations
           // (push, splice, qty changes, etc.)
           this.$watch(() => JSON.stringify(this.cart), () => {
+            // Skip syncing until cart has been loaded at least once
+            if (!this._cartLoadedOnce) return;
+            
             const user = window.firebaseAuth?.currentUser;
             
             if (!user) {
@@ -972,8 +975,9 @@
           // Prevent multiple loads per page session
           if (this._cartLoadedOnce) return;
           
+          const user = window.firebaseAuth?.currentUser;
+          
           try {
-            const user = window.firebaseAuth?.currentUser;
             if (!user || !window.firebaseDB) {
               // Guest user: load from localStorage ONLY
               const saved = localStorage.getItem('aa_cart');
@@ -998,7 +1002,6 @@
           } catch (err) {
             console.error('Failed to load cart from Firestore:', err);
             // On error, keep cart empty for authenticated users
-            const user = window.firebaseAuth?.currentUser;
             if (user) {
               this.cart = [];
             } else {
