@@ -100,14 +100,14 @@ export async function initBrandTimeline(lang = 'en') {
           dotEl.className = `timeline-dot${isRTL ? ' rtl' : ''}`;
 
           const contentEl = document.createElement('div');
-          contentEl.className = 'glass rounded-2xl p-5 border border-white/10';
+          contentEl.className = 'glass rounded-2xl p-4 border border-white/10';
 
           const translatedStage = t.stages[stage.stage] || stage.stage;
 
           let html = `<h3 class="text-xl font-bold mb-2">${translatedStage}</h3>`;
-          html += `<p class="text-emerald-400 text-sm mb-2">${stage.location}</p>`;
+          html += `<p class="timeline-location text-emerald-400 text-sm mb-2">${stage.location}</p>`;
           if (stage.duration) {
-            html += `<span class="inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200">${stage.duration}</span>`;
+            html += `<span class="timeline-duration inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200">${stage.duration}</span>`;
           }
 
           contentEl.innerHTML = html;

@@ -70,3 +70,15 @@
     transform: translateX(0);
   }
 }
+
+/* Duration badge RTL fix */
+.timeline-duration {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Location text - visually secondary */
+.timeline-location {
+  opacity: 0.7;
+  font-size: 0.875rem;
+}
