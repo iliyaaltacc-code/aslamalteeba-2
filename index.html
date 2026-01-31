@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/timeline.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
@@ -244,6 +245,11 @@
       </template>
     </div>
   </section>
+
+  <!-- BRAND PRODUCTION TIMELINE -->
+  <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+  </section>
+
 <!-- INTRODUCTION EMAIL -->
   <section id="intro" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/40 rounded-3xl">
     <h2 class="text-3xl font-bold mb-4">Get an Introduction Email</h2>
@@ -1323,7 +1329,12 @@
       }
     }
   </script>
+
  <script src="/chat.js" defer></script>
+  <script type="module">
+    import { initBrandTimeline } from '/components/BrandTimeline.js';
+    initBrandTimeline('en');
+  </script>
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {

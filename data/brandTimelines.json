@@ -1,0 +1,258 @@
+{
+  "Firemax": [
+    {
+      "stage": "Raw Materials",
+      "location": "Southeast Asia rubber supply via Qingdao corridor",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Guangrao County, Shandong",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Shandong Yongsheng automated production lines",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Guangrao curing presses",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Guangrao ISO-certified laboratories",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Qingdao Port → Jebel Ali Port (Asat Group warehousing)",
+      "duration": "20–28 days"
+    }
+  ],
+  "Vikrant": [
+    {
+      "stage": "Raw Materials",
+      "location": "Kerala and Tamil Nadu rubber belt + Southeast Asia imports",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Mysuru, Karnataka",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Vikrant plant, Mysuru",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Mysuru curing department",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Mysuru inspection laboratories",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Mumbai or Cochin → Jebel Ali (Asat Group warehousing)",
+      "duration": "5–12 days"
+    }
+  ],
+  "Bridgestone": [
+    {
+      "stage": "Raw Materials",
+      "location": "Company-owned plantations in Sumatra, Kalimantan, Liberia + approved suppliers",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Regional facilities (India, Thailand, Indonesia)",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Regional Bridgestone plants",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Regional curing facilities",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Bridgestone global QC laboratories",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Thailand / India / Indonesia → Jebel Ali (Asat Group warehousing)",
+      "duration": "7–21 days"
+    }
+  ],
+  "Duraturn": [
+    {
+      "stage": "Raw Materials",
+      "location": "Shandong regional supply chain",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Guangrao (shared Yongsheng facility)",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Guangrao shared production lines",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Guangrao curing presses",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Guangrao DOT/ECE verification labs",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Qingdao Port → Jebel Ali (Asat Group warehousing)",
+      "duration": "20–28 days"
+    }
+  ],
+  "Dovroad": [
+    {
+      "stage": "Raw Materials",
+      "location": "Shandong suppliers via Qingdao logistics corridor",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Qingdao Double Road facility",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Qingdao production lines",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Qingdao curing presses",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Qingdao export compliance labs",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Qingdao Port → Jebel Ali (Asat Group warehousing)",
+      "duration": "20–28 days"
+    }
+  ],
+  "Kpatos": [
+    {
+      "stage": "Raw Materials",
+      "location": "Shandong regional rubber supply chain",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Qingdao Sunfulcess facility",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Qingdao production lines",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Qingdao curing presses",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Qingdao export testing",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Qingdao Port → Jebel Ali (Asat Group warehousing)",
+      "duration": "20–28 days"
+    }
+  ],
+  "Haida": [
+    {
+      "stage": "Raw Materials",
+      "location": "Southeast Asia rubber via Chengdu/Chongqing logistics corridor",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Jianyang, Sichuan",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "Jianyang production facility",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "Jianyang curing presses",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Sichuan Haida laboratories",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Chongqing/Chengdu → Shanghai or Qingdao → Jebel Ali (Asat Group warehousing)",
+      "duration": "25–35 days"
+    }
+  ],
+  "JK Tyres": [
+    {
+      "stage": "Raw Materials",
+      "location": "Kerala and Tamil Nadu rubber + ISCC-certified supply chain",
+      "duration": ""
+    },
+    {
+      "stage": "Mixing",
+      "location": "Mysuru / Chennai / Laksar",
+      "duration": "4–6 hours"
+    },
+    {
+      "stage": "Tire Building",
+      "location": "JK Tyres plants (Vikrant/Mysuru primary)",
+      "duration": "3–6 minutes per tire"
+    },
+    {
+      "stage": "Curing",
+      "location": "JK Tyres curing departments",
+      "duration": "12–20 minutes"
+    },
+    {
+      "stage": "Quality Control",
+      "location": "Government-approved testing tracks",
+      "duration": "2–4 hours"
+    },
+    {
+      "stage": "Export to UAE",
+      "location": "Mumbai or Chennai → Jebel Ali (Asat Group warehousing)",
+      "duration": "5–12 days"
+    }
+  ]
+}
