@@ -107,7 +107,7 @@ export async function initBrandTimeline(lang = 'en') {
           let html = `<h3 class="text-xl font-bold mb-2">${translatedStage}</h3>`;
           html += `<p class="timeline-location text-emerald-400 text-sm mb-2">${stage.location}</p>`;
           if (stage.duration) {
-            html += `<span class="timeline-duration inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200">${stage.duration}</span>`;
+            html += `<span class="timeline-duration inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200" style="direction:ltr; unicode-bidi:isolate;">${stage.duration}</span>`;
           }
 
           contentEl.innerHTML = html;
