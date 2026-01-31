@@ -172,6 +172,19 @@
     const googleBtn = document.getElementById("googleBtn");
     const forgotPassword = document.getElementById("forgotPassword");
 
+    // Localize Google button based on URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const lang = urlParams.get('lang');
+    
+    if (lang === 'fa') {
+      // Persian/Farsi
+      googleBtn.childNodes[2].textContent = 'ادامه با Google';
+    } else if (lang === 'ar') {
+      // Arabic
+      googleBtn.childNodes[2].textContent = 'المتابعة باستخدام Google';
+    }
+    // Default is already "Continue with Google" in HTML
+
     toggleMode.onclick = () => {
       mode = mode === "signin" ? "signup" : "signin";
       title.textContent = mode === "signin" ? "Sign In" : "Create Account";
