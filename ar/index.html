@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/timeline.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="../customerMemory.js"></script>
@@ -70,70 +71,6 @@
       direction: ltr;
       unicode-bidi: isolate;
       display: inline-block;
-    }
-    
-    /* Brand Production Timeline */
-    .timeline-container { position: relative; }
-    .timeline-line {
-      position: absolute;
-      left: 20px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(180deg, rgba(0,224,164,0.3), rgba(50,213,255,0.3));
-    }
-    .timeline-line.rtl {
-      left: auto;
-      right: 20px;
-    }
-    .timeline-stage {
-      position: relative;
-      padding-left: 60px;
-      margin-bottom: 32px;
-      opacity: 0;
-      animation: stageSlideIn 0.5s ease forwards;
-    }
-    .timeline-stage.rtl {
-      padding-left: 0;
-      padding-right: 60px;
-      text-align: right;
-    }
-    .timeline-dot {
-      position: absolute;
-      left: 12px;
-      top: 8px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #00E0A4, #32D5FF);
-      box-shadow: 0 0 12px rgba(0,224,164,0.6);
-    }
-    .timeline-dot.rtl {
-      left: auto;
-      right: 12px;
-    }
-    @keyframes stageSlideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    .timeline-stage.rtl {
-      animation: stageSlideInRTL 0.5s ease forwards;
-    }
-    @keyframes stageSlideInRTL {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
     }
   </style>
 </head>
@@ -330,28 +267,6 @@
 
   <!-- BRAND PRODUCTION TIMELINE -->
   <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
-    <div class="mb-8">
-      <h2 class="text-3xl font-extrabold mb-2">الجدول الزمني لإنتاج العلامات التجارية</h2>
-      <p class="text-neutral-400">استكشف رحلة الإنتاج الكاملة من المواد الخام إلى التوصيل في الإمارات.</p>
-    </div>
-
-    <div class="mb-8">
-      <label class="block text-sm text-neutral-400 mb-2">اختر العلامة التجارية</label>
-      <select id="timelineBrandSelect" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 w-full max-w-md text-lg">
-        <option value="Firemax">Firemax</option>
-        <option value="Vikrant">Vikrant</option>
-        <option value="Bridgestone">Bridgestone</option>
-        <option value="Duraturn">Duraturn</option>
-        <option value="Dovroad">Dovroad</option>
-        <option value="Kpatos">Kpatos</option>
-        <option value="Haida">Haida</option>
-        <option value="JK Tyres">JK Tyres</option>
-      </select>
-    </div>
-
-    <div id="timelineStages" class="timeline-container relative">
-      <div class="timeline-line rtl"></div>
-    </div>
   </section>
 
   <!-- INTRODUCTION EMAIL -->
@@ -1411,130 +1326,11 @@
     }
   </script>
 
-  <!-- Brand Production Timeline Script -->
-  <script>
-    (function() {
-      try {
-        const timelineData = {
-          "Firemax": [
-            { stage: "المواد الخام", location: "إمدادات المطاط من جنوب شرق آسيا عبر ممر تشينغداو", description: "توريد مركبات المطاط الممتازة", duration: "" },
-            { stage: "الخلط", location: "مقاطعة غوانغراو، شاندونغ", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "خطوط إنتاج شاندونغ يونغشنغ الآلية", description: "البناء على خطوط آلية", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "مكابس المعالجة في غوانغراو", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات غوانغراو المعتمدة من ISO", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "ميناء تشينغداو ← ميناء جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "20–28 يوماً" }
-          ],
-          "Vikrant": [
-            { stage: "المواد الخام", location: "حزام المطاط في كيرالا وتاميل نادو + واردات جنوب شرق آسيا", description: "توريد المطاط الإقليمي", duration: "" },
-            { stage: "الخلط", location: "ميسورو، كارناتاكا", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "مصنع فيكرانت، ميسورو", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "قسم المعالجة في ميسورو", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات الفحص في ميسورو", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "مومباي أو كوتشي ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "5–12 يوماً" }
-          ],
-          "Bridgestone": [
-            { stage: "المواد الخام", location: "مزارع الشركة في سومطرة، كاليمانتان، ليبيريا + موردون معتمدون", description: "مطاط ممتاز من مزارع مملوكة", duration: "" },
-            { stage: "الخلط", location: "منشآت إقليمية (الهند، تايلاند، إندونيسيا)", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "مصانع بريدجستون الإقليمية", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "منشآت المعالجة الإقليمية", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات بريدجستون العالمية لمراقبة الجودة", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "تايلاند / الهند / إندونيسيا ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "7–21 يوماً" }
-          ],
-          "Duraturn": [
-            { stage: "المواد الخام", location: "سلسلة التوريد الإقليمية في شاندونغ", description: "توريد المطاط الإقليمي", duration: "" },
-            { stage: "الخلط", location: "غوانغراو (منشأة يونغشنغ المشتركة)", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "خطوط الإنتاج المشتركة في غوانغراو", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "مكابس المعالجة في غوانغراو", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات التحقق DOT/ECE في غوانغراو", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "ميناء تشينغداو ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "20–28 يوماً" }
-          ],
-          "Dovroad": [
-            { stage: "المواد الخام", location: "موردو شاندونغ عبر ممر تشينغداو اللوجستي", description: "توريد المطاط الإقليمي", duration: "" },
-            { stage: "الخلط", location: "منشأة تشينغداو دبل رود", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "خطوط الإنتاج في تشينغداو", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "مكابس المعالجة في تشينغداو", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات الامتثال للتصدير في تشينغداو", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "ميناء تشينغداو ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "20–28 يوماً" }
-          ],
-          "Kpatos": [
-            { stage: "المواد الخام", location: "سلسلة توريد المطاط الإقليمية في شاندونغ", description: "توريد المطاط الإقليمي", duration: "" },
-            { stage: "الخلط", location: "منشأة تشينغداو سنفولسس", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "خطوط الإنتاج في تشينغداو", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "مكابس المعالجة في تشينغداو", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "اختبار التصدير في تشينغداو", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "ميناء تشينغداو ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "20–28 يوماً" }
-          ],
-          "Haida": [
-            { stage: "المواد الخام", location: "مطاط جنوب شرق آسيا عبر ممر تشنغدو/تشونغتشينغ اللوجستي", description: "التوريد عبر الممر اللوجستي الغربي", duration: "" },
-            { stage: "الخلط", location: "جيانيانغ، سيتشوان", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "منشأة الإنتاج في جيانيانغ", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "مكابس المعالجة في جيانيانغ", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مختبرات سيتشوان هايدا", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "تشونغتشينغ/تشنغدو ← شنغهاي أو تشينغداو ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "25–35 يوماً" }
-          ],
-          "JK Tyres": [
-            { stage: "المواد الخام", location: "مطاط كيرالا وتاميل نادو + سلسلة توريد معتمدة ISCC", description: "توريد مطاط مستدام معتمد", duration: "" },
-            { stage: "الخلط", location: "ميسورو / تشيناي / لاكسار", description: "إعداد المركبات", duration: "4–6 ساعات" },
-            { stage: "بناء الإطارات", location: "مصانع JK Tyres (فيكرانت/ميسورو الأساسية)", description: "عملية البناء", duration: "3–6 دقائق لكل إطار" },
-            { stage: "المعالجة", location: "أقسام المعالجة في JK Tyres", description: "عملية الفلكنة", duration: "12–20 دقيقة" },
-            { stage: "مراقبة الجودة", location: "مضامير اختبار معتمدة حكومياً", description: "الفحص والاختبار", duration: "2–4 ساعات" },
-            { stage: "التصدير إلى الإمارات", location: "مومباي أو تشيناي ← جبل علي", description: "الشحن إلى ميناء جبل علي، تخزين مجموعة أسات", duration: "5–12 يوماً" }
-          ]
-        };
-
-        function renderTimeline(brandName) {
-          const container = document.getElementById('timelineStages');
-          if (!container) return;
-          
-          const stages = timelineData[brandName];
-          if (!stages) return;
-          
-          const isRTL = document.documentElement.dir === 'rtl';
-          
-          container.innerHTML = '<div class="timeline-line' + (isRTL ? ' rtl' : '') + '"></div>';
-          
-          stages.forEach((stage, index) => {
-            setTimeout(() => {
-              const stageEl = document.createElement('div');
-              stageEl.className = 'timeline-stage' + (isRTL ? ' rtl' : '');
-              stageEl.style.animationDelay = (index * 0.1) + 's';
-              
-              const dotEl = document.createElement('div');
-              dotEl.className = 'timeline-dot' + (isRTL ? ' rtl' : '');
-              
-              const contentEl = document.createElement('div');
-              contentEl.className = 'glass rounded-2xl p-5 border border-white/10';
-              
-              let html = '<h3 class="text-xl font-bold mb-2">' + stage.stage + '</h3>';
-              html += '<p class="text-emerald-400 text-sm mb-2">' + stage.location + '</p>';
-              html += '<p class="text-neutral-300 text-sm mb-2">' + stage.description + '</p>';
-              if (stage.duration) {
-                html += '<span class="inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200">' + stage.duration + '</span>';
-              }
-              
-              contentEl.innerHTML = html;
-              stageEl.appendChild(dotEl);
-              stageEl.appendChild(contentEl);
-              container.appendChild(stageEl);
-            }, index * 100);
-          });
-        }
-
-        const selectEl = document.getElementById('timelineBrandSelect');
-        if (selectEl) {
-          selectEl.addEventListener('change', function() {
-            renderTimeline(this.value);
-          });
-          
-          renderTimeline('Firemax');
-        }
-      } catch (err) {
-        console.warn('Timeline initialization failed (non-blocking):', err);
-      }
-    })();
-  </script>
-
   <script src="/chat.js" defer></script>
+  <script type="module">
+    import { initBrandTimeline } from '../components/BrandTimeline.js';
+    initBrandTimeline('ar');
+  </script>
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
