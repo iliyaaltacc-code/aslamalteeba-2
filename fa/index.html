@@ -64,9 +64,9 @@
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 glass">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-      <h1 class="text-xl font-extrabold tracking-tight">Aslama <span class="text-emerald-400">Alteeba</span></h1>
-      <nav class="hidden md:flex gap-6 text-sm">
+    <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
+      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <nav class="hidden md:flex gap-6 text-sm flex-wrap">
         <a href="#about" class="hover:text-white">درباره ما</a>
         <div class="relative" x-data="{open:false}">
           <button class="hover:text-white flex items-center gap-2" aria-haspopup="true" :aria-expanded="open" @click="open = !open" @keydown.escape="open=false">
@@ -88,13 +88,21 @@
         <a href="#shop" class="hover:text-white">مرور</a>
         <a href="#contact" class="hover:text-white">تماس</a>
       </nav>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 ml-auto">
         <a href="/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇬🇧 English
         </a>
         <a href="/ar/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇦🇪 العربية
         </a>
+
+        <!-- Profile Icon (always visible) -->
+        <button id="profileIcon" onclick="handleProfileClick()" class="w-10 h-10 rounded-full bg-white/10 border border-white/10 hover:bg-white/15 flex items-center justify-center" title="حساب کاربری" aria-label="رفتن به حساب کاربری یا ورود">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          </svg>
+        </button>
 
         <!-- Auth buttons (controlled by Firebase) -->
         <a href="/auth.html?lang=fa" id="authSignInBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
