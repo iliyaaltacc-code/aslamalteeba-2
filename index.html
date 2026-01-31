@@ -98,7 +98,7 @@
         </button>
 
         <!-- Auth buttons (controlled by Firebase) -->
-        <a href="/auth.html" id="authSignInBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" style="display: none;">
+        <a href="/auth.html?lang=en" id="authSignInBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" style="display: none;">
           Sign In / Sign Up
         </a>
         <button id="authSignOutBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" style="display: none;">
@@ -1416,7 +1416,7 @@
       window.location.href = "/profile.html";
     } else {
       // User is signed out - go to auth page
-      window.location.href = "/auth.html";
+      window.location.href = "/auth.html?lang=en";
     }
   };
 </script>
