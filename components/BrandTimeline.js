@@ -10,6 +10,55 @@ const TRANSLATIONS = {
       'Curing': 'Curing',
       'Quality Control': 'Quality Control',
       'Export to UAE': 'Export to UAE'
+    },
+    // Location keywords
+    locationTerms: {
+      'rubber supply': 'rubber supply',
+      'via': 'via',
+      'corridor': 'corridor',
+      'County': 'County',
+      'automated production lines': 'automated production lines',
+      'production lines': 'production lines',
+      'curing presses': 'curing presses',
+      'curing department': 'curing department',
+      'curing facilities': 'curing facilities',
+      'ISO-certified laboratories': 'ISO-certified laboratories',
+      'inspection laboratories': 'inspection laboratories',
+      'laboratories': 'laboratories',
+      'verification labs': 'verification labs',
+      'export compliance labs': 'export compliance labs',
+      'export testing': 'export testing',
+      'testing tracks': 'testing tracks',
+      'plant': 'plant',
+      'plants': 'plants',
+      'facility': 'facility',
+      'facilities': 'facilities',
+      'production facility': 'production facility',
+      'shared': 'shared',
+      'regional': 'regional',
+      'Regional': 'Regional',
+      'supply chain': 'supply chain',
+      'suppliers': 'suppliers',
+      'approved suppliers': 'approved suppliers',
+      'logistics corridor': 'logistics corridor',
+      'Company-owned plantations in': 'Company-owned plantations in',
+      'rubber belt': 'rubber belt',
+      'imports': 'imports',
+      'global QC laboratories': 'global QC laboratories',
+      'Government-approved': 'Government-approved',
+      'primary': 'primary',
+      'departments': 'departments',
+      'warehousing': 'warehousing',
+      'Port': 'Port',
+      'or': 'or',
+      'and': 'and'
+    },
+    // Duration units
+    durationUnits: {
+      'hours': 'hours',
+      'minutes': 'minutes',
+      'days': 'days',
+      'per tire': 'per tire'
     }
   },
   ar: {
@@ -23,6 +72,55 @@ const TRANSLATIONS = {
       'Curing': 'المعالجة',
       'Quality Control': 'مراقبة الجودة',
       'Export to UAE': 'التصدير إلى الإمارات'
+    },
+    // Location keywords
+    locationTerms: {
+      'rubber supply': 'إمدادات المطاط',
+      'via': 'عبر',
+      'corridor': 'ممر',
+      'County': 'مقاطعة',
+      'automated production lines': 'خطوط الإنتاج الآلية',
+      'production lines': 'خطوط الإنتاج',
+      'curing presses': 'مكابس المعالجة',
+      'curing department': 'قسم المعالجة',
+      'curing facilities': 'منشآت المعالجة',
+      'ISO-certified laboratories': 'مختبرات معتمدة من ISO',
+      'inspection laboratories': 'مختبرات الفحص',
+      'laboratories': 'مختبرات',
+      'verification labs': 'مختبرات التحقق',
+      'export compliance labs': 'مختبرات الامتثال للتصدير',
+      'export testing': 'اختبار التصدير',
+      'testing tracks': 'مسارات الاختبار',
+      'plant': 'مصنع',
+      'plants': 'مصانع',
+      'facility': 'منشأة',
+      'facilities': 'منشآت',
+      'production facility': 'منشأة الإنتاج',
+      'shared': 'مشتركة',
+      'regional': 'إقليمية',
+      'Regional': 'إقليمية',
+      'supply chain': 'سلسلة التوريد',
+      'suppliers': 'موردون',
+      'approved suppliers': 'موردون معتمدون',
+      'logistics corridor': 'ممر لوجستي',
+      'Company-owned plantations in': 'مزارع الشركة في',
+      'rubber belt': 'حزام المطاط',
+      'imports': 'واردات',
+      'global QC laboratories': 'مختبرات مراقبة الجودة العالمية',
+      'Government-approved': 'معتمد حكومياً',
+      'primary': 'أساسي',
+      'departments': 'أقسام',
+      'warehousing': 'تخزين',
+      'Port': 'ميناء',
+      'or': 'أو',
+      'and': 'و'
+    },
+    // Duration units
+    durationUnits: {
+      'hours': 'ساعات',
+      'minutes': 'دقائق',
+      'days': 'أيام',
+      'per tire': 'لكل إطار'
     }
   },
   fa: {
@@ -36,6 +134,55 @@ const TRANSLATIONS = {
       'Curing': 'پخت',
       'Quality Control': 'کنترل کیفیت',
       'Export to UAE': 'صادرات به امارات'
+    },
+    // Location keywords
+    locationTerms: {
+      'rubber supply': 'تامین لاستیک',
+      'via': 'از طریق',
+      'corridor': 'کریدور',
+      'County': 'شهرستان',
+      'automated production lines': 'خطوط تولید خودکار',
+      'production lines': 'خطوط تولید',
+      'curing presses': 'پرس‌های پخت',
+      'curing department': 'بخش پخت',
+      'curing facilities': 'تاسیسات پخت',
+      'ISO-certified laboratories': 'آزمایشگاه‌های دارای گواهینامه ISO',
+      'inspection laboratories': 'آزمایشگاه‌های بازرسی',
+      'laboratories': 'آزمایشگاه‌ها',
+      'verification labs': 'آزمایشگاه‌های تایید',
+      'export compliance labs': 'آزمایشگاه‌های تطابق صادرات',
+      'export testing': 'آزمایش صادرات',
+      'testing tracks': 'مسیرهای آزمایش',
+      'plant': 'کارخانه',
+      'plants': 'کارخانه‌ها',
+      'facility': 'تاسیسات',
+      'facilities': 'تاسیسات',
+      'production facility': 'تاسیسات تولید',
+      'shared': 'مشترک',
+      'regional': 'منطقه‌ای',
+      'Regional': 'منطقه‌ای',
+      'supply chain': 'زنجیره تامین',
+      'suppliers': 'تامین‌کنندگان',
+      'approved suppliers': 'تامین‌کنندگان تایید شده',
+      'logistics corridor': 'کریدور لجستیک',
+      'Company-owned plantations in': 'مزارع متعلق به شرکت در',
+      'rubber belt': 'کمربند لاستیک',
+      'imports': 'واردات',
+      'global QC laboratories': 'آزمایشگاه‌های جهانی کنترل کیفیت',
+      'Government-approved': 'تایید شده دولتی',
+      'primary': 'اصلی',
+      'departments': 'بخش‌ها',
+      'warehousing': 'انبارداری',
+      'Port': 'بندر',
+      'or': 'یا',
+      'and': 'و'
+    },
+    // Duration units
+    durationUnits: {
+      'hours': 'ساعت',
+      'minutes': 'دقیقه',
+      'days': 'روز',
+      'per tire': 'به ازای هر تایر'
     }
   }
 };
@@ -55,6 +202,40 @@ export async function initBrandTimeline(lang = 'en') {
     }
 
     const timelineData = await response.json();
+
+    // Helper function to translate location text
+    function translateLocation(location, lang) {
+      if (lang === 'en') return location;
+      
+      let translated = location;
+      const terms = t.locationTerms;
+      
+      // Sort terms by length (longest first) to avoid partial replacements
+      const sortedTerms = Object.keys(terms).sort((a, b) => b.length - a.length);
+      
+      for (const term of sortedTerms) {
+        const regex = new RegExp(term, 'gi');
+        translated = translated.replace(regex, terms[term]);
+      }
+      
+      return translated;
+    }
+
+    // Helper function to translate duration text
+    function translateDuration(duration, lang) {
+      if (lang === 'en' || !duration) return duration;
+      
+      let translated = duration;
+      const units = t.durationUnits;
+      
+      // Translate duration units while preserving numbers
+      for (const unit in units) {
+        const regex = new RegExp(unit, 'gi');
+        translated = translated.replace(regex, units[unit]);
+      }
+      
+      return translated;
+    }
 
     container.innerHTML = `
       <div class="mb-8">
@@ -103,11 +284,13 @@ export async function initBrandTimeline(lang = 'en') {
           contentEl.className = 'glass rounded-2xl p-4 border border-white/10';
 
           const translatedStage = t.stages[stage.stage] || stage.stage;
+          const translatedLocation = translateLocation(stage.location, lang);
+          const translatedDuration = translateDuration(stage.duration, lang);
 
           let html = `<h3 class="text-xl font-bold mb-2">${translatedStage}</h3>`;
-          html += `<p class="timeline-location text-emerald-400 text-sm mb-2">${stage.location}</p>`;
+          html += `<p class="timeline-location text-emerald-400 text-sm mb-2">${translatedLocation}</p>`;
           if (stage.duration) {
-            html += `<span class="timeline-duration inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200" style="direction:ltr; unicode-bidi:isolate;">${stage.duration}</span>`;
+            html += `<span class="timeline-duration inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-neutral-200" style="direction:ltr; unicode-bidi:isolate;">${translatedDuration}</span>`;
           }
 
           contentEl.innerHTML = html;
