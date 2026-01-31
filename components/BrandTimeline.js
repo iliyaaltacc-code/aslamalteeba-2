@@ -48,8 +48,7 @@ export async function initBrandTimeline(lang = 'en') {
     const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
     const isRTL = lang === 'ar' || lang === 'fa';
 
-    const dataPath = lang === 'en' ? '/data/brandTimelines.json' : '../data/brandTimelines.json';
-    const response = await fetch(dataPath);
+    const response = await fetch('/data/brandTimelines.json');
     if (!response.ok) {
       console.warn('Timeline data not available');
       return;

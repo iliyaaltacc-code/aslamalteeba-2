@@ -30,6 +30,7 @@
   padding-left: 0;
   padding-right: 60px;
   text-align: right;
+  animation: stageSlideInRTL 0.5s ease forwards;
 }
 
 .timeline-dot {
@@ -57,10 +58,6 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-.timeline-stage.rtl {
-  animation: stageSlideInRTL 0.5s ease forwards;
 }
 
 @keyframes stageSlideInRTL {
