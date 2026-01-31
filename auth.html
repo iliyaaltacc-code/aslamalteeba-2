@@ -101,6 +101,15 @@
       height: 20px;
       flex-shrink: 0;
     }
+
+    /* RTL support */
+    [dir="rtl"] .forgot-password {
+      text-align: left;
+    }
+    
+    [dir="ltr"] .forgot-password {
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -130,6 +139,84 @@
 
     <div class="status" id="status"></div>
   </div>
+
+  <!-- LOCALIZATION -->
+  <script>
+    // Language detection from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const lang = urlParams.get('lang') || 'en';
+    
+    // Localization texts
+    const texts = {
+      en: {
+        signIn: 'Sign In',
+        createAccount: 'Create Account',
+        signUp: 'Sign Up',
+        email: 'Email',
+        password: 'Password',
+        forgotPassword: 'Forgot password?',
+        continueWithGoogle: 'Continue with Google',
+        noAccount: "Don't have an account? Create one",
+        haveAccount: "Already have an account? Sign in"
+      },
+      fa: {
+        signIn: 'ورود',
+        createAccount: 'ایجاد حساب',
+        signUp: 'ثبت‌نام',
+        email: 'ایمیل',
+        password: 'رمز عبور',
+        forgotPassword: 'رمز عبور را فراموش کردهاید؟',
+        continueWithGoogle: 'ادامه با Google',
+        noAccount: 'حساب کاربری ندارید؟ ایجاد حساب',
+        haveAccount: 'حساب کاربری دارید؟ ورود'
+      },
+      ar: {
+        signIn: 'تسجيل الدخول',
+        createAccount: 'إنشاء حساب',
+        signUp: 'التسجيل',
+        email: 'البريد الإلكتروني',
+        password: 'كلمة المرور',
+        forgotPassword: 'هل نسيت كلمة المرور؟',
+        continueWithGoogle: 'المتابعة باستخدام Google',
+        noAccount: 'ليس لديك حساب؟ أنشئ حسابًا',
+        haveAccount: 'لديك حساب؟ تسجيل الدخول'
+      }
+    };
+    
+    // Get current language texts (default to en if invalid)
+    const t = texts[lang] || texts.en;
+    
+    // Set document direction and language
+    if (lang === 'fa' || lang === 'ar') {
+      document.documentElement.dir = 'rtl';
+      document.documentElement.lang = lang;
+    } else {
+      document.documentElement.dir = 'ltr';
+      document.documentElement.lang = 'en';
+    }
+    
+    // Apply localization when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('title').textContent = t.signIn;
+      document.getElementById('email').placeholder = t.email;
+      document.getElementById('password').placeholder = t.password;
+      document.getElementById('forgotPassword').textContent = t.forgotPassword;
+      document.getElementById('submitBtn').textContent = t.signIn;
+      document.getElementById('toggleMode').textContent = t.noAccount;
+      
+      // Update Google button text (preserve SVG)
+      const googleBtn = document.getElementById('googleBtn');
+      const googleText = googleBtn.childNodes[googleBtn.childNodes.length - 1];
+      if (googleText.nodeType === Node.TEXT_NODE) {
+        googleText.textContent = t.continueWithGoogle;
+      }
+      
+      // Adjust Google button for RTL
+      if (lang === 'fa' || lang === 'ar') {
+        googleBtn.style.flexDirection = 'row-reverse';
+      }
+    });
+  </script>
 
   <!-- FIREBASE AUTH -->
   <script type="module">
