@@ -221,6 +221,18 @@ p {
   stroke: var(--accent);
 }
 
+/* Quick Question Button */
+.quick-question-btn {
+  background: rgba(255,255,255,0.05);
+  color: #A7AFBF;
+  transition: all 0.3s ease;
+}
+
+.quick-question-btn:hover {
+  background: rgba(57,255,20,0.2);
+  color: #39FF14;
+}
+
 /* Form Input */
 .form-input {
   background: rgba(255,255,255,0.05);
