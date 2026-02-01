@@ -551,6 +551,11 @@ textarea::placeholder {
   color: #00E0A4 !important;
 }
 
+/* RTL dropdown links */
+[dir="rtl"] [x-show] a:hover {
+  transform: translateX(-4px);
+}
+
 /* ============================================
    BRAND CARDS - PREMIUM SHOWCASE
    ============================================ */
@@ -633,8 +638,8 @@ html {
    FINAL POLISH - MICRO-INTERACTIONS
    ============================================ */
 
-/* Smooth all transitions globally */
-* {
+/* Smooth transitions for interactive elements */
+a, button, input, select, textarea, [role="button"] {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
