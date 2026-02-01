@@ -8,14 +8,13 @@
   <meta name="description" content="Aslama Alteeba: premium tire supplier in the UAE. Browse Duraturn, Bridgestone, Firemax. Quality, heritage, and reliability." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/timeline.css">
   <link rel="stylesheet" href="/styles/theme.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
   <style>
-    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;background:#05060B;color:#F2F5F9}
+    /* Glass effects and brand-specific styles */
     .glass{backdrop-filter:blur(12px);background:rgba(5,6,11,0.6);border:1px solid rgba(57,255,20,0.1)}
     .brand-gradient{background:#39FF14}
     .shine{position:relative;overflow:hidden}
@@ -56,7 +55,7 @@
     }
   </style>
 </head>
-<body style="background:#05060B;color:#F2F5F9" x-data="appState()" x-init="init(); showWelcomeMessage()">
+<body x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
   <header class="sticky top-0 z-50 nav-glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
