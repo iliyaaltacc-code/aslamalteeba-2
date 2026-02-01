@@ -8,17 +8,18 @@
   <meta name="description" content="Aslama Alteeba: premium tire supplier in the UAE. Browse Duraturn, Bridgestone, Firemax. Quality, heritage, and reliability." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/timeline.css">
+  <link rel="stylesheet" href="/styles/theme.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
   <style>
-    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
-    .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
-    .brand-gradient{background:linear-gradient(135deg,#00E0A4,#32D5FF)}
+    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;background:#05060B;color:#F2F5F9}
+    .glass{backdrop-filter:blur(12px);background:rgba(5,6,11,0.6);border:1px solid rgba(57,255,20,0.1)}
+    .brand-gradient{background:#39FF14}
     .shine{position:relative;overflow:hidden}
-    .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
+    .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(57,255,20,.18),transparent);animation:shine 6s infinite}
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
     
@@ -40,38 +41,38 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      background: #39FF14;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+      box-shadow: 0 2px 8px rgba(57,255,20,0.4);
     }
     .slider::-moz-range-thumb {
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      background: #39FF14;
       cursor: pointer;
       border: none;
-      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+      box-shadow: 0 2px 8px rgba(57,255,20,0.4);
     }
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
+<body style="background:#05060B;color:#F2F5F9" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 glass">
+  <header class="sticky top-0 z-50 nav-glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
-      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span style="color:#39FF14">Alteeba</span></h1>
       <nav class="hidden md:flex gap-6 text-sm flex-wrap">
         <a href="#about" class="hover:text-white">About</a>
         <div class="relative" x-data="{open:false}">
           <button class="hover:text-white flex items-center gap-2" aria-haspopup="true" :aria-expanded="open" @click="open = !open" @keydown.escape="open=false">
             Products
-            <span class="text-xs text-neutral-400">▾</span>
+            <span class="text-xs" style="color:#A7AFBF">▾</span>
           </button>
-          <div class="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-white/10 bg-neutral-950/95 backdrop-blur p-2 shadow-xl" x-show="open" x-transition.origin.top.left @click.outside="open=false" x-cloak>
-            <a href="#passenger-car-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Passenger Car Tires</a>
-            <a href="#truck-bus-radial-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Truck And Bus Radial Tires</a>
-            <a href="#otr-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">OTR Tires</a>
-            <a href="#truck-bus-bias-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">Truck And Bus Bias Tires</a>
+          <div class="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-white/10 backdrop-blur p-2 shadow-xl" style="background:rgba(5,6,11,0.95)" x-show="open" x-transition.origin.top.left @click.outside="open=false" x-cloak>
+            <a href="#passenger-car-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">Passenger Car Tires</a>
+            <a href="#truck-bus-radial-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">Truck And Bus Radial Tires</a>
+            <a href="#otr-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">OTR Tires</a>
+            <a href="#truck-bus-bias-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">Truck And Bus Bias Tires</a>
           </div>
         </div>
         <a href="#intro" class="hover:text-white">Introduction Email</a>
@@ -106,7 +107,7 @@
           Sign Out
         </button>
 
-        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
+        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl font-semibold hover:opacity-90" style="background:#39FF14;color:#05060B">
           +971 55 463 7045
         </a>
       </div>
@@ -116,32 +117,32 @@
   <!-- HERO -->
   <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
     <div>
-      <h2 class="text-5xl font-extrabold mb-4 leading-tight">Premium Tires.<br><span class="text-emerald-400">UAE Quality.</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">Aslama Alteeba delivers high-grade tires across the UAE. Partnerships with Duraturn, Bridgestone, and Firemax ensure safety, comfort, and reliability.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
+      <h2 class="text-5xl font-extrabold mb-4 leading-tight" style="font-family:Sora,Inter,sans-serif">Premium Tires.<br><span style="color:#39FF14">UAE Quality.</span></h2>
+      <p class="text-lg mb-6" style="color:#A7AFBF">Aslama Alteeba delivers high-grade tires across the UAE. Partnerships with Duraturn, Bridgestone, and Firemax ensure safety, comfort, and reliability.</p>
+      <a href="#shop" class="cta-primary px-6 py-3 rounded-2xl font-bold inline-block" style="background:#39FF14;color:#05060B">Browse Tires</a>
     </div>
     <div>
-      <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
+      <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="photo-treated rounded-2xl shadow-lg" alt="Tire showcase">
     </div>
   </section>
 
   <!-- ABOUT -->
   <section id="about" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">Our History</h2>
-    <p class="text-neutral-300 leading-relaxed">Founded in Dubai in 2017, Aslama Alteeba began as a small supplier focused on bringing safe, affordable, and performance-driven tires to local markets. Over the years, we evolved into a trusted distributor, known for precision logistics and customer care.</p>
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Our History</h2>
+    <p class="leading-relaxed" style="color:#A7AFBF">Founded in Dubai in 2017, Aslama Alteeba began as a small supplier focused on bringing safe, affordable, and performance-driven tires to local markets. Over the years, we evolved into a trusted distributor, known for precision logistics and customer care.</p>
   </section>
 
   <!-- MATERIALS -->
-  <section id="materials" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
-    <h2 class="text-3xl font-bold mb-4">Products</h2>
-    <p class="text-neutral-300 leading-relaxed mb-8">Explore the core product families we supply for private vehicles, long-haul fleets, and heavy-duty industrial use. Each range is curated for consistent performance, predictable wear, and dependable casing integrity across the conditions they are designed for.</p>
+  <section id="materials" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Products</h2>
+    <p class="leading-relaxed mb-8" style="color:#A7AFBF">Explore the core product families we supply for private vehicles, long-haul fleets, and heavy-duty industrial use. Each range is curated for consistent performance, predictable wear, and dependable casing integrity across the conditions they are designed for.</p>
     <div class="space-y-32 md:space-y-44">
-      <article id="passenger-car-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
-        <h3 class="text-xl font-bold mb-3">Passenger Car Tires</h3>
-        <p class="text-neutral-300 leading-relaxed">Passenger car tires are engineered for daily comfort, low noise, and safe braking at highway speeds. Our selection emphasizes optimized tread patterns for wet traction, balanced rolling resistance for fuel economy, and stable shoulder blocks for confident lane changes. Customers can choose touring-focused options for smooth rides or performance-oriented compounds for precise steering response, all backed by consistent uniformity standards that reduce vibration over long distances.</p>
+      <article id="passenger-car-tires" class="glass-card rounded-3xl p-6 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3" style="font-family:Sora,Inter,sans-serif">Passenger Car Tires</h3>
+        <p class="leading-relaxed" style="color:#A7AFBF">Passenger car tires are engineered for daily comfort, low noise, and safe braking at highway speeds. Our selection emphasizes optimized tread patterns for wet traction, balanced rolling resistance for fuel economy, and stable shoulder blocks for confident lane changes. Customers can choose touring-focused options for smooth rides or performance-oriented compounds for precise steering response, all backed by consistent uniformity standards that reduce vibration over long distances.</p>
         <div class="mt-6 space-y-4">
           <div class="max-w-md">
-            <label class="text-sm font-semibold text-neutral-200">Passenger car tire brands</label>
+            <label class="text-sm font-semibold" style="color:#F2F5F9">Passenger car tire brands</label>
             <select
               x-model="passengerBrandSelection"
               @change="activePassengerBrand = passengerBrandSelection"
@@ -154,12 +155,13 @@
             </select>
           </div>
 
-          <div x-show="passengerBrandSelection" x-transition x-cloak class="glass rounded-2xl p-5 border-white/10">
+          <div x-show="passengerBrandSelection" x-transition x-cloak class="glass-card rounded-2xl p-5">
             <div class="flex flex-wrap gap-2 mb-4">
               <template x-for="b in passengerBrands" :key="b.name">
                 <button
                   class="px-3 py-2 rounded-xl text-sm border border-white/10"
-                  :class="activePassengerBrand === b.name ? 'bg-emerald-400 text-black font-semibold' : 'bg-white/5 text-neutral-200 hover:bg-white/10'"
+                  :class="activePassengerBrand === b.name ? 'font-semibold' : 'bg-white/5 hover:bg-white/10'"
+                  :style="activePassengerBrand === b.name ? 'background:#39FF14;color:#05060B' : 'color:#A7AFBF'"
                   @click="activePassengerBrand = b.name; passengerBrandSelection = b.name"
                   x-text="b.name"
                 ></button>
@@ -172,62 +174,62 @@
                   <img :src="m.img" :alt="m.name" class="w-full h-36 object-cover" />
                   <div class="p-3 space-y-1">
                     <h4 class="font-semibold" x-text="m.name"></h4>
-                    <p class="text-xs text-neutral-400" x-text="m.desc"></p>
+                    <p class="text-xs" style="color:#A7AFBF" x-text="m.desc"></p>
                   </div>
                 </article>
               </template>
             </div>
-            <p class="text-sm text-neutral-400" x-show="passengerBrandSelection && !passengerBrandModels(activePassengerBrand).length">
+            <p class="text-sm" style="color:#A7AFBF" x-show="passengerBrandSelection && !passengerBrandModels(activePassengerBrand).length">
               Model lineup coming soon.
             </p>
           </div>
         </div>
       </article>
-      <article id="truck-bus-radial-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
-        <h3 class="text-xl font-bold mb-3">Truck And Bus Radial Tires</h3>
-        <p class="text-neutral-300 leading-relaxed">Truck and bus radial tires are built to maximize mileage and load stability for commercial fleets. These casings use steel-belted radial construction to control heat, improve tread life, and support retreading cycles. We stock options for steer, drive, and trailer positions, with tread designs tailored for long-haul efficiency, regional durability, or urban stop-start traction. The result is predictable wear, reduced downtime, and improved cost-per-kilometer performance.</p>
+      <article id="truck-bus-radial-tires" class="glass-card rounded-3xl p-6 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3" style="font-family:Sora,Inter,sans-serif">Truck And Bus Radial Tires</h3>
+        <p class="leading-relaxed" style="color:#A7AFBF">Truck and bus radial tires are built to maximize mileage and load stability for commercial fleets. These casings use steel-belted radial construction to control heat, improve tread life, and support retreading cycles. We stock options for steer, drive, and trailer positions, with tread designs tailored for long-haul efficiency, regional durability, or urban stop-start traction. The result is predictable wear, reduced downtime, and improved cost-per-kilometer performance.</p>
       </article>
-      <article id="otr-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
-        <h3 class="text-xl font-bold mb-3">OTR Tires</h3>
-        <p class="text-neutral-300 leading-relaxed">OTR (Off-the-Road) tires are specified for heavy machinery operating in quarries, construction sites, and mining environments. These tires prioritize cut resistance, deep lug depth, and robust sidewall protection to handle sharp debris and high torque loads. The product mix includes patterns for loaders, graders, and articulated dump trucks, with compounds tuned for heat management and traction on loose or rocky terrain. This ensures long service life under extreme working conditions.</p>
+      <article id="otr-tires" class="glass-card rounded-3xl p-6 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3" style="font-family:Sora,Inter,sans-serif">OTR Tires</h3>
+        <p class="leading-relaxed" style="color:#A7AFBF">OTR (Off-the-Road) tires are specified for heavy machinery operating in quarries, construction sites, and mining environments. These tires prioritize cut resistance, deep lug depth, and robust sidewall protection to handle sharp debris and high torque loads. The product mix includes patterns for loaders, graders, and articulated dump trucks, with compounds tuned for heat management and traction on loose or rocky terrain. This ensures long service life under extreme working conditions.</p>
       </article>
-      <article id="truck-bus-bias-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
-        <h3 class="text-xl font-bold mb-3">Truck And Bus Bias Tires</h3>
-        <p class="text-neutral-300 leading-relaxed">Truck and bus bias tires remain the preferred choice for certain regional routes, mixed surfaces, and low-speed heavy-load applications. Their cross-ply construction delivers strong sidewall rigidity and resistance to impacts, making them suitable for rugged sites and older fleets. We provide bias options with reinforced plies, durable compounds, and tread patterns designed for traction and stability on uneven roads, helping operators maintain reliable performance in demanding environments.</p>
+      <article id="truck-bus-bias-tires" class="glass-card rounded-3xl p-6 scroll-mt-24">
+        <h3 class="text-xl font-bold mb-3" style="font-family:Sora,Inter,sans-serif">Truck And Bus Bias Tires</h3>
+        <p class="leading-relaxed" style="color:#A7AFBF">Truck and bus bias tires remain the preferred choice for certain regional routes, mixed surfaces, and low-speed heavy-load applications. Their cross-ply construction delivers strong sidewall rigidity and resistance to impacts, making them suitable for rugged sites and older fleets. We provide bias options with reinforced plies, durable compounds, and tread patterns designed for traction and stability on uneven roads, helping operators maintain reliable performance in demanding environments.</p>
       </article>
     </div>
   </section>
 
   <!-- HQ -->
   <section id="hq" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">Headquarters & Facilities</h2>
-    <p class="text-neutral-300 leading-relaxed">Our Dubai HQ is the operational hub for logistics, import coordination, and partner management. With satellite facilities in Sharjah and Ras Al Khaimah, we ensure smooth inventory distribution and real-time container tracking.</p>
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Headquarters & Facilities</h2>
+    <p class="leading-relaxed" style="color:#A7AFBF">Our Dubai HQ is the operational hub for logistics, import coordination, and partner management. With satellite facilities in Sharjah and Ras Al Khaimah, we ensure smooth inventory distribution and real-time container tracking.</p>
   </section>
 
   <!-- IMPORTS -->
-  <section id="imports" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
-    <h2 class="text-3xl font-bold mb-4">Global Imports</h2>
-    <p class="text-neutral-300 leading-relaxed">We source from certified manufacturers across Japan, China, and Thailand, maintaining relationships with Duraturn, Bridgestone, and Firemax plants. Every shipment passes through customs-approved facilities, ensuring authenticity and traceability.</p>
+  <section id="imports" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Global Imports</h2>
+    <p class="leading-relaxed" style="color:#A7AFBF">We source from certified manufacturers across Japan, China, and Thailand, maintaining relationships with Duraturn, Bridgestone, and Firemax plants. Every shipment passes through customs-approved facilities, ensuring authenticity and traceability.</p>
   </section>
 
   <!-- SHIPPING -->
   <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">Shipping & Installation</h2>
-    <p class="text-neutral-300 leading-relaxed">Rapid delivery across all Emirates. Choose local pickup, on-site installation, or direct shipment for fleet clients. We collaborate with service centers to provide same-day fitting when possible.</p>
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Shipping & Installation</h2>
+    <p class="leading-relaxed" style="color:#A7AFBF">Rapid delivery across all Emirates. Choose local pickup, on-site installation, or direct shipment for fleet clients. We collaborate with service centers to provide same-day fitting when possible.</p>
   </section>
 
   <!-- BRANDS -->
-  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 glass-card rounded-3xl">
     <div class="flex items-end justify-between gap-4 mb-8">
       <div>
-        <h2 class="text-3xl font-extrabold">Brands</h2>
-        <p class="text-neutral-400">Browse our partner brands and send an inquiry instantly.</p>
+        <h2 class="text-3xl font-extrabold" style="font-family:Sora,Inter,sans-serif">Brands</h2>
+        <p style="color:#A7AFBF">Browse our partner brands and send an inquiry instantly.</p>
       </div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
       <template x-for="b in brands" :key="b.name">
-        <article class="glass rounded-3xl overflow-hidden border-white/10">
+        <article class="glass-card rounded-3xl overflow-hidden">
           <div class="bg-black/30 p-4 h-32 flex items-center justify-center">
             <img :src="b.img" :alt="b.name + ' logo'" class="max-h-24 object-contain" />
           </div>
@@ -236,8 +238,8 @@
               <h3 class="font-bold text-lg" x-text="b.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' products'"></span>
             </div>
-            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
-            <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="sendBrandInquiry(b.name)">
+            <p class="text-sm" style="color:#A7AFBF" x-text="b.desc"></p>
+            <button class="w-full px-4 py-2 rounded-xl font-bold hover:opacity-90" style="background:#39FF14;color:#05060B" @click="sendBrandInquiry(b.name)">
               Send Inquiry
             </button>
           </div>
@@ -247,19 +249,19 @@
   </section>
 
   <!-- BRAND PRODUCTION TIMELINE -->
-  <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+  <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 glass-card rounded-3xl">
   </section>
 
 <!-- INTRODUCTION EMAIL -->
-  <section id="intro" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/40 rounded-3xl">
-    <h2 class="text-3xl font-bold mb-4">Get an Introduction Email</h2>
-    <p class="text-neutral-300 mb-6">Enter your details to receive a professional introduction email about our services. A copy goes to you and to our inbox automatically.</p>
+  <section id="intro" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
+    <h2 class="text-3xl font-bold mb-4" style="font-family:Sora,Inter,sans-serif">Get an Introduction Email</h2>
+    <p class="mb-6" style="color:#A7AFBF">Enter your details to receive a professional introduction email about our services. A copy goes to you and to our inbox automatically.</p>
     <form @submit.prevent="sendIntro" class="space-y-4 max-w-xl">
-      <input required x-model="intro.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Full Name"/>
-      <input required x-model="intro.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Email Address"/>
-      <input required x-model="intro.phone" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Phone Number"/>
-      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Introduction Email</button>
-      <p x-show="introSuccess" class="text-emerald-400 text-sm mt-1">✅ Email sent successfully!</p>
+      <input required x-model="intro.name" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Full Name"/>
+      <input required x-model="intro.email" type="email" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Email Address"/>
+      <input required x-model="intro.phone" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Phone Number"/>
+      <button class="px-6 py-3 rounded-2xl font-bold" style="background:#39FF14;color:#05060B">Send Introduction Email</button>
+      <p x-show="introSuccess" class="text-sm mt-1" style="color:#39FF14">✅ Email sent successfully!</p>
       <p x-show="introError" class="text-red-400 text-sm mt-1" x-text="introError"></p>
     </form>
   </section>
@@ -268,9 +270,9 @@
   <section id="shop" class="max-w-7xl mx-auto px-4 py-20">
     <div class="flex items-end justify-between gap-4 mb-6">
       <div>
-        <h2 class="text-3xl font-extrabold">Browse Tires</h2>
-        <p class="text-neutral-400">Search and filter by brand to view our product catalog.</p>
-        <p class="text-amber-400 text-sm mt-1" x-show="bulkMode" x-cloak>For bulk orders and wholesale inquiries</p>
+        <h2 class="text-3xl font-extrabold" style="font-family:Sora,Inter,sans-serif">Browse Tires</h2>
+        <p style="color:#A7AFBF">Search and filter by brand to view our product catalog.</p>
+        <p class="text-sm mt-1" style="color:#F59E0B" x-show="bulkMode" x-cloak>For bulk orders and wholesale inquiries</p>
       </div>
       <div class="flex gap-2 items-center">
         <label class="flex items-center gap-2 text-sm cursor-pointer">
@@ -287,7 +289,7 @@
           <option>Bridgestone</option>
           <option>Firemax</option>
         </select>
-        <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
+        <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2" style="color:#F2F5F9" />
       </div>
     </div>
 
@@ -300,8 +302,8 @@
     >
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-2xl font-bold">Interactive Tire Universe</h3>
-          <p class="text-neutral-400 text-sm">Explore tires visually — adjust the sliders to see products react</p>
+          <h3 class="text-2xl font-bold" style="font-family:Sora,Inter,sans-serif">Interactive Tire Universe</h3>
+          <p class="text-sm" style="color:#A7AFBF">Explore tires visually — adjust the sliders to see products react</p>
         </div>
         <button 
           @click="toggleSlidersDocked()"
@@ -316,8 +318,8 @@
         <!-- Slider 1: City <-> Highway -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">City</label>
-            <label class="text-sm font-semibold text-neutral-300">Highway</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">City</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">Highway</label>
           </div>
           <input 
             type="range" 
@@ -331,8 +333,8 @@
         <!-- Slider 2: Budget <-> Performance -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">Budget</label>
-            <label class="text-sm font-semibold text-neutral-300">Performance</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">Budget</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">Performance</label>
           </div>
           <input 
             type="range" 
@@ -346,8 +348,8 @@
         <!-- Slider 3: Quiet <-> Aggressive -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">Quiet</label>
-            <label class="text-sm font-semibold text-neutral-300">Aggressive</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">Quiet</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">Aggressive</label>
           </div>
           <input 
             type="range" 
@@ -362,15 +364,15 @@
 
     <!-- PODIUM STAGE (separate from product grid) -->
     <div class="mb-12 relative" style="height: 650px;">
-      <div class="absolute inset-0 glass rounded-3xl border-white/10 overflow-hidden">
-        <h3 class="text-xl font-bold text-center pt-4 pb-2">Podium Ranking</h3>
+      <div class="absolute inset-0 glass-card rounded-3xl overflow-hidden">
+        <h3 class="text-xl font-bold text-center pt-4 pb-2" style="font-family:Sora,Inter,sans-serif">Podium Ranking</h3>
         
         <!-- 6 Fixed Podium Slots -->
         <div class="relative w-full h-full">
           <template x-for="p in products" :key="p.id">
             <div 
               :id="'podium-' + p.id"
-              class="absolute podium-card glass rounded-2xl overflow-hidden border-white/10"
+              class="absolute podium-card glass-card rounded-2xl overflow-hidden"
               :style="getPodiumSlotStyle(p)"
               style="width: 200px; transition: all 1.4s cubic-bezier(0.22, 1, 0.36, 1);"
             >
@@ -391,7 +393,7 @@
                   :style="{ color: getVerdictText(p).color }"
                   x-text="getVerdictText(p).text"
                 ></div>
-                <p class="text-neutral-400 text-xs" x-text="p.size"></p>
+                <p class="text-xs" style="color:#A7AFBF" x-text="p.size"></p>
               </div>
             </div>
           </template>
@@ -403,7 +405,7 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <template x-for="p in filteredProducts()" :key="p.id">
         <article 
-          class="glass rounded-3xl overflow-hidden shine border-white/10"
+          class="glass-card rounded-3xl overflow-hidden shine"
         >
           <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
           <div class="p-4 space-y-2">
@@ -418,15 +420,16 @@
               style="animation: fadeInScale 0.4s ease-out 0.15s both;"
             ></div>
             
-            <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            <p class="text-sm" style="color:#A7AFBF" x-text="p.desc"></p>
             
             <!-- Quick Questions Section -->
             <div class="pt-2 border-t border-white/10">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-semibold text-neutral-400">Quick questions</span>
+                <span class="text-xs font-semibold" style="color:#A7AFBF">Quick questions</span>
                 <button 
                   @click="refreshProductQuestions(p)" 
-                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10"
+                  style="color:#A7AFBF"
                   title="Refresh questions">
                   ↻
                 </button>
@@ -435,7 +438,8 @@
                 <template x-for="(q, idx) in getProductQuestions(p)" :key="p.id + '-' + idx">
                   <button 
                     @click="openChatWithQuestion(q, p)"
-                    class="w-full text-left text-xs px-2 py-1.5 rounded-lg bg-white/5 hover:bg-teal-500/20 text-neutral-300 hover:text-teal-300 transition-colors"
+                    class="w-full text-left text-xs px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    style="color:#A7AFBF"
                     x-text="q">
                   </button>
                 </template>
@@ -448,7 +452,7 @@
                 <div class="flex items-center justify-between w-full">
                   <div>
                     <div class="text-lg font-extrabold" x-text="formatPrice(p.price)"></div>
-                    <div class="text-xs text-neutral-400" x-text="p.size"></div>
+                    <div class="text-xs" style="color:#A7AFBF" x-text="p.size"></div>
                   </div>
                 </div>
               </template>
@@ -458,11 +462,11 @@
                 <div class="flex flex-col gap-2 w-full">
                   <div class="flex items-center justify-between">
                     <div>
-                      <div class="text-sm text-neutral-400">Contact us for bulk pricing</div>
-                      <div class="text-xs text-neutral-400" x-text="p.size"></div>
+                      <div class="text-sm" style="color:#A7AFBF">Contact us for bulk pricing</div>
+                      <div class="text-xs" style="color:#A7AFBF" x-text="p.size"></div>
                     </div>
                   </div>
-                  <button class="w-full px-4 py-2 rounded-xl bg-amber-500 text-black font-bold hover:opacity-90" @click="requestBulkQuote(p)">Request bulk quote</button>
+                  <button class="w-full px-4 py-2 rounded-xl font-bold hover:opacity-90" style="background:#F59E0B;color:#05060B" @click="requestBulkQuote(p)">Request bulk quote</button>
                 </div>
               </template>
             </div>
@@ -474,17 +478,17 @@
 
   <!-- CONTACT -->
   <section id="contact" class="max-w-7xl mx-auto px-4 py-20">
-    <h2 class="text-3xl font-bold mb-6">Contact Us</h2>
+    <h2 class="text-3xl font-bold mb-6" style="font-family:Sora,Inter,sans-serif">Contact Us</h2>
     <form @submit.prevent="sendContact" class="space-y-4 max-w-xl">
-      <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your name"/>
-      <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your email"/>
-      <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your message"></textarea>
-      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Message</button>
+      <input required x-model="contact.name" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your name"/>
+      <input required x-model="contact.email" type="email" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your email"/>
+      <textarea required x-model="contact.message" rows="4" class="form-input bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your message"></textarea>
+      <button class="px-6 py-3 rounded-2xl font-bold" style="background:#39FF14;color:#05060B">Send Message</button>
     </form>
   </section>
 
   <!-- FOOTER -->
-  <footer class="border-t border-white/10 text-neutral-400 text-sm text-center py-6">
+  <footer class="border-t border-white/10 text-sm text-center py-6" style="color:#A7AFBF">
     © <span x-text="new Date().getFullYear()"></span> Aslama Alteeba. All rights reserved.
   </footer>
 
@@ -492,7 +496,8 @@
   <!-- AI CHAT PANEL -->
   <div class="fixed bottom-5 left-5 z-50">
     <button
-      class="px-4 py-3 rounded-2xl brand-gradient text-black font-extrabold shadow-lg hover:opacity-90"
+      class="px-4 py-3 rounded-2xl font-extrabold shadow-lg hover:opacity-90"
+      style="background:#39FF14;color:#05060B"
       @click="chatOpen = !chatOpen; if(chatOpen){$nextTick(() => scrollChat());}"
       aria-label="Open AI chat"
     >
@@ -506,11 +511,11 @@
     x-transition
     @keydown.escape.window="chatOpen=false"
   >
-    <div class="glass rounded-3xl border border-white/10 overflow-hidden">
+    <div class="glass-card rounded-3xl border border-white/10 overflow-hidden">
       <div class="flex items-center justify-between px-4 py-3 bg-black/40">
         <div>
           <div class="font-bold">Aslama AI Assistant</div>
-          <div class="text-xs text-neutral-400">Ask about sizes, brands, or availability.</div>
+          <div class="text-xs" style="color:#A7AFBF">Ask about sizes, brands, or availability.</div>
         </div>
         <button class="p-2 rounded-lg bg-white/5" @click="chatOpen=false">✕</button>
       </div>
@@ -520,7 +525,8 @@
           <div class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
             <div
               class="px-3 py-2 rounded-2xl text-sm max-w-[80%]"
-              :class="msg.role === 'user' ? 'bg-emerald-500 text-black' : 'bg-white/10 text-neutral-100'"
+              :class="msg.role === 'user' ? '' : 'bg-white/10'"
+              :style="msg.role === 'user' ? 'background:#39FF14;color:#05060B' : 'color:#F2F5F9'"
               x-text="msg.content"
             ></div>
           </div>
@@ -528,7 +534,7 @@
 
         <template x-if="chatLoading">
           <div class="flex justify-start">
-            <div class="px-3 py-2 rounded-2xl text-sm bg-white/10 text-neutral-100">Typing…</div>
+            <div class="px-3 py-2 rounded-2xl text-sm bg-white/10" style="color:#F2F5F9">Typing…</div>
           </div>
         </template>
       </div>
@@ -543,7 +549,8 @@
             :disabled="chatLoading"
           />
           <button
-            class="px-4 py-2 rounded-xl brand-gradient text-black font-bold"
+            class="px-4 py-2 rounded-xl font-bold"
+            style="background:#39FF14;color:#05060B"
             :disabled="chatLoading || !chatInput.trim()"
           >
             Send
@@ -556,7 +563,8 @@
   <!-- WHATSAPP FLOAT BUTTON (ALWAYS VISIBLE) -->
   <a
     href="https://wa.me/971554637045?text=Hello%20Aslama%20Alteeba%2C%20I%20would%20like%20to%20inquire%20about%20tires."
-    class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl bg-emerald-500 text-black font-extrabold shadow-lg hover:opacity-90"
+    class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl font-extrabold shadow-lg hover:opacity-90"
+    style="background:#39FF14;color:#05060B"
     aria-label="WhatsApp"
     target="_blank"
     rel="noopener"
