@@ -1,4 +1,4 @@
-/* Brand Production Timeline Styles */
+/* Brand Production Timeline Styles — Updated for Cinematic Design System */
 
 .timeline-container {
   position: relative;
@@ -10,7 +10,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg, rgba(0, 224, 164, 0.3), rgba(50, 213, 255, 0.3));
+  background: linear-gradient(180deg, rgba(57, 255, 20, 0.4), rgba(57, 255, 20, 0.1));
 }
 
 .timeline-line.rtl {
@@ -40,8 +40,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00E0A4, #32D5FF);
-  box-shadow: 0 0 12px rgba(0, 224, 164, 0.6);
+  background: #39FF14;
+  box-shadow: 0 0 16px rgba(57, 255, 20, 0.5);
 }
 
 .timeline-dot.rtl {
