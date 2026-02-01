@@ -9,15 +9,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/timeline.css">
+  <link rel="stylesheet" href="/styles/theme.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="../customerMemory.js"></script>
   <style>
     html,body{font-family:Vazirmatn,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
-    .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
-    .brand-gradient{background:linear-gradient(135deg,#00E0A4,#32D5FF)}
+    .glass{backdrop-filter:blur(12px);background:rgba(5,6,11,0.6);border:1px solid rgba(57,255,20,0.1)}
+    .brand-gradient{background:#39FF14}
     .shine{position:relative;overflow:hidden}
-    .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:shine 6s infinite}
+    .shine:after{content:"";position:absolute;inset:-120% auto auto -120%;width:60%;height:300%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(57,255,20,.18),transparent);animation:shine 6s infinite}
     [x-cloak]{display:none !important}
     @keyframes shine{0%{left:-120%}60%{left:140%}100%{left:140%}}
     
@@ -39,18 +40,18 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      background: #39FF14;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+      box-shadow: 0 2px 8px rgba(57,255,20,0.4);
     }
     .slider::-moz-range-thumb {
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg,#00E0A4,#32D5FF);
+      background: #39FF14;
       cursor: pointer;
       border: none;
-      box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+      box-shadow: 0 2px 8px rgba(57,255,20,0.4);
     }
     
     /* Fix phone number display for RTL */
@@ -61,23 +62,23 @@
     }
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
+<body style="background:#05060B;color:#F2F5F9" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 glass">
+  <header class="sticky top-0 z-50 nav-glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
-      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span style="color:#39FF14">Alteeba</span></h1>
       <nav class="hidden md:flex gap-6 text-sm flex-wrap">
         <a href="#about" class="hover:text-white">درباره ما</a>
         <div class="relative" x-data="{open:false}">
           <button class="hover:text-white flex items-center gap-2" aria-haspopup="true" :aria-expanded="open" @click="open = !open" @keydown.escape="open=false">
             محصولات
-            <span class="text-xs text-neutral-400">▾</span>
+            <span class="text-xs" style="color:#A7AFBF">▾</span>
           </button>
-          <div class="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-white/10 bg-neutral-950/95 backdrop-blur p-2 shadow-xl" x-show="open" x-transition.origin.top.right @click.outside="open=false" x-cloak>
-            <a href="#passenger-car-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">تایر سواری</a>
-            <a href="#truck-bus-radial-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">تایر رادیال کامیون و اتوبوس</a>
-            <a href="#otr-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">تایر OTR</a>
-            <a href="#truck-bus-bias-tires" class="block rounded-xl px-3 py-2 text-sm text-neutral-200 hover:bg-white/10" @click="open=false">تایر بایاس کامیون و اتوبوس</a>
+          <div class="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-white/10 backdrop-blur p-2 shadow-xl" style="background:rgba(5,6,11,0.95)" x-show="open" x-transition.origin.top.right @click.outside="open=false" x-cloak>
+            <a href="#passenger-car-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">تایر سواری</a>
+            <a href="#truck-bus-radial-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">تایر رادیال کامیون و اتوبوس</a>
+            <a href="#otr-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">تایر OTR</a>
+            <a href="#truck-bus-bias-tires" class="block rounded-xl px-3 py-2 text-sm hover:bg-white/10" style="color:#F2F5F9" @click="open=false">تایر بایاس کامیون و اتوبوس</a>
           </div>
         </div>
         <a href="#hq" class="hover:text-white">دفتر مرکزی</a>
@@ -112,7 +113,7 @@
           خروج
         </button>
 
-        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
+        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl font-semibold hover:opacity-90" style="background:#39FF14;color:#05060B">
           <span id="phone-display" class="phone-number">+971 55 463 7045</span>
         </a>
       </div>
@@ -122,8 +123,8 @@
   <!-- HERO -->
   <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
     <div>
-      <h2 class="text-5xl font-extrabold mb-4 leading-tight">تایرهای ممتاز.<br><span class="text-emerald-400">کیفیت امارات.</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">اسلمه الطیبه تایرهای درجه‌یک را در سراسر امارات عرضه می‌کند. همکاری با Duraturn، Bridgestone و Firemax ایمنی، آرامش و اعتماد را تضمین می‌کند.</p>
+      <h2 class="text-5xl font-extrabold mb-4 leading-tight">تایرهای ممتاز.<br><span style="color:#39FF14">کیفیت امارات.</span></h2>
+      <p class="text-lg mb-6" style="color:#A7AFBF">اسلمه الطیبه تایرهای درجه‌یک را در سراسر امارات عرضه می‌کند. همکاری با Duraturn، Bridgestone و Firemax ایمنی، آرامش و اعتماد را تضمین می‌کند.</p>
       <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">مرور تایرها</a>
     </div>
     <div>
@@ -134,20 +135,20 @@
   <!-- ABOUT -->
   <section id="about" class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-bold mb-4">تاریخچه ما</h2>
-    <p class="text-neutral-300 leading-relaxed">اسلمه الطیبه از سال ۲۰۱۷ در دبی با هدف تامین تایرهای ایمن، مقرون‌به‌صرفه و با عملکرد بالا آغاز به کار کرد. امروز، ما به عنوان توزیع‌کننده‌ای قابل اعتماد با لجستیک دقیق و خدمات مشتری ممتاز شناخته می‌شویم.</p>
+    <p class="leading-relaxed" style="color:#A7AFBF">اسلمه الطیبه از سال ۲۰۱۷ در دبی با هدف تامین تایرهای ایمن، مقرون‌به‌صرفه و با عملکرد بالا آغاز به کار کرد. امروز، ما به عنوان توزیع‌کننده‌ای قابل اعتماد با لجستیک دقیق و خدمات مشتری ممتاز شناخته می‌شویم.</p>
   </section>
 
   <!-- MATERIALS -->
-  <section id="materials" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
+  <section id="materials" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
     <h2 class="text-3xl font-bold mb-4">محصولات</h2>
-    <p class="text-neutral-300 leading-relaxed mb-8">خانواده‌های اصلی تایرهای سواری، ناوگان حمل‌ونقل سنگین و کاربردهای صنعتی را بررسی کنید. هر رده برای عملکرد پایدار، عمر مفید قابل پیش‌بینی و استحکام مناسب انتخاب شده است.</p>
+    <p class="leading-relaxed mb-8" style="color:#A7AFBF">خانواده‌های اصلی تایرهای سواری، ناوگان حمل‌ونقل سنگین و کاربردهای صنعتی را بررسی کنید. هر رده برای عملکرد پایدار، عمر مفید قابل پیش‌بینی و استحکام مناسب انتخاب شده است.</p>
     <div class="space-y-32 md:space-y-44">
       <article id="passenger-car-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
         <h3 class="text-xl font-bold mb-3">تایر سواری</h3>
-        <p class="text-neutral-300 leading-relaxed">تایرهای سواری برای راحتی روزانه، صدای کم و ترمزگیری ایمن در سرعت‌های بالا طراحی شده‌اند. ما روی الگوهای آج بهینه برای چسبندگی در سطح خیس، مقاومت غلتشی متعادل برای مصرف سوخت کمتر و پایداری در تغییر مسیر تمرکز داریم.</p>
+        <p class="leading-relaxed" style="color:#A7AFBF">تایرهای سواری برای راحتی روزانه، صدای کم و ترمزگیری ایمن در سرعت‌های بالا طراحی شده‌اند. ما روی الگوهای آج بهینه برای چسبندگی در سطح خیس، مقاومت غلتشی متعادل برای مصرف سوخت کمتر و پایداری در تغییر مسیر تمرکز داریم.</p>
         <div class="mt-6 space-y-4">
           <div class="max-w-md">
-            <label class="text-sm font-semibold text-neutral-200">برند تایر سواری</label>
+            <label class="text-sm font-semibold" style="color:#F2F5F9">برند تایر سواری</label>
             <select
               x-model="passengerBrandSelection"
               @change="activePassengerBrand = passengerBrandSelection"
@@ -165,7 +166,8 @@
               <template x-for="b in passengerBrands" :key="b.name">
                 <button
                   class="px-3 py-2 rounded-xl text-sm border border-white/10"
-                  :class="activePassengerBrand === b.name ? 'bg-emerald-400 text-black font-semibold' : 'bg-white/5 text-neutral-200 hover:bg-white/10'"
+                  :class="activePassengerBrand === b.name ? 'font-semibold' : 'bg-white/5 hover:bg-white/10'"
+                  :style="activePassengerBrand === b.name ? 'background:#39FF14;color:#05060B' : 'color:#F2F5F9'"
                   @click="activePassengerBrand = b.name; passengerBrandSelection = b.name"
                   x-text="b.name"
                 ></button>
@@ -178,12 +180,12 @@
                   <img :src="m.img" :alt="m.name" class="w-full h-36 object-cover" />
                   <div class="p-3 space-y-1">
                     <h4 class="font-semibold" x-text="m.name"></h4>
-                    <p class="text-xs text-neutral-400" x-text="m.desc"></p>
+                    <p class="text-xs" style="color:#A7AFBF" x-text="m.desc"></p>
                   </div>
                 </article>
               </template>
             </div>
-            <p class="text-sm text-neutral-400" x-show="passengerBrandSelection && !passengerBrandModels(activePassengerBrand).length">
+            <p class="text-sm" style="color:#A7AFBF" x-show="passengerBrandSelection && !passengerBrandModels(activePassengerBrand).length">
               فهرست مدل‌ها به‌زودی اضافه می‌شود.
             </p>
           </div>
@@ -191,15 +193,15 @@
       </article>
       <article id="truck-bus-radial-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
         <h3 class="text-xl font-bold mb-3">تایر رادیال کامیون و اتوبوس</h3>
-        <p class="text-neutral-300 leading-relaxed">تایرهای رادیال کامیون و اتوبوس برای پیمایش طولانی و تحمل بار بالا ساخته شده‌اند. ساختار رادیال فولادی، کنترل حرارت، طول عمر آج و امکان بازسازی را بهبود می‌دهد و هزینه هر کیلومتر را کاهش می‌دهد.</p>
+        <p class="leading-relaxed" style="color:#A7AFBF">تایرهای رادیال کامیون و اتوبوس برای پیمایش طولانی و تحمل بار بالا ساخته شده‌اند. ساختار رادیال فولادی، کنترل حرارت، طول عمر آج و امکان بازسازی را بهبود می‌دهد و هزینه هر کیلومتر را کاهش می‌دهد.</p>
       </article>
       <article id="otr-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
         <h3 class="text-xl font-bold mb-3">تایر OTR</h3>
-        <p class="text-neutral-300 leading-relaxed">تایرهای OTR (خارج جاده‌ای) برای ماشین‌آلات سنگین در معدن و پروژه‌های عمرانی طراحی شده‌اند. دیواره‌های مقاوم، عمق آج بالا و ترکیبات ضدبرش، عمر مفید را در محیط‌های سخت افزایش می‌دهد.</p>
+        <p class="leading-relaxed" style="color:#A7AFBF">تایرهای OTR (خارج جاده‌ای) برای ماشین‌آلات سنگین در معدن و پروژه‌های عمرانی طراحی شده‌اند. دیواره‌های مقاوم، عمق آج بالا و ترکیبات ضدبرش، عمر مفید را در محیط‌های سخت افزایش می‌دهد.</p>
       </article>
       <article id="truck-bus-bias-tires" class="glass rounded-3xl p-6 border-white/10 scroll-mt-24">
         <h3 class="text-xl font-bold mb-3">تایر بایاس کامیون و اتوبوس</h3>
-        <p class="text-neutral-300 leading-relaxed">تایرهای بایاس همچنان برای مسیرهای منطقه‌ای و سطوح ناهموار انتخاب می‌شوند. ساختار چندلایه، مقاومت جانبی بالایی ایجاد می‌کند و برای شرایط دشوار و سرعت‌های پایین مناسب است.</p>
+        <p class="leading-relaxed" style="color:#A7AFBF">تایرهای بایاس همچنان برای مسیرهای منطقه‌ای و سطوح ناهموار انتخاب می‌شوند. ساختار چندلایه، مقاومت جانبی بالایی ایجاد می‌کند و برای شرایط دشوار و سرعت‌های پایین مناسب است.</p>
       </article>
     </div>
   </section>
@@ -207,27 +209,27 @@
   <!-- HQ -->
   <section id="hq" class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-bold mb-4">دفتر مرکزی و امکانات</h2>
-    <p class="text-neutral-300 leading-relaxed">دفتر مرکزی ما در دبی، مرکز عملیات لجستیک و مدیریت واردات است. با مراکز پشتیبان در شارجه و راس‌الخیمه، توزیع سریع و ردیابی موجودی را تضمین می‌کنیم.</p>
+    <p class="leading-relaxed" style="color:#A7AFBF">دفتر مرکزی ما در دبی، مرکز عملیات لجستیک و مدیریت واردات است. با مراکز پشتیبان در شارجه و راس‌الخیمه، توزیع سریع و ردیابی موجودی را تضمین می‌کنیم.</p>
   </section>
 
   <!-- IMPORTS -->
-  <section id="imports" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl">
+  <section id="imports" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
     <h2 class="text-3xl font-bold mb-4">واردات جهانی</h2>
-    <p class="text-neutral-300 leading-relaxed">از تولیدکنندگان تاییدشده در ژاپن، چین و تایلند تامین می‌کنیم و با کارخانه‌های Duraturn، Bridgestone و Firemax همکاری نزدیک داریم. هر محموله با کنترل‌های لازم وارد کشور می‌شود.</p>
+    <p class="leading-relaxed" style="color:#A7AFBF">از تولیدکنندگان تاییدشده در ژاپن، چین و تایلند تامین می‌کنیم و با کارخانه‌های Duraturn، Bridgestone و Firemax همکاری نزدیک داریم. هر محموله با کنترل‌های لازم وارد کشور می‌شود.</p>
   </section>
 
   <!-- SHIPPING -->
   <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-bold mb-4">ارسال و نصب</h2>
-    <p class="text-neutral-300 leading-relaxed">ارسال سریع به تمام امارات. امکان دریافت حضوری، نصب در محل یا ارسال مستقیم برای ناوگان‌ها فراهم است. با مراکز خدماتی همکاری داریم تا نصب در همان روز انجام شود.</p>
+    <p class="leading-relaxed" style="color:#A7AFBF">ارسال سریع به تمام امارات. امکان دریافت حضوری، نصب در محل یا ارسال مستقیم برای ناوگان‌ها فراهم است. با مراکز خدماتی همکاری داریم تا نصب در همان روز انجام شود.</p>
   </section>
 
   <!-- BRANDS -->
-  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 glass-card rounded-3xl">
     <div class="flex items-end justify-between gap-4 mb-8">
       <div>
         <h2 class="text-3xl font-extrabold">برندها</h2>
-        <p class="text-neutral-400">برندهای همکار را ببینید و سریع استعلام کنید.</p>
+        <p style="color:#A7AFBF">برندهای همکار را ببینید و سریع استعلام کنید.</p>
       </div>
     </div>
 
@@ -242,7 +244,7 @@
               <h3 class="font-bold text-lg" x-text="b.name"></h3>
               <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' محصول'"></span>
             </div>
-            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
+            <p class="text-sm" style="color:#A7AFBF" x-text="b.desc"></p>
             <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="sendBrandInquiry(b.name)">
               ارسال استعلام
             </button>
@@ -253,19 +255,19 @@
   </section>
 
   <!-- BRAND PRODUCTION TIMELINE -->
-  <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+  <section id="production-timeline" class="max-w-7xl mx-auto px-4 py-20 glass-card rounded-3xl">
   </section>
 
   <!-- INTRODUCTION EMAIL -->
-  <section id="intro" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/40 rounded-3xl">
+  <section id="intro" class="max-w-7xl mx-auto px-4 py-16 glass-card rounded-3xl">
     <h2 class="text-3xl font-bold mb-4">دریافت ایمیل معرفی</h2>
-    <p class="text-neutral-300 mb-6">اطلاعات خود را وارد کنید تا یک ایمیل معرفی حرفه‌ای دریافت کنید. یک نسخه برای شما و یک نسخه برای ما ارسال می‌شود.</p>
+    <p class="mb-6" style="color:#A7AFBF">اطلاعات خود را وارد کنید تا یک ایمیل معرفی حرفه‌ای دریافت کنید. یک نسخه برای شما و یک نسخه برای ما ارسال می‌شود.</p>
     <form @submit.prevent="sendIntro" class="space-y-4 max-w-xl">
       <input required x-model="intro.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="نام و نام خانوادگی"/>
       <input required x-model="intro.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="ایمیل"/>
       <input required x-model="intro.phone" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="شماره تماس"/>
       <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">ارسال ایمیل معرفی</button>
-      <p x-show="introSuccess" class="text-emerald-400 text-sm mt-1">✅ ایمیل با موفقیت ارسال شد!</p>
+      <p x-show="introSuccess" class="text-sm mt-1" style="color:#39FF14">✅ ایمیل با موفقیت ارسال شد!</p>
       <p x-show="introError" class="text-red-400 text-sm mt-1" x-text="introError"></p>
     </form>
   </section>
@@ -275,7 +277,7 @@
     <div class="flex items-end justify-between gap-4 mb-6">
       <div>
         <h2 class="text-3xl font-extrabold">مرور تایرها</h2>
-        <p class="text-neutral-400">جستجو و فیلتر برند برای مشاهده کاتالوگ محصولات ما.</p>
+        <p style="color:#A7AFBF">جستجو و فیلتر برند برای مشاهده کاتالوگ محصولات ما.</p>
         <p class="text-amber-400 text-sm mt-1" x-show="bulkMode" x-cloak>برای سفارشات عمده و استعلامهای عمدهفروشی</p>
       </div>
       <div class="flex gap-2 items-center">
@@ -293,7 +295,7 @@
           <option>Bridgestone</option>
           <option>Firemax</option>
         </select>
-        <input x-model="filters.query" type="search" placeholder="جستجوی سایز… مثلاً 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
+        <input x-model="filters.query" type="search" placeholder="جستجوی سایز… مثلاً 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2" style="color:#F2F5F9" />
       </div>
     </div>
 
@@ -307,7 +309,7 @@
       <div class="flex items-center justify-between mb-4">
         <div>
           <h3 class="text-2xl font-bold">جهان تعاملی تایرها</h3>
-          <p class="text-neutral-400 text-sm">تایرها را بصری کاوش کنید — اسلایدرها را تنظیم کنید و واکنش محصولات را ببینید</p>
+          <p class="text-sm" style="color:#A7AFBF">تایرها را بصری کاوش کنید — اسلایدرها را تنظیم کنید و واکنش محصولات را ببینید</p>
         </div>
         <button 
           @click="toggleSlidersDocked()"
@@ -322,8 +324,8 @@
         <!-- Slider 1: Highway <-> City (reversed for RTL) -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">بزرگراه</label>
-            <label class="text-sm font-semibold text-neutral-300">شهری</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">بزرگراه</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">شهری</label>
           </div>
           <input 
             type="range" 
@@ -338,8 +340,8 @@
         <!-- Slider 2: Performance <-> Budget (reversed for RTL) -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">عملکرد</label>
-            <label class="text-sm font-semibold text-neutral-300">بودجه</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">عملکرد</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">بودجه</label>
           </div>
           <input 
             type="range" 
@@ -354,8 +356,8 @@
         <!-- Slider 3: Aggressive <-> Quiet (reversed for RTL) -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-semibold text-neutral-300">ورزشی</label>
-            <label class="text-sm font-semibold text-neutral-300">آرام</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">ورزشی</label>
+            <label class="text-sm font-semibold" style="color:#A7AFBF">آرام</label>
           </div>
           <input 
             type="range" 
@@ -400,7 +402,7 @@
                   :style="{ color: getVerdictTextFa(p).color }"
                   x-text="getVerdictTextFa(p).text"
                 ></div>
-                <p class="text-neutral-400 text-xs" x-text="p.size"></p>
+                <p class="text-xs" style="color:#A7AFBF" x-text="p.size"></p>
               </div>
             </div>
           </template>
@@ -429,15 +431,16 @@
               style="animation: fadeInScale 0.4s ease-out 0.15s both;"
             ></div>
             
-            <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            <p class="text-sm" style="color:#A7AFBF" x-text="p.desc"></p>
             
             <!-- Quick Questions Section (Persian) -->
             <div class="pt-2 border-t border-white/10">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-semibold text-neutral-400">پرسش‌های سریع</span>
+                <span class="text-xs font-semibold" style="color:#A7AFBF">پرسش‌های سریع</span>
                 <button 
                   @click="refreshProductQuestions(p)" 
-                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  class="text-xs px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10"
+                  style="color:#A7AFBF"
                   title="تازه‌سازی پرسش‌ها">
                   ↻
                 </button>
@@ -446,7 +449,7 @@
                 <template x-for="(q, idx) in getProductQuestions(p)" :key="p.id + '-' + idx">
                   <button 
                     @click="openChatWithQuestion(q, p)"
-                    class="w-full text-right text-xs px-2 py-1.5 rounded-lg bg-white/5 hover:bg-teal-500/20 text-neutral-300 hover:text-teal-300 transition-colors"
+                    class="w-full text-right text-xs px-2 py-1.5 rounded-lg quick-question-btn"
                     x-text="q">
                   </button>
                 </template>
@@ -508,7 +511,8 @@
   <!-- WHATSAPP FLOAT BUTTON (ALWAYS VISIBLE) -->
   <a
     href="https://wa.me/971554637045?text=Hello%20Aslama%20Alteeba%2C%20I%20would%20like%20to%20inquire%20about%20tires."
-    class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl bg-emerald-500 text-black font-extrabold shadow-lg hover:opacity-90"
+    class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl font-extrabold shadow-lg hover:opacity-90"
+    style="background:#39FF14;color:#05060B"
     aria-label="WhatsApp"
     target="_blank"
     rel="noopener"

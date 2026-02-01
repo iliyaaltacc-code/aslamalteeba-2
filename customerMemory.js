@@ -259,17 +259,19 @@
           position: fixed;
           top: 80px;
           ${isRTL ? 'right: 20px' : 'left: 20px'};
-          background: rgba(16, 185, 129, 0.95);
-          color: #fff;
+          background: rgba(57, 255, 20, 0.15);
+          border: 1px solid rgba(57, 255, 20, 0.3);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          color: #F2F5F9;
           padding: 12px 18px;
-          border-radius: 12px;
+          border-radius: 14px;
           font-size: 14px;
           font-weight: 600;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
           z-index: 10000;
           animation: cm-slide-in 0.4s ease-out, cm-fade-out 0.4s ease-in 4.6s;
           direction: ${isRTL ? 'rtl' : 'ltr'};
-          backdrop-filter: blur(8px);
         }
         
         .cm-welcome-content {
@@ -284,9 +286,11 @@
           justify-content: center;
           width: 20px;
           height: 20px;
-          background: rgba(255, 255, 255, 0.2);
+          background: #39FF14;
+          color: #05060B;
           border-radius: 50%;
           font-size: 12px;
+          font-weight: 700;
         }
         
         @keyframes cm-slide-in {
@@ -346,21 +350,22 @@
           position: fixed;
           bottom: 80px;
           ${isRTL ? 'left: 20px' : 'right: 20px'};
-          background: rgba(255, 255, 255, 0.1);
-          color: #fff;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.05);
+          color: #F2F5F9;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           padding: 8px 12px;
-          border-radius: 8px;
+          border-radius: 12px;
           font-size: 12px;
           cursor: pointer;
           z-index: 9998;
-          backdrop-filter: blur(8px);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           transition: all 0.2s;
         }
         
         .customer-memory-reset:hover {
-          background: rgba(255, 255, 255, 0.15);
-          border-color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(57, 255, 20, 0.3);
         }
       `;
       
