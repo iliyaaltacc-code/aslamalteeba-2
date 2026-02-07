@@ -19,6 +19,8 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
   <script src="/favorites.js"></script>
+  <script src="/data/products.js"></script>
+  <script src="/compareState.js"></script>
   <script defer src="/transition.js"></script>
   <style>
     html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
@@ -431,6 +433,7 @@
       <template x-for="p in filteredProducts()" :key="p.id">
         <article 
           class="glass rounded-3xl overflow-hidden shine border-white/10"
+          :class="isCompared(p.id) ? 'ring-2 ring-emerald-400/70' : ''"
         >
           <div class="relative">
             <img :src="p.img" :alt="p.name" class="w-full h-48 object-contain bg-black/30"/>
@@ -460,6 +463,29 @@
             ></div>
             
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+
+            <div class="flex items-center justify-between pt-2 border-t border-white/10">
+              <label
+                class="flex items-center gap-2 text-xs font-semibold"
+                :class="isCompareDisabled(p.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+              >
+                <input
+                  type="checkbox"
+                  class="rounded border-white/20 bg-white/5 text-emerald-400 focus:ring-emerald-300/60"
+                  :checked="isCompared(p.id)"
+                  :disabled="isCompareDisabled(p.id)"
+                  @change="toggleCompareSelection(p)"
+                />
+                <span>Compare</span>
+              </label>
+              <span
+                class="text-xs text-amber-300"
+                x-show="compareLimitReached && isCompareDisabled(p.id)"
+                x-cloak
+              >
+                Limit reached
+              </span>
+            </div>
             
             <!-- Quick Questions Section -->
             <div class="pt-2 border-t border-white/10">
@@ -528,6 +554,27 @@
   <footer class="border-t border-white/10 text-neutral-400 text-sm text-center py-6">
     © <span x-text="new Date().getFullYear()"></span> Aslama Alteeba. All rights reserved.
   </footer>
+
+  <div
+    class="fixed bottom-24 right-5 z-40"
+    x-show="compareSelection.length"
+    x-transition.opacity.duration.200ms
+    x-cloak
+  >
+    <div class="glass rounded-2xl border border-white/10 px-4 py-3 shadow-xl flex items-center gap-3">
+      <div>
+        <div class="text-sm font-semibold">Compare <span x-text="compareSelection.length"></span>/3</div>
+        <p class="text-xs text-amber-300" x-show="compareLimitReached" x-text="compareLimitMessage"></p>
+      </div>
+      <a
+        href="/compare.html"
+        class="px-4 py-2 rounded-xl bg-emerald-400 text-black font-bold"
+        @click="persistCompareSelection()"
+      >
+        Compare
+      </a>
+    </div>
+  </div>
 
 
   <!-- AI CHAT PANEL -->
@@ -781,14 +828,11 @@
           }
         ],
 
-        products:[
-          {id:'dur-1', brand:'Duraturn', name:'Duraturn Mozzo Touring', size:'205/55R16', price:79.99, img:'https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png', desc:'All-season comfort with optimized tread blocks.'},
-          {id:'bri-1', brand:'Bridgestone', name:'Bridgestone WeatherPeak', size:'225/45R17', price:129.99, img:'https://cdn.pneusecono.ca/images/produits/Bridgestone-Weatherpeak.jpg', desc:'Confident in wet & light snow. Touring refinement.'},
-          {id:'fir-1', brand:'Firemax', name:'Firemax FM501', size:'235/75R15', price:69.99, img:'https://fdflex.com/wp-content/uploads/2024/01/FM501_2.png', desc:'Value SUV tire with stable highway manners.'},
-          {id:'dur-2', brand:'Duraturn', name:'Duraturn Travia A/T', size:'265/70R16', price:92.50, img:'https://cdn11.bigcommerce.com/s-e8i94i2k1a/images/stencil/1280x1280/products/58714/844891/duraturn-travia-at-b-aaa-1__48494.1719256293.jpg?c=2', desc:'All-terrain versatility for trucks & SUVs.'},
-          {id:'bri-2', brand:'Bridgestone', name:'Bridgestone Dueler A/T Ascent', size:'275/60R20', price:189.00, img:'https://m.media-amazon.com/images/I/9116emC8QiL._AC_UF350,350_QL80_.jpg', desc:'All-terrain grip with on-road comfort.'},
-          {id:'fir-2', brand:'Firemax', name:'Firemax FM316', size:'205/55R16', price:58.00, img:'https://www.tiremaxx.ca/public/upload/product/pattern_rc-upload-1688577203434-12.webp', desc:'Budget-friendly passenger car tire.'}
-        ],
+        products: window.TIRE_PRODUCTS || [],
+        compareSelection: [],
+        compareLimit: window.CompareState ? CompareState.limit : 3,
+        compareLimitReached: false,
+        compareLimitMessage: '',
 
         // Question generation templates
         questionTemplates: {
@@ -816,6 +860,15 @@
 
         async init(){
           this.initFavorites();
+          const validIds = this.products.map(product => product.id);
+          if (window.CompareState) {
+            this.compareSelection = CompareState.normalize(CompareState.load(), validIds);
+          }
+          this.$watch('compareSelection', (value) => {
+            if (window.CompareState) {
+              CompareState.save(value);
+            }
+          });
           // Initialize tire universe scores
           this.updateTireScores();
           
@@ -894,6 +947,37 @@
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
+        },
+
+        isCompared(id){
+          return this.compareSelection.includes(id);
+        },
+
+        isCompareDisabled(id){
+          return this.compareSelection.length >= this.compareLimit && !this.isCompared(id);
+        },
+
+        toggleCompareSelection(product){
+          if (this.isCompared(product.id)) {
+            this.compareSelection = this.compareSelection.filter(id => id !== product.id);
+            return;
+          }
+          if (this.compareSelection.length >= this.compareLimit) {
+            this.compareLimitReached = true;
+            this.compareLimitMessage = 'You can compare up to 3 tires.';
+            window.setTimeout(() => {
+              this.compareLimitReached = false;
+              this.compareLimitMessage = '';
+            }, 2000);
+            return;
+          }
+          this.compareSelection = [...this.compareSelection, product.id];
+        },
+
+        persistCompareSelection(){
+          if (window.CompareState) {
+            CompareState.save(this.compareSelection);
+          }
         },
 
         brandProductCount(brandName){
