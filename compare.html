@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compare Tires — Aslama Alteeba</title>
+  <script>
+    document.documentElement.classList.add("js-page-transition");
+  </script>
+  <meta name="description" content="Compare up to three tires side-by-side with pricing, ratings, and specifications." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/smoothness.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="/data/products.js"></script>
+  <script src="/compareState.js"></script>
+  <script defer src="/transition.js"></script>
+  <style>
+    html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
+    [x-cloak]{display:none !important}
+  </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100" x-data="comparePage()" x-init="init()">
+  <div id="page-transition" class="page-transition is-active" aria-hidden="true"></div>
+
+  <header class="sticky top-0 z-40 glass">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-4">
+      <div>
+        <p class="text-xs text-emerald-300 font-semibold uppercase tracking-wide">Comparison</p>
+        <h1 class="text-2xl md:text-3xl font-extrabold">Compare Tires</h1>
+      </div>
+      <a href="/#shop" class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+        ← Back to browse
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+    <section class="glass rounded-3xl border-white/10 p-6" x-show="compareTires.length" x-cloak>
+      <div class="grid gap-6 md:grid-cols-3">
+        <template x-for="tire in compareTires" :key="tire.id">
+          <article
+            class="rounded-3xl border border-white/10 bg-black/30 p-5 flex flex-col gap-4"
+            :class="isBestPrice(tire) ? 'ring-2 ring-emerald-400/70' : ''"
+          >
+            <img :src="tire.img" :alt="tire.name" class="w-full h-40 object-contain bg-black/20 rounded-2xl" />
+            <div class="space-y-1">
+              <p class="text-xs text-neutral-400" x-text="tire.brand"></p>
+              <h2 class="text-lg font-bold" x-text="tire.name"></h2>
+              <p class="text-sm text-neutral-400" x-text="tire.size"></p>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-neutral-400">Price</p>
+                <p class="text-xl font-extrabold" x-text="formatPrice(tire.price)"></p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-neutral-400">Rating</p>
+                <p class="text-sm font-semibold" x-text="tire.rating ? `${tire.rating} / 5` : 'Not rated'"></p>
+              </div>
+            </div>
+            <button class="mt-auto px-4 py-2 rounded-xl bg-emerald-400 text-black font-bold hover:opacity-90">
+              Choose this tire
+            </button>
+          </article>
+        </template>
+      </div>
+    </section>
+
+    <section class="glass rounded-3xl border-white/10 p-6" x-show="compareTires.length" x-cloak>
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Specification comparison</h2>
+          <p class="text-sm text-neutral-400">Side-by-side insights to help you pick the right tire.</p>
+        </div>
+        <span class="text-xs text-emerald-300" x-show="lowestPrice !== null">★ Best price highlighted</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-[700px] w-full text-left border-separate border-spacing-y-2">
+          <thead>
+            <tr>
+              <th scope="col" class="text-xs uppercase tracking-wide text-neutral-400 px-4">Specification</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-head`">
+                <th scope="col" class="text-xs uppercase tracking-wide text-neutral-400 px-4">
+                  <span class="block" x-text="tire.name"></span>
+                  <span class="text-[11px] text-neutral-500" x-text="tire.brand"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Price</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-price`">
+                <td class="px-4 py-3 text-sm font-semibold"
+                    :class="isBestPrice(tire) ? 'text-emerald-300' : 'text-neutral-100'"
+                    x-text="formatPrice(tire.price)"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Tread life</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-tread`">
+                <td class="px-4 py-3 text-sm" x-text="tire.treadLife"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Wet grip</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-wet`">
+                <td class="px-4 py-3 text-sm" x-text="tire.wetGrip"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Noise level</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-noise`">
+                <td class="px-4 py-3 text-sm" x-text="tire.noiseLevel"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Fuel efficiency</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-fuel`">
+                <td class="px-4 py-3 text-sm" x-text="tire.fuelEfficiency"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Warranty</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-warranty`">
+                <td class="px-4 py-3 text-sm" x-text="tire.warranty"></td>
+              </template>
+            </tr>
+            <tr class="bg-white/5">
+              <th scope="row" class="px-4 py-3 text-sm font-semibold">Availability</th>
+              <template x-for="tire in compareTires" :key="`${tire.id}-availability`">
+                <td class="px-4 py-3 text-sm">
+                  <span class="inline-flex items-center gap-2">
+                    <span aria-hidden="true">✓</span>
+                    <span x-text="tire.availability"></span>
+                  </span>
+                </td>
+              </template>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section
+      class="glass rounded-3xl border-white/10 p-6 text-center"
+      x-show="!compareTires.length"
+      x-cloak
+    >
+      <h2 class="text-xl font-bold mb-2">No tires selected</h2>
+      <p class="text-neutral-400 mb-4">Choose up to three tires from the catalog to start comparing.</p>
+      <a href="/#shop" class="inline-flex px-4 py-2 rounded-xl bg-emerald-400 text-black font-bold">Browse tires</a>
+    </section>
+  </main>
+
+  <script>
+    function comparePage() {
+      return {
+        products: window.TIRE_PRODUCTS || [],
+        compareTires: [],
+        lowestPrice: null,
+        selectedCurrency: "USD",
+        exchangeRates: { USD: 1, AED: 3.67 },
+        currencySymbols: { USD: "$", AED: "د.إ" },
+
+        async init() {
+          this.selectedCurrency = localStorage.getItem("aa_currency") || "USD";
+          this.setCompareTires();
+          await this.fetchExchangeRates();
+        },
+
+        setCompareTires() {
+          const validIds = this.products.map(product => product.id);
+          const selectedIds = window.CompareState
+            ? CompareState.normalize(CompareState.load(), validIds)
+            : [];
+          this.compareTires = selectedIds
+            .map(id => this.products.find(product => product.id === id))
+            .filter(Boolean)
+            .slice(0, window.CompareState ? CompareState.limit : 3);
+          this.lowestPrice = this.compareTires.length
+            ? Math.min(...this.compareTires.map(tire => tire.price))
+            : null;
+        },
+
+        async fetchExchangeRates() {
+          try {
+            const response = await fetch("/api/exchange-rates");
+            const data = await response.json();
+            if (data.rates) {
+              this.exchangeRates = data.rates;
+            }
+          } catch (error) {
+            console.warn("Failed to fetch exchange rates:", error);
+          }
+        },
+
+        convertPrice(usdPrice) {
+          if (this.selectedCurrency === "USD") {
+            return usdPrice;
+          }
+          if (this.selectedCurrency === "AED") {
+            return usdPrice * this.exchangeRates.AED;
+          }
+          return usdPrice;
+        },
+
+        formatPrice(usdPrice) {
+          const converted = this.convertPrice(usdPrice);
+          const symbol = this.currencySymbols[this.selectedCurrency] || "$";
+          return `${symbol}${converted.toFixed(2)}`;
+        },
+
+        isBestPrice(tire) {
+          return this.lowestPrice !== null && tire.price === this.lowestPrice;
+        }
+      };
+    }
+  </script>
+</body>
+</html>
