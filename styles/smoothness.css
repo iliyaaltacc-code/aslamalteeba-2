@@ -50,6 +50,21 @@ img:hover {
   transform: scale(1.01);
 }
 
+.page-transition {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(18, 22, 30, 0.92), rgba(8, 10, 14, 0.95));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+  z-index: 9998;
+}
+
+.js-page-transition .page-transition.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
