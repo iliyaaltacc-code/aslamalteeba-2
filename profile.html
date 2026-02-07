@@ -49,6 +49,21 @@
       window.location.href = "/";
     };
 
+    window.navigateToStore = () => {
+      const storePath = "/";
+      const referrer = document.referrer;
+      const isStoreReferrer = referrer
+        && new URL(referrer).origin === window.location.origin
+        && new URL(referrer).pathname === storePath;
+
+      if (isStoreReferrer) {
+        window.history.back();
+        return;
+      }
+
+      window.location.href = storePath;
+    };
+
     window.changePassword = async () => {
       const user = auth.currentUser;
       if (!user) return;
@@ -66,11 +81,18 @@
   
   <!-- Header -->
   <header class="glass sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center gap-3 px-4 py-3">
+      <button
+        type="button"
+        onclick="navigateToStore()"
+        aria-label="Back to store"
+        class="inline-flex items-center justify-center rounded-full p-2 text-neutral-200 transition duration-150 hover:opacity-80 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
       <h1 class="text-xl font-extrabold tracking-tight">Aslama <span class="text-emerald-400">Alteeba</span></h1>
-      <a href="/" class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
-        Back to Store
-      </a>
     </div>
   </header>
 
