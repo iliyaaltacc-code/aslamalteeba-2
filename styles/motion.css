@@ -1,0 +1,95 @@
+:root {
+  --motion-accent: rgba(50, 213, 255, 0.35);
+  --motion-accent-strong: rgba(0, 224, 164, 0.6);
+  --motion-glow: 0 0 24px rgba(0, 224, 164, 0.18);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px);
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+.motion-ease {
+  transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: transform, opacity, filter;
+}
+
+.motion-glow {
+  box-shadow: var(--motion-glow);
+}
+
+.motion-underline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.motion-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0,224,164,0.1), rgba(0,224,164,0.75), rgba(50,213,255,0.75));
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.35s ease;
+}
+
+.motion-underline:hover::after,
+.motion-underline:focus-visible::after,
+.motion-underline.is-active::after {
+  transform: scaleX(1);
+}
+
+.motion-card {
+  --motion-card-lift: 0px;
+  --motion-card-skew: 0deg;
+  transform: translate3d(0, var(--motion-card-lift), 0) skewY(var(--motion-card-skew));
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.motion-card:hover {
+  --motion-card-lift: -6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 24px rgba(50, 213, 255, 0.15);
+  border-color: rgba(50, 213, 255, 0.4);
+}
+
+.motion-magnetic {
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.motion-button-glow:hover,
+.motion-button-glow:focus-visible {
+  box-shadow: 0 0 0 1px rgba(50, 213, 255, 0.3), 0 12px 30px rgba(0, 224, 164, 0.25);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(50, 213, 255, 0.35), 0 0 18px rgba(0, 224, 164, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-ease,
+  .motion-card,
+  .motion-magnetic {
+    transition: none !important;
+  }
+
+  body::before {
+    opacity: 0.04;
+  }
+}
