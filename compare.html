@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/styles/smoothness.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="/personalization.js"></script>
   <script src="/data/products.js"></script>
   <script src="/compareState.js"></script>
   <script defer src="/transition.js"></script>
@@ -31,6 +32,7 @@
       <div>
         <p class="text-xs text-emerald-300 font-semibold uppercase tracking-wide">Comparison</p>
         <h1 class="text-2xl md:text-3xl font-extrabold">Compare Tires</h1>
+        <p class="text-xs text-neutral-400">Profile: <span class="text-emerald-300" x-text="profile.label"></span></p>
       </div>
       <a href="/#shop" class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
         ← Back to browse
@@ -92,7 +94,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="bg-white/5">
+            <tr class="bg-white/5 transition-colors" :class="highlightedSpec === 'price' ? 'bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.25)]' : ''">
               <th scope="row" class="px-4 py-3 text-sm font-semibold">Price</th>
               <template x-for="tire in compareTires" :key="`${tire.id}-price`">
                 <td class="px-4 py-3 text-sm font-semibold"
@@ -100,19 +102,19 @@
                     x-text="formatPrice(tire.price)"></td>
               </template>
             </tr>
-            <tr class="bg-white/5">
+            <tr class="bg-white/5 transition-colors" :class="highlightedSpec === 'treadLife' ? 'bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.25)]' : ''">
               <th scope="row" class="px-4 py-3 text-sm font-semibold">Tread life</th>
               <template x-for="tire in compareTires" :key="`${tire.id}-tread`">
                 <td class="px-4 py-3 text-sm" x-text="tire.treadLife"></td>
               </template>
             </tr>
-            <tr class="bg-white/5">
+            <tr class="bg-white/5 transition-colors" :class="highlightedSpec === 'wetGrip' ? 'bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.25)]' : ''">
               <th scope="row" class="px-4 py-3 text-sm font-semibold">Wet grip</th>
               <template x-for="tire in compareTires" :key="`${tire.id}-wet`">
                 <td class="px-4 py-3 text-sm" x-text="tire.wetGrip"></td>
               </template>
             </tr>
-            <tr class="bg-white/5">
+            <tr class="bg-white/5 transition-colors" :class="highlightedSpec === 'noiseLevel' ? 'bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.25)]' : ''">
               <th scope="row" class="px-4 py-3 text-sm font-semibold">Noise level</th>
               <template x-for="tire in compareTires" :key="`${tire.id}-noise`">
                 <td class="px-4 py-3 text-sm" x-text="tire.noiseLevel"></td>
@@ -159,10 +161,19 @@
 
   <script>
     function comparePage() {
+      const fallbackProfile = {
+        id: 'balanced',
+        label: 'Balanced'
+      };
+      const personalization = window.Personalization;
+      const initialProfile = personalization ? personalization.getProfile() : fallbackProfile;
+
       return {
         products: window.TIRE_PRODUCTS || [],
         compareTires: [],
         lowestPrice: null,
+        profile: initialProfile,
+        highlightedSpec: 'price',
         selectedCurrency: "USD",
         exchangeRates: { USD: 1, AED: 3.67 },
         currencySymbols: { USD: "$", AED: "د.إ" },
@@ -170,6 +181,16 @@
         async init() {
           this.selectedCurrency = localStorage.getItem("aa_currency") || "USD";
           this.setCompareTires();
+          if (window.Personalization) {
+            this.profile = Personalization.getProfile();
+            this.highlightedSpec = this.getHighlightedSpec(this.profile);
+            Personalization.subscribe((nextProfile) => {
+              this.profile = nextProfile;
+              this.highlightedSpec = this.getHighlightedSpec(nextProfile);
+            });
+          } else {
+            this.highlightedSpec = this.getHighlightedSpec(this.profile);
+          }
           await this.fetchExchangeRates();
         },
 
@@ -213,6 +234,20 @@
           const converted = this.convertPrice(usdPrice);
           const symbol = this.currencySymbols[this.selectedCurrency] || "$";
           return `${symbol}${converted.toFixed(2)}`;
+        },
+
+        getHighlightedSpec(profile) {
+          switch (profile?.id) {
+            case 'cityquiet':
+              return 'noiseLevel';
+            case 'highwayheat':
+              return 'treadLife';
+            case 'offroad':
+              return 'wetGrip';
+            case 'balanced':
+            default:
+              return 'price';
+          }
         },
 
         isBestPrice(tire) {
