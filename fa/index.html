@@ -1376,6 +1376,8 @@
     setDoc
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+  // 🛡️ Boot-error capture: Ensure UI never renders blank on auth failures
+  try {
   const firebaseConfig = {
     apiKey: "AIzaSyD5vnHsA23Uw3snDvu4qvqSh5wgRtDTMSc",
     authDomain: "aslamalteeba-2.firebaseapp.com",
@@ -1450,6 +1452,19 @@
       window.location.href = "/auth.html";
     }
   };
+  } catch (bootError) {
+    // 🛡️ Firebase boot failure - log but keep UI visible
+    console.error('Firebase initialization error:', bootError);
+    // UI remains functional even if auth fails to initialize
+    
+    // Ensure critical functions are available even on Firebase failure
+    if (!window.handleProfileClick) {
+      window.handleProfileClick = function() {
+        // Fallback: always go to auth page if Firebase failed
+        window.location.href = "/auth.html";
+      };
+    }
+  }
   </script>
   
   <!-- Convert phone number digits to Persian numerals -->
