@@ -22,6 +22,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="/customerMemory.js"></script>
   <script src="/favorites.js"></script>
+  <script src="/personalization.js"></script>
   <script src="/data/products.js"></script>
   <script src="/compareState.js"></script>
   <script defer src="/transition.js"></script>
@@ -74,6 +75,49 @@
   <header class="sticky top-0 z-50 glass">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
       <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
+      <div class="relative" x-data="{ open: false }">
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-200 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+          :aria-expanded="open"
+          aria-haspopup="listbox"
+          @click="open = !open"
+          @keydown.escape="open = false"
+        >
+          <span class="text-[10px] text-neutral-400">Driving Profile</span>
+          <span class="text-sm font-semibold normal-case" :class="profile.accentClass" x-text="profile.label"></span>
+          <span class="text-xs text-neutral-400">▾</span>
+        </button>
+        <div
+          class="absolute left-0 top-full mt-2 w-64 rounded-2xl border border-white/10 bg-neutral-950/95 backdrop-blur p-2 shadow-xl"
+          x-show="open"
+          x-transition.origin.top.left
+          @click.outside="open = false"
+          @keydown.escape="open = false"
+          x-cloak
+        >
+          <p class="px-3 pt-2 text-[11px] uppercase tracking-wide text-neutral-500">Choose your focus</p>
+          <div class="mt-2 space-y-1" role="listbox" aria-label="Driving profiles">
+            <template x-for="option in profileOptions" :key="option.id">
+              <button
+                type="button"
+                role="option"
+                class="w-full rounded-xl px-3 py-2 text-left transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                :aria-selected="option.id === profile.id"
+                @click="selectProfile(option.id); open = false"
+                @keydown.enter.prevent="selectProfile(option.id); open = false"
+                @keydown.space.prevent="selectProfile(option.id); open = false"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-semibold text-neutral-100" x-text="option.label"></span>
+                  <span class="text-[11px] text-neutral-500" x-show="option.id === profile.id">Selected</span>
+                </div>
+                <p class="text-xs text-neutral-400" x-text="option.tagline"></p>
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
       <nav class="hidden md:flex gap-6 text-sm flex-wrap">
         <a href="#about" class="hover:text-white">About</a>
         <div class="relative" x-data="{open:false}">
@@ -138,7 +182,7 @@
   <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
     <div>
       <h2 class="text-5xl font-extrabold mb-4 leading-tight">Premium Tires.<br><span class="text-emerald-400">UAE Quality.</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">Aslama Alteeba delivers high-grade tires across the UAE. Partnerships with Duraturn, Bridgestone, and Firemax ensure safety, comfort, and reliability.</p>
+      <p class="text-lg text-neutral-300 mb-6" x-text="profile.heroSubcopy"></p>
       <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
     </div>
     <div>
@@ -291,6 +335,7 @@
       <div>
         <h2 class="text-3xl font-extrabold">Browse Tires</h2>
         <p class="text-neutral-400">Search and filter by brand to view our product catalog.</p>
+        <p class="text-xs" :class="profile.accentClass" x-text="profile.tagline"></p>
         <p class="text-amber-400 text-sm mt-1" x-show="bulkMode" x-cloak>For bulk orders and wholesale inquiries</p>
       </div>
       <div class="flex gap-2 items-center">
@@ -457,7 +502,14 @@
           <div class="p-4 space-y-2">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-bold" x-text="p.name"></h3>
-              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="p.brand"></span>
+                <span
+                  class="text-[10px] px-2 py-1 rounded-full"
+                  :class="`${getProfileBadge(p).className} ${profile.accentClass}`"
+                  x-text="getProfileBadge(p).label"
+                ></span>
+              </div>
             </div>
             <div 
               class="text-sm font-semibold"
@@ -709,6 +761,29 @@
         // localStorage not available, use defaults
         console.warn('localStorage not available:', e);
       }
+
+      const fallbackProfile = {
+        id: 'balanced',
+        label: 'Balanced',
+        tagline: 'Everyday confidence for mixed UAE driving.',
+        heroSubcopy: 'Balanced performance for daily commuting, weekend drives, and steady UAE reliability.',
+        orderingWeights: {
+          price: 0.2,
+          noise: 0.2,
+          treadLife: 0.2,
+          wetGrip: 0.2,
+          fuelEfficiency: 0.2
+        },
+        badgeRules: {
+          label: 'Best all-round',
+          className: 'bg-white/10 border border-white/10'
+        },
+        accentClass: 'text-emerald-300',
+        defaultBrand: ''
+      };
+      const personalization = window.Personalization;
+      const initialProfile = personalization ? personalization.getProfile() : fallbackProfile;
+      const profileOptions = personalization ? personalization.getProfiles() : [fallbackProfile];
       
       const favoritesController = window.FavoritesUI
         ? FavoritesUI.createController()
@@ -727,6 +802,8 @@
 
       return {
         ...favoritesController,
+        profile: initialProfile,
+        profileOptions,
         filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
@@ -773,6 +850,143 @@
         toggleBulkMode(){
           // Bulk mode is now automatically saved via watcher in init()
           // This method just toggles the value, the watcher handles persistence
+        },
+
+        selectProfile(profileId){
+          if (!window.Personalization) {
+            return;
+          }
+          Personalization.runProfileTransition(() => {
+            Personalization.setProfile(profileId);
+          });
+        },
+
+        applyProfileDefaults(forceUpdate){
+          const defaultBrand = this.profile?.defaultBrand || '';
+          if (forceUpdate || !this.filters.brand) {
+            this.filters.brand = defaultBrand;
+          }
+        },
+
+        getProfileBadge(product){
+          const badge = this.profile?.badgeRules || { label: 'Best all-round', className: 'bg-white/10 border border-white/10' };
+          const text = `${product?.name || ''} ${product?.desc || ''}`.toLowerCase();
+          if (this.profile?.id === 'offroad') {
+            const isTrail = /(a\\/t|all[-\\s]?terrain|trail|off-road)/.test(text);
+            return {
+              label: isTrail ? badge.label : (badge.secondaryLabel || badge.label),
+              className: badge.className
+            };
+          }
+          return { label: badge.label, className: badge.className };
+        },
+
+        getMetricBounds(){
+          const metrics = {
+            price: [],
+            noise: [],
+            treadLife: [],
+            wetGrip: [],
+            fuelEfficiency: []
+          };
+
+          this.products.forEach(product => {
+            const price = this.parseMetricValue(product.price);
+            const noise = this.parseMetricValue(product.noiseLevel);
+            const treadLife = this.parseMetricValue(product.treadLife);
+            const wetGrip = this.parseGrade(product.wetGrip);
+            const fuelEfficiency = this.parseGrade(product.fuelEfficiency);
+
+            if (price !== null) metrics.price.push(price);
+            if (noise !== null) metrics.noise.push(noise);
+            if (treadLife !== null) metrics.treadLife.push(treadLife);
+            if (wetGrip !== null) metrics.wetGrip.push(wetGrip);
+            if (fuelEfficiency !== null) metrics.fuelEfficiency.push(fuelEfficiency);
+          });
+
+          return Object.fromEntries(
+            Object.entries(metrics).map(([key, values]) => {
+              if (!values.length) {
+                return [key, { min: 0, max: 0 }];
+              }
+              return [key, { min: Math.min(...values), max: Math.max(...values) }];
+            })
+          );
+        },
+
+        getEffectiveWeights(){
+          const baseWeights = { ...(this.profile?.orderingWeights || {}) };
+          const applyBoost = (key, factor) => {
+            if (typeof baseWeights[key] !== 'number') {
+              baseWeights[key] = 0;
+            }
+            baseWeights[key] = Math.max(0, baseWeights[key] * (1 + factor));
+          };
+
+          const drivingTypeFactor = (this.tireUniverse.drivingType - 50) / 50;
+          if (drivingTypeFactor < 0) {
+            const boost = Math.abs(drivingTypeFactor) * 0.35;
+            applyBoost('noise', boost);
+            applyBoost('price', boost * 0.4);
+          } else if (drivingTypeFactor > 0) {
+            const boost = drivingTypeFactor * 0.35;
+            applyBoost('treadLife', boost);
+            applyBoost('fuelEfficiency', boost);
+          }
+
+          const priorityFactor = (this.tireUniverse.priority - 50) / 50;
+          if (priorityFactor < 0) {
+            applyBoost('price', Math.abs(priorityFactor) * 0.6);
+          } else if (priorityFactor > 0) {
+            applyBoost('wetGrip', priorityFactor * 0.35);
+            applyBoost('treadLife', priorityFactor * 0.25);
+          }
+
+          const drivingStyleFactor = (this.tireUniverse.drivingStyle - 50) / 50;
+          if (drivingStyleFactor < 0) {
+            applyBoost('noise', Math.abs(drivingStyleFactor) * 0.4);
+          } else if (drivingStyleFactor > 0) {
+            applyBoost('wetGrip', drivingStyleFactor * 0.35);
+          }
+
+          const total = Object.values(baseWeights).reduce((sum, value) => sum + value, 0) || 1;
+          Object.keys(baseWeights).forEach(key => {
+            baseWeights[key] /= total;
+          });
+          return baseWeights;
+        },
+
+        parseMetricValue(value){
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+          }
+          if (!value) {
+            return null;
+          }
+          const numeric = Number(String(value).replace(/[^0-9.]/g, ''));
+          if (!Number.isFinite(numeric)) {
+            return null;
+          }
+          return numeric || null;
+        },
+
+        parseGrade(value){
+          const gradeMap = { A: 100, B: 80, C: 60, D: 40, E: 20 };
+          const grade = String(value || '').trim().charAt(0).toUpperCase();
+          return gradeMap[grade] ?? null;
+        },
+
+        normalizeMetric(value, bounds, invert){
+          if (value === null || !bounds) {
+            return 0.5;
+          }
+          const { min, max } = bounds;
+          if (min === max) {
+            return 0.5;
+          }
+          const normalized = (value - min) / (max - min);
+          const clamped = Math.max(0, Math.min(1, normalized));
+          return invert ? 1 - clamped : clamped;
         },
 
         requestBulkQuote(p){
@@ -873,6 +1087,16 @@
               CompareState.save(value);
             }
           });
+          if (window.Personalization) {
+            this.profile = Personalization.getProfile();
+            this.profileOptions = Personalization.getProfiles();
+            Personalization.subscribe((nextProfile) => {
+              this.profile = nextProfile;
+              this.applyProfileDefaults(true);
+              this.updateTireScores();
+            });
+          }
+          this.applyProfileDefaults(false);
           // Initialize tire universe scores
           this.updateTireScores();
           
@@ -994,20 +1218,27 @@
         },
 
         filteredProducts(){
-          return this.products.filter(p => {
+          const filtered = this.products.filter(p => {
             const brandMatch = !this.filters.brand || p.brand === this.filters.brand;
             const q = this.filters.query.trim().toLowerCase();
             const queryMatch = !q || (p.name + ' ' + p.size).toLowerCase().includes(q);
             return brandMatch && queryMatch;
+          });
+          return filtered.sort((a, b) => {
+            const scoreDiff = (this.tireUniverse.scores[b.id] || 0) - (this.tireUniverse.scores[a.id] || 0);
+            if (scoreDiff !== 0) return scoreDiff;
+            return (a.name || '').localeCompare(b.name || '');
           });
         },
 
         // Interactive Tire Universe Methods
         updateTireScores(){
           // Build new scores object to trigger Alpine reactivity
+          const bounds = this.getMetricBounds();
+          const weights = this.getEffectiveWeights();
           const newScores = {};
           this.products.forEach(p => {
-            newScores[p.id] = this.calculateProductScore(p);
+            newScores[p.id] = this.calculateProductScore(p, bounds, weights);
           });
           
           // RANK SNAPPING: Normalize score spread and force minimum distance
@@ -1043,93 +1274,24 @@
           this.tireUniverse.ranks = newRanks;
         },
 
-        calculateProductScore(product){
-          const { drivingType, priority, drivingStyle } = this.tireUniverse;
-          
-          // NON-LINEAR AMPLIFICATION: Apply power curve to slider deltas from center
-          const amplifyDelta = (sliderValue) => {
-            const delta = sliderValue - 50; // Distance from center
-            const sign = Math.sign(delta);
-            const absDelta = Math.abs(delta);
-            // Power curve: small movements get amplified more
-            const amplified = sign * Math.pow(absDelta, 1.6);
-            return 50 + amplified; // Return amplified slider position
+        calculateProductScore(product, bounds, weights){
+          const normalized = {
+            price: this.normalizeMetric(this.parseMetricValue(product.price), bounds.price, true),
+            noise: this.normalizeMetric(this.parseMetricValue(product.noiseLevel), bounds.noise, true),
+            treadLife: this.normalizeMetric(this.parseMetricValue(product.treadLife), bounds.treadLife, false),
+            wetGrip: this.normalizeMetric(this.parseGrade(product.wetGrip), bounds.wetGrip, false),
+            fuelEfficiency: this.normalizeMetric(this.parseGrade(product.fuelEfficiency), bounds.fuelEfficiency, false)
           };
-          
-          const amplifiedDrivingType = amplifyDelta(drivingType);
-          const amplifiedPriority = amplifyDelta(priority);
-          const amplifiedDrivingStyle = amplifyDelta(drivingStyle);
-          
-          // DOMINANCE THRESHOLD: Check if any slider is ±10 from center (increased sensitivity)
-          const drivingTypeDelta = Math.abs(drivingType - 50);
-          const priorityDelta = Math.abs(priority - 50);
-          const drivingStyleDelta = Math.abs(drivingStyle - 50);
-          
-          const drivingTypeDominant = drivingTypeDelta >= 10;
-          const priorityDominant = priorityDelta >= 10;
-          const drivingStyleDominant = drivingStyleDelta >= 10;
-          
-          // Get price percentile (0-100)
-          const prices = this.products.map(p => p.price);
-          const minPrice = Math.min(...prices);
-          const maxPrice = Math.max(...prices);
-          const pricePercentile = maxPrice > minPrice 
-            ? ((product.price - minPrice) / (maxPrice - minPrice)) * 100 
-            : 50;
-          
-          // Brand category (performance tier)
-          const brandTier = {
-            'Bridgestone': 85,
-            'Firemax': 45,
-            'Duraturn': 60
-          }[product.brand] || 50;
-          
-          // Keyword matching from description
-          const desc = (product.desc || '').toLowerCase();
-          const name = (product.name || '').toLowerCase();
-          const text = desc + ' ' + name;
-          
-          // City vs Highway keywords (using AMPLIFIED slider value)
-          const cityKeywords = ['city', 'urban', 'comfort', 'quiet', 'smooth', 'touring'];
-          const highwayKeywords = ['highway', 'speed', 'stability', 'long', 'distance'];
-          const cityScore = cityKeywords.filter(k => text.includes(k)).length * 20;
-          const highwayScore = highwayKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingTypeScore = 100 - Math.abs(amplifiedDrivingType - (highwayScore - cityScore + 50));
-          
-          // Budget vs Performance - correlate with price percentile and brand (using AMPLIFIED value)
-          const performanceIndicator = (pricePercentile * 0.6) + (brandTier * 0.4);
-          const priorityScore = 100 - Math.abs(amplifiedPriority - performanceIndicator);
-          
-          // Quiet vs Aggressive keywords (using AMPLIFIED value)
-          const quietKeywords = ['quiet', 'comfort', 'smooth', 'refined', 'touring'];
-          const aggressiveKeywords = ['sport', 'performance', 'grip', 'traction', 'aggressive'];
-          const quietScore = quietKeywords.filter(k => text.includes(k)).length * 20;
-          const aggressiveScore = aggressiveKeywords.filter(k => text.includes(k)).length * 20;
-          const drivingStyleScore = 100 - Math.abs(amplifiedDrivingStyle - (aggressiveScore - quietScore + 50));
-          
-          // DOMINANCE-BASED WEIGHTING
-          let weights = { drivingType: 0.33, priority: 0.34, drivingStyle: 0.33 };
-          
-          if (drivingTypeDominant || priorityDominant || drivingStyleDominant) {
-            // When a dimension is dominant, boost its weight significantly
-            weights = { drivingType: 0.15, priority: 0.15, drivingStyle: 0.15 };
-            
-            if (drivingTypeDominant) weights.drivingType = 0.55;
-            if (priorityDominant) weights.priority = 0.55;
-            if (drivingStyleDominant) weights.drivingStyle = 0.55;
-            
-            // Normalize
-            const totalWeight = weights.drivingType + weights.priority + weights.drivingStyle;
-            weights.drivingType /= totalWeight;
-            weights.priority /= totalWeight;
-            weights.drivingStyle /= totalWeight;
-          }
-          
-          // Weighted average with dynamic weights
-          const finalScore = (drivingTypeScore * weights.drivingType) + 
-                            (priorityScore * weights.priority) + 
-                            (drivingStyleScore * weights.drivingStyle);
-          
+
+          let total = 0;
+          let weightedSum = 0;
+          Object.entries(weights).forEach(([key, weight]) => {
+            const value = normalized[key] ?? 0.5;
+            total += weight;
+            weightedSum += value * weight;
+          });
+
+          const finalScore = total ? (weightedSum / total) * 100 : 50;
           return Math.max(0, Math.min(100, finalScore));
         },
 

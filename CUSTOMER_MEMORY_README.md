@@ -15,6 +15,7 @@ The system automatically remembers and restores:
 3. **Brand Filter** - Last selected brand filter in the shop
 4. **WhatsApp Usage** - Tracks if user has contacted via WhatsApp
 5. **Bulk Quote Requests** - Tracks if user has requested bulk quotes
+6. **Driving Profile** - The selected personalization profile
 
 ### Multilingual Support
 
@@ -60,6 +61,7 @@ All preferences are stored in localStorage with the `aa_` prefix:
   aa_currency: 'USD' | 'AED',
   aa_bulkMode: 'true' | 'false',
   aa_brandFilter: 'Duraturn' | 'Bridgestone' | 'Firemax' | '',
+  aa_profile: 'balanced' | 'cityquiet' | 'highwayheat' | 'offroad',
   aa_whatsappUsed: 'true',
   aa_bulkQuoteUsed: 'true',
   aa_welcomeShown: '<date string>' // Resets daily
@@ -135,6 +137,26 @@ Users can reset preferences:
 3. **Helpful** - Saves user time by remembering preferences
 4. **Transparent** - No hidden behavior
 5. **Optional** - Works without requiring any user action
+
+## Personalization Engine (Driving Profiles)
+
+The site includes a deterministic personalization engine that adapts hero messaging, product ordering, badges, and comparison emphasis based on a selected **Driving Profile**. Profiles are stored in `localStorage` as `aa_profile` and are available across pages without external services or AI calls.
+
+**Current profiles:**
+- Balanced
+- City & Quiet
+- Highway & UAE Heat
+- Off-Road / A/T
+
+**How it works:**
+- Profile definitions live in `personalization.js` (labels, hero copy, weights, badges, and default brand filters).
+- Pages read the active profile via `window.Personalization.getProfile()` and subscribe to changes for live updates.
+- Product ordering uses profile-specific scoring (price, noise, tread life, wet grip, fuel efficiency) with graceful handling of missing data.
+
+**How to extend:**
+1. Add a new profile entry in `personalization.js` with a unique `id`, copy, weights, and badge rules.
+2. Update any UI mappings (e.g., comparison-row highlights) to include the new `id`.
+3. Keep weights normalized (or rely on normalization in the scoring helper) to maintain consistent ranking behavior.
 
 ## Browser Compatibility
 
