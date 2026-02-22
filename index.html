@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/styles/timeline.css">
   <link rel="stylesheet" href="/styles/smoothness.css">
   <link rel="stylesheet" href="/styles/favorites.css">
+  <link rel="stylesheet" href="/components/3d-tire-explorer/3d-tire-explorer.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
@@ -139,6 +140,39 @@
     </div>
     <div>
       <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
+    </div>
+  </section>
+
+  <section class="tire-explorer" data-tire-explorer aria-labelledby="tire-explorer-title">
+    <div class="tire-explorer__shell">
+      <header class="tire-explorer__header">
+        <h2 id="tire-explorer-title" data-title></h2>
+        <p data-intro></p>
+      </header>
+      <div class="tire-explorer__layout">
+        <div class="tire-explorer__viewer">
+          <div class="tire-explorer__canvas" data-tire-canvas></div>
+          <div class="tire-explorer__hud">
+            <button class="tire-explorer__button" type="button" data-tire-reset></button>
+            <button class="tire-explorer__button" type="button" data-tire-pause></button>
+          </div>
+        </div>
+        <aside class="tire-explorer__panel">
+          <div class="tire-explorer__parts" role="tablist" aria-label="Tire construction controls">
+            <button class="tire-explorer__part" type="button" data-part="tread"></button>
+            <button class="tire-explorer__part" type="button" data-part="sidewall"></button>
+            <button class="tire-explorer__part" type="button" data-part="belts"></button>
+            <button class="tire-explorer__part" type="button" data-part="bead"></button>
+            <button class="tire-explorer__part" type="button" data-part="innerLiner"></button>
+          </div>
+          <article class="tire-explorer__info">
+            <h3 data-info-name></h3>
+            <p data-info-does></p>
+            <p data-info-uae></p>
+          </article>
+          <p class="tire-explorer__status" data-tire-status></p>
+        </aside>
+      </div>
     </div>
   </section>
 
@@ -1583,5 +1617,6 @@
     }
   };
 </script>
+  <script type="module" src="/components/3d-tire-explorer/3d-tire-explorer.js"></script>
 </body>
 </html>
