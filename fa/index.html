@@ -91,7 +91,6 @@
         <a href="#hq" class="hover:text-white">دفتر مرکزی</a>
         <a href="#imports" class="hover:text-white">واردات</a>
         <a href="#shipping" class="hover:text-white">ارسال</a>
-        <a href="#brands" class="hover:text-white">برندها</a>
         <a href="#intro" class="hover:text-white">ایمیل معرفی</a>
         <a href="#shop" class="hover:text-white">مرور</a>
         <a href="#contact" class="hover:text-white">تماس</a>
@@ -233,38 +232,8 @@
 
   <!-- SHIPPING -->
   <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">ارسال و نصب</h2>
-    <p class="text-neutral-300 leading-relaxed">ارسال سریع به تمام امارات. امکان دریافت حضوری، نصب در محل یا ارسال مستقیم برای ناوگان‌ها فراهم است. با مراکز خدماتی همکاری داریم تا نصب در همان روز انجام شود.</p>
-  </section>
-
-  <!-- BRANDS -->
-  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
-    <div class="flex items-end justify-between gap-4 mb-8">
-      <div>
-        <h2 class="text-3xl font-extrabold">برندها</h2>
-        <p class="text-neutral-400">برندهای همکار را ببینید و سریع استعلام کنید.</p>
-      </div>
-    </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <template x-for="b in brands" :key="b.name">
-        <article class="glass rounded-3xl overflow-hidden border-white/10">
-          <div class="bg-black/30 p-4 h-32 flex items-center justify-center">
-            <img :src="b.img" :alt="b.name + ' logo'" class="max-h-24 object-contain" />
-          </div>
-          <div class="p-4 space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <h3 class="font-bold text-lg" x-text="b.name"></h3>
-              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' محصول'"></span>
-            </div>
-            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
-            <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="sendBrandInquiry(b.name)">
-              ارسال استعلام
-            </button>
-          </div>
-        </article>
-      </template>
-    </div>
+    <h2 class="text-3xl font-bold mb-4">ارسال و تحویل</h2>
+    <p class="text-neutral-300 leading-relaxed">ما روش‌های تحویل مختلفی مانند FoB، CFR و DDP ارائه می‌دهیم.</p>
   </section>
 
   <!-- BRAND PRODUCTION TIMELINE -->
@@ -686,13 +655,6 @@
           }
         },
 
-        brands:[
-          {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'محصولات اقتصادی برای سواری و SUV.'},
-          {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'کیفیت مقرون‌به‌صرفه با گزینه‌های تورینگ و A/T.'},
-          {name:'Haida', img:'https://i.postimg.cc/yNYNNGxd/haidatireb.webp', desc:'تایرهای قابل اعتماد با دوام مناسب.'},
-          {name:'Vikrant', img:'https://i.postimg.cc/vZXQCvzS/Vikrant-Tyres-Logo.jpg', desc:'تایرهایی برای عملکرد پایدار و استفاده روزمره.'}
-        ],
-
         passengerBrands:[
           {
             name:'Firemax',
@@ -842,10 +804,6 @@
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
-        },
-
-        brandProductCount(brandName){
-          return this.products.filter(p => p.brand === brandName).length;
         },
 
         passengerBrandModels(brandName){
@@ -1240,32 +1198,6 @@
         async sendTwoEmails(params){
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: params.customer_email || params.from_email});
-        },
-
-        // BRAND INQUIRY
-        async sendBrandInquiry(brandName){
-          const list = this.products.filter(p => p.brand === brandName);
-          const lines = list.length
-            ? list.map(p => `• ${p.name} (${p.size}) — $${p.price.toFixed(2)}`).join('\n')
-            : 'محصولی برای این برند ثبت نشده است.';
-
-          const params = {
-            subject_line: `استعلام برند — ${brandName}`,
-            from_name: 'بازدیدکننده سایت',
-            from_email: 'no-reply@aslamalteeba.netlify.app',
-            customer_email: 'no-reply@aslamalteeba.netlify.app',
-            message: `درخواست اطلاعات درباره ${brandName}.`,
-            brand_name: brandName,
-            brand_products: lines
-          };
-
-          try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
-            alert('✅ استعلام ارسال شد. به زودی با شما تماس می‌گیریم.');
-          } catch (err){
-            console.error(err);
-            alert('❌ خطا در ارسال استعلام: ' + (err?.text || err?.message || 'نامشخص'));
-          }
         },
 
         // CONTACT

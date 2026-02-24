@@ -104,7 +104,6 @@
         <a href="#hq" class="hover:text-white">المقر الرئيسي</a>
         <a href="#imports" class="hover:text-white">الاستيراد</a>
         <a href="#shipping" class="hover:text-white">الشحن</a>
-        <a href="#brands" class="hover:text-white">العلامات التجارية</a>
         <a href="#intro" class="hover:text-white">بريد التعريف</a>
         <a href="#shop" class="hover:text-white">تصفح</a>
         <a href="#contact" class="hover:text-white">اتصل بنا</a>
@@ -246,38 +245,8 @@
 
   <!-- SHIPPING -->
   <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">الشحن والتركيب</h2>
-    <p class="text-neutral-300 leading-relaxed">توصيل سريع إلى جميع إمارات الدولة. يمكن اختيار الاستلام من الموقع، التركيب في الموقع، أو الشحن المباشر لعملاء الأساطيل. نتعاون مع مراكز الخدمة لتوفير تركيب في اليوم نفسه عند الإمكان.</p>
-  </section>
-
-  <!-- BRANDS -->
-  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
-    <div class="flex items-end justify-between gap-4 mb-8">
-      <div>
-        <h2 class="text-3xl font-extrabold">العلامات التجارية</h2>
-        <p class="text-neutral-400">تصفح علاماتنا الشريكة وأرسل استفساراً فوراً.</p>
-      </div>
-    </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <template x-for="b in brands" :key="b.name">
-        <article class="glass rounded-3xl overflow-hidden border-white/10">
-          <div class="bg-black/30 p-4 h-32 flex items-center justify-center">
-            <img :src="b.img" :alt="b.name + ' logo'" class="max-h-24 object-contain" />
-          </div>
-          <div class="p-4 space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <h3 class="font-bold text-lg" x-text="b.name"></h3>
-              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' منتجات'"></span>
-            </div>
-            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
-            <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="sendBrandInquiry(b.name)">
-              إرسال استفسار
-            </button>
-          </div>
-        </article>
-      </template>
-    </div>
+    <h2 class="text-3xl font-bold mb-4">الشحن والتسليم</h2>
+    <p class="text-neutral-300 leading-relaxed">نقدم طرق تسليم مختلفة مثل FoB وCFR وDDP.</p>
   </section>
 
   <!-- BRAND PRODUCTION TIMELINE -->
@@ -734,13 +703,6 @@
           }
         },
 
-        brands:[
-          {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'تشكيلة اقتصادية لسيارات الركاب وSUV.'},
-          {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'جودة اقتصادية مع خيارات تورينغ وA/T قوية.'},
-          {name:'Haida', img:'https://i.postimg.cc/yNYNNGxd/haidatireb.webp', desc:'مجموعة موثوقة تجمع بين المتانة والقيمة.'},
-          {name:'Vikrant', img:'https://i.postimg.cc/vZXQCvzS/Vikrant-Tyres-Logo.jpg', desc:'إطارات لأداء ثابت واستخدام يومي.'}
-        ],
-
         passengerBrands:[
           {
             name:'Firemax',
@@ -890,10 +852,6 @@
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
-        },
-
-        brandProductCount(brandName){
-          return this.products.filter(p => p.brand === brandName).length;
         },
 
         passengerBrandModels(brandName){
@@ -1288,32 +1246,6 @@
         async sendTwoEmails(params){
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: params.customer_email || params.from_email});
-        },
-
-        // BRAND INQUIRY
-        async sendBrandInquiry(brandName){
-          const list = this.products.filter(p => p.brand === brandName);
-          const lines = list.length
-            ? list.map(p => `• ${p.name} (${p.size}) — $${p.price.toFixed(2)}`).join('\n')
-            : 'لا توجد منتجات مسجلة لهذه العلامة حتى الآن.';
-
-          const params = {
-            subject_line: `استفسار علامة — ${brandName}`,
-            from_name: 'زائر الموقع',
-            from_email: 'no-reply@aslamalteeba.netlify.app',
-            customer_email: 'no-reply@aslamalteeba.netlify.app',
-            message: `طلب الزائر معلومات عن ${brandName}.`,
-            brand_name: brandName,
-            brand_products: lines
-          };
-
-          try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
-            alert('✅ تم إرسال الاستفسار! سيتم التواصل قريباً.');
-          } catch (err){
-            console.error(err);
-            alert('❌ حدث خطأ أثناء إرسال الاستفسار: ' + (err?.text || err?.message || 'غير معروف'));
-          }
         },
 
         // CONTACT
