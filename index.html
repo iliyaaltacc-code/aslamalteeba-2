@@ -228,8 +228,38 @@
 
   <!-- SHIPPING -->
   <section id="shipping" class="max-w-7xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold mb-4">Shipping And Delivery</h2>
-    <p class="text-neutral-300 leading-relaxed">We offer different delivery methods such as FoB, CFR and DDP.</p>
+    <h2 class="text-3xl font-bold mb-4">Shipping & Installation</h2>
+    <p class="text-neutral-300 leading-relaxed">Rapid delivery across all Emirates. Choose local pickup, on-site installation, or direct shipment for fleet clients. We collaborate with service centers to provide same-day fitting when possible.</p>
+  </section>
+
+  <!-- BRANDS -->
+  <section id="brands" class="max-w-7xl mx-auto px-4 py-20 bg-neutral-900/40 rounded-3xl">
+    <div class="flex items-end justify-between gap-4 mb-8">
+      <div>
+        <h2 class="text-3xl font-extrabold">Brands</h2>
+        <p class="text-neutral-400">Browse our partner brands and send an inquiry instantly.</p>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <template x-for="b in brands" :key="b.name">
+        <article class="glass rounded-3xl overflow-hidden border-white/10">
+          <div class="bg-black/30 p-4 h-32 flex items-center justify-center cursor-pointer" @click="openInquiryModal(b.name)">
+            <img :src="b.img" :alt="b.name + ' logo'" class="max-h-24 object-contain" />
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold text-lg" x-text="b.name"></h3>
+              <span class="text-xs px-2 py-1 rounded-full bg-white/10" x-text="brandProductCount(b.name) + ' products'"></span>
+            </div>
+            <p class="text-neutral-300 text-sm" x-text="b.desc"></p>
+            <button class="w-full px-4 py-2 rounded-xl brand-gradient text-black font-bold hover:opacity-90" @click="openInquiryModal(b.name)">
+              Send Inquiry
+            </button>
+          </div>
+        </article>
+      </template>
+    </div>
   </section>
 
   <!-- BRAND PRODUCTION TIMELINE -->
@@ -547,6 +577,57 @@
 
 
   <!-- AI CHAT PANEL -->
+  <div
+    x-show="inquiryModal.open"
+    x-cloak
+    class="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-4"
+    @keydown.escape.window="closeInquiryModal()"
+  >
+    <div class="glass w-full max-w-lg rounded-3xl border border-white/10 p-6" @click.outside="closeInquiryModal()">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <h3 class="text-xl font-bold">Send Inquiry</h3>
+        <button type="button" class="p-2 rounded-lg bg-white/5" @click="closeInquiryModal()" aria-label="Close inquiry form">✕</button>
+      </div>
+
+      <form class="space-y-3" @submit.prevent="submitInquiry">
+        <div>
+          <label class="text-sm text-neutral-300">What Specific Product Are you Interested In</label>
+          <input
+            x-ref="inquiryProductInput"
+            x-model.trim="inquiryModal.form.productInterest"
+            class="mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full"
+          />
+          <p x-show="inquiryModal.errors.productInterest" class="text-red-400 text-xs mt-1" x-text="inquiryModal.errors.productInterest"></p>
+        </div>
+
+        <div>
+          <label class="text-sm text-neutral-300">Your full name</label>
+          <input x-model.trim="inquiryModal.form.fullName" class="mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" />
+          <p x-show="inquiryModal.errors.fullName" class="text-red-400 text-xs mt-1" x-text="inquiryModal.errors.fullName"></p>
+        </div>
+
+        <div>
+          <label class="text-sm text-neutral-300">Email</label>
+          <input x-model.trim="inquiryModal.form.email" type="email" class="mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" />
+          <p x-show="inquiryModal.errors.email" class="text-red-400 text-xs mt-1" x-text="inquiryModal.errors.email"></p>
+        </div>
+
+        <div>
+          <label class="text-sm text-neutral-300">Phone number</label>
+          <input x-model.trim="inquiryModal.form.phone" type="tel" class="mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" />
+          <p x-show="inquiryModal.errors.phone" class="text-red-400 text-xs mt-1" x-text="inquiryModal.errors.phone"></p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" class="px-4 py-2 rounded-xl bg-white/10 font-semibold" @click="closeInquiryModal()">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl brand-gradient text-black font-bold" :disabled="inquiryModal.sending">
+            <span x-text="inquiryModal.sending ? 'Sending...' : 'Send Inquiry'"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="fixed bottom-5 left-5 z-50">
     <button
       class="px-4 py-3 rounded-2xl brand-gradient text-black font-extrabold shadow-lg hover:opacity-90"
@@ -621,6 +702,8 @@
   >
     WhatsApp
   </a>
+
+  <p x-show="inquirySuccess" x-cloak class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] px-4 py-2 rounded-xl bg-emerald-500 text-black font-semibold">✅ Inquiry sent.</p>
   <div
     class="fixed top-20 z-50 space-y-2"
     style="inset-inline-end: 1rem;"
@@ -699,6 +782,14 @@
         intro:{name:'',email:'',phone:''},
         introSuccess:false,
         introError:'',
+        inquirySuccess:false,
+        inquiryModal:{
+          open:false,
+          selectedBrand:'',
+          sending:false,
+          form:{productInterest:'', fullName:'', email:'', phone:''},
+          errors:{productInterest:'', fullName:'', email:'', phone:''}
+        },
         chatOpen:false,
         chatInput:'',
         chatLoading:false,
@@ -1334,6 +1425,81 @@
         async sendTwoEmails(params){
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: params.customer_email || params.from_email});
+        },
+
+        openInquiryModal(brandName = ''){
+          this.inquirySuccess = false;
+          this.inquiryModal.open = true;
+          this.inquiryModal.selectedBrand = brandName || '';
+          this.inquiryModal.form.productInterest = brandName || '';
+          this.inquiryModal.form.fullName = '';
+          this.inquiryModal.form.email = '';
+          this.inquiryModal.form.phone = '';
+          this.inquiryModal.errors = {productInterest:'', fullName:'', email:'', phone:''};
+          this.$nextTick(() => this.$refs.inquiryProductInput?.focus());
+        },
+
+        closeInquiryModal(){
+          this.inquiryModal.open = false;
+          this.inquiryModal.sending = false;
+          this.inquiryModal.errors = {productInterest:'', fullName:'', email:'', phone:''};
+        },
+
+        validateInquiryForm(){
+          const f = this.inquiryModal.form;
+          const errors = {productInterest:'', fullName:'', email:'', phone:''};
+          if (!f.productInterest) errors.productInterest = 'This field is required.';
+          if (!f.fullName) errors.fullName = 'This field is required.';
+          if (!f.email) errors.email = 'This field is required.';
+          else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errors.email = 'Please enter a valid email.';
+          if (!f.phone) errors.phone = 'This field is required.';
+          this.inquiryModal.errors = errors;
+          return !Object.values(errors).some(Boolean);
+        },
+
+        // BRAND/GENERAL INQUIRY
+        async submitInquiry(){
+          if (!this.validateInquiryForm()) return;
+          this.inquiryModal.sending = true;
+          const brandName = this.inquiryModal.selectedBrand;
+          const list = this.products.filter(p => p.brand === brandName);
+          const lines = list.length
+            ? list.map(p => `• ${p.name} (${p.size}) — $${p.price.toFixed(2)}`).join('\n')
+            : 'No products listed for this brand yet.';
+
+          const params = {
+            subject_line: brandName ? `Brand Inquiry — ${brandName}` : 'General Inquiry — Website',
+            from_name: this.inquiryModal.form.fullName,
+            from_email: this.inquiryModal.form.email,
+            customer_email: this.inquiryModal.form.email,
+            phone: this.inquiryModal.form.phone,
+            full_name: this.inquiryModal.form.fullName,
+            email: this.inquiryModal.form.email,
+            product_interest: this.inquiryModal.form.productInterest,
+            selected_brand: brandName || '',
+            brand_name: brandName || '',
+            brand_products: brandName ? lines : '',
+            page_path: window.location.pathname,
+            message: brandName
+              ? `A visitor requested information about ${brandName}. Product interest: ${this.inquiryModal.form.productInterest}.`
+              : `A visitor requested information about: ${this.inquiryModal.form.productInterest}.`
+          };
+
+          try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {...params, to_email: 'Ilimot2012@gmail.com'});
+            this.closeInquiryModal();
+            this.inquirySuccess = true;
+            setTimeout(() => { this.inquirySuccess = false; }, 3000);
+          } catch (err){
+            console.error(err);
+            alert('❌ Error sending inquiry: ' + (err?.text || err?.message || 'Unknown'));
+          } finally {
+            this.inquiryModal.sending = false;
+          }
+        },
+
+        sendBrandInquiry(brandName){
+          this.openInquiryModal(brandName);
         },
 
         // CONTACT
