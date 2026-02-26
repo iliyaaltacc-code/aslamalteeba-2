@@ -104,7 +104,6 @@
         <a href="#hq" class="hover:text-white">المقر الرئيسي</a>
         <a href="#imports" class="hover:text-white">الاستيراد</a>
         <a href="#shipping" class="hover:text-white">الشحن</a>
-        <a href="#brands" class="hover:text-white">العلامات التجارية</a>
         <a href="#intro" class="hover:text-white">بريد التعريف</a>
         <a href="#shop" class="hover:text-white">تصفح</a>
         <a href="#contact" class="hover:text-white">اتصل بنا</a>
@@ -766,13 +765,6 @@
           }
         },
 
-        brands:[
-          {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'تشكيلة اقتصادية لسيارات الركاب وSUV.'},
-          {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'جودة اقتصادية مع خيارات تورينغ وA/T قوية.'},
-          {name:'Haida', img:'https://i.postimg.cc/yNYNNGxd/haidatireb.webp', desc:'مجموعة موثوقة تجمع بين المتانة والقيمة.'},
-          {name:'Vikrant', img:'https://i.postimg.cc/vZXQCvzS/Vikrant-Tyres-Logo.jpg', desc:'إطارات لأداء ثابت واستخدام يومي.'}
-        ],
-
         passengerBrands:[
           {
             name:'Firemax',
@@ -922,10 +914,6 @@
           const symbol = this.currencySymbols[this.selectedCurrency] || '$';
           // AED and USD both use 2 decimal places
           return `${symbol}${converted.toFixed(2)}`;
-        },
-
-        brandProductCount(brandName){
-          return this.products.filter(p => p.brand === brandName).length;
         },
 
         passengerBrandModels(brandName){

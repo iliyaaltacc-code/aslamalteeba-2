@@ -90,7 +90,6 @@
         <a href="#hq" class="hover:text-white">HQ</a>
         <a href="#imports" class="hover:text-white">Imports</a>
         <a href="#shipping" class="hover:text-white">Shipping</a>
-        <a href="#brands" class="hover:text-white">Brands</a>
       </nav>
       <div class="flex items-center gap-2 ml-auto">
         <a href="/fa/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
@@ -841,13 +840,6 @@
           }
         },
 
-        brands:[
-          {name:'Firemax', img:'https://i.postimg.cc/nrLrwP86/firemax-logo-e-motors-ru-removebg-preview.png', desc:'Value-focused lineup for passenger and SUV needs.'},
-          {name:'Duraturn', img:'https://i.postimg.cc/ZKGYrRq1/4h-HO1KRF0AYc-JDu3S1nl0w3a0n-OYIt-SV0vrue-CTf-png.webp', desc:'Affordable quality tires with strong touring and A/T options.'},
-          {name:'Haida', img:'https://i.postimg.cc/yNYNNGxd/haidatireb.webp', desc:'Reliable tire range with a balance of durability and value.'},
-          {name:'Vikrant', img:'https://i.postimg.cc/vZXQCvzS/Vikrant-Tyres-Logo.jpg', desc:'Tyres built for dependable performance and everyday use.'}
-        ],
-
         passengerBrands:[
           {
             name:'Firemax',
@@ -1039,10 +1031,6 @@
           if (window.CompareState) {
             CompareState.save(this.compareSelection);
           }
-        },
-
-        brandProductCount(brandName){
-          return this.products.filter(p => p.brand === brandName).length;
         },
 
         passengerBrandModels(brandName){
