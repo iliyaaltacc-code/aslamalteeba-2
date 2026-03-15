@@ -303,6 +303,7 @@
           <option>Duraturn</option>
           <option>Bridgestone</option>
           <option>Firemax</option>
+          <option>Vikrant</option>
         </select>
         <input x-model="filters.query" type="search" placeholder="Search size… e.g., 205/55R16" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 placeholder:text-neutral-500" />
       </div>
@@ -866,7 +867,9 @@
           {
             name:'Dovroad',
             models:[
-              {name:'Coming Soon', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'Product lineup coming soon.'}
+              {name:'DA212', img:'https://i.postimg.cc/Y9fZYhnG/0fc5270f-9981-43f9-9437-2ce807d75915-jpg-640xaf-2.jpg', desc:''},
+              {name:'DF152', img:'https://i.postimg.cc/pdcsKKR5/a36daa3a-d807-4d9d-9903-f811dd32714f-jpg-640xaf.jpg', desc:''},
+              {name:'DD652', img:'https://i.postimg.cc/X7KxQR4c/p-FOQme-UPTu-Czs-TOl-W727Aw-jpg-640xaf.jpg', desc:''}
             ]
           },
           {
@@ -885,6 +888,17 @@
             name:'Duraturn',
             models:[
               {name:'Coming Soon', img:'https://placehold.co/600x400?text=Coming+Soon', desc:'Product lineup coming soon.'}
+            ]
+          },
+          {
+            name:'Vikrant',
+            models:[
+              {name:'VUH5', img:'https://i.postimg.cc/RFwwMc6z/vuh-5.png', desc:''},
+              {name:'VUL3', img:'https://i.postimg.cc/8CM7WT1C/LT-VUL04-2.png', desc:''},
+              {name:'VDL 3', img:'https://i.postimg.cc/RFs0ByPM/VDL3-1.png', desc:''},
+              {name:'VDH6', img:'https://i.postimg.cc/28BSsHh9/VDH6.png', desc:''},
+              {name:'VUH6', img:'https://i.postimg.cc/90wcjMRS/VUH6.png', desc:''},
+              {name:'VTL', img:'https://i.postimg.cc/BnBLzYGZ/VTL.png', desc:''}
             ]
           }
         ],
@@ -1138,7 +1152,8 @@
           const brandTier = {
             'Bridgestone': 85,
             'Firemax': 45,
-            'Duraturn': 60
+            'Duraturn': 60,
+            'Vikrant': 55
           }[product.brand] || 50;
           
           // Keyword matching from description
