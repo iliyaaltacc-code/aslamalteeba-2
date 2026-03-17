@@ -62,6 +62,68 @@
       border: none;
       box-shadow: 0 2px 8px rgba(0,224,164,0.4);
     }
+
+    .hero-shell {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.75rem;
+      isolation: isolate;
+      transform: translateZ(0);
+    }
+
+    .hero-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(50, 213, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(0, 224, 164, 0.1), transparent 45%);
+      transform: scale(var(--hero-bg-scale, 1));
+      transform-origin: center;
+      will-change: transform;
+      z-index: -2;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.2), rgba(2, 6, 23, 0.56));
+      opacity: var(--hero-overlay-opacity, 0.42);
+      transition: opacity 0.25s linear;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .hero-reveal {
+      opacity: 0;
+      transform: translate3d(0, 24px, 0);
+      transition: transform 0.8s cubic-bezier(.2,.7,.2,1), opacity 0.8s ease;
+      will-change: transform, opacity;
+    }
+
+    .hero-reveal.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .hero-visual {
+      transform: translate3d(0, var(--hero-visual-y, 0px), 0);
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-shell::before,
+      .hero-overlay,
+      .hero-reveal,
+      .hero-visual {
+        transition: none !important;
+        transform: none !important;
+      }
+
+      .hero-reveal {
+        opacity: 1 !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
@@ -131,13 +193,14 @@
   </header>
 
   <!-- HERO -->
-  <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
+  <section id="hero" class="hero-shell max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center" data-hero>
+    <div class="hero-overlay" aria-hidden="true"></div>
     <div>
-      <h2 class="text-5xl font-extrabold mb-4 leading-tight">Create Value From <span class="text-green-700">Dubai Tire Hub</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
+      <h2 class="hero-reveal text-5xl font-extrabold mb-4 leading-tight" data-hero-reveal="0">Create Value From <span class="text-green-700">Dubai Tire Hub</span></h2>
+      <p class="hero-reveal text-lg text-neutral-300 mb-6" data-hero-reveal="1">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers.</p>
+      <a href="#shop" class="hero-reveal inline-flex px-6 py-3 rounded-2xl brand-gradient text-black font-bold" data-hero-reveal="2">Browse Tires</a>
     </div>
-    <div>
+    <div class="hero-visual">
       <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
     </div>
   </section>
@@ -1711,6 +1774,54 @@
       window.location.href = "/auth.html";
     }
   };
-</script>
+  </script>
+  <script>
+    (() => {
+      const hero = document.querySelector('[data-hero]');
+      if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        hero?.querySelectorAll('[data-hero-reveal]').forEach((el) => el.classList.add('is-visible'));
+        return;
+      }
+
+      const revealItems = [...hero.querySelectorAll('[data-hero-reveal]')];
+      revealItems.forEach((item) => {
+        item.style.transitionDelay = `${Number(item.dataset.heroReveal || 0) * 80}ms`;
+      });
+
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          revealItems.forEach((item) => item.classList.add('is-visible'));
+          observer.disconnect();
+        });
+      }, { threshold: 0.35 });
+
+      revealObserver.observe(hero);
+
+      let ticking = false;
+      const updateHeroScroll = () => {
+        const rect = hero.getBoundingClientRect();
+        const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (window.innerHeight + rect.height)));
+        const bgScale = 1.06 - progress * 0.06;
+        const visualShift = Math.round(progress * 28) - 8;
+        const overlayOpacity = 0.38 + progress * 0.2;
+
+        hero.style.setProperty('--hero-bg-scale', bgScale.toFixed(3));
+        hero.style.setProperty('--hero-visual-y', `${visualShift}px`);
+        hero.style.setProperty('--hero-overlay-opacity', overlayOpacity.toFixed(3));
+        ticking = false;
+      };
+
+      const requestUpdate = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(updateHeroScroll);
+      };
+
+      updateHeroScroll();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+  </script>
 </body>
 </html>
