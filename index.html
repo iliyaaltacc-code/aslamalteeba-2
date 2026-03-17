@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="/styles/smoothness.css">
   <link rel="stylesheet" href="/styles/favorites.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="/customerMemory.js"></script>
   <script src="/favorites.js"></script>
@@ -61,6 +63,56 @@
       cursor: pointer;
       border: none;
       box-shadow: 0 2px 8px rgba(0,224,164,0.4);
+    }
+
+    #hero {
+      min-height: calc(100vh - 88px);
+      position: relative;
+      overflow: clip;
+      border-radius: 2rem;
+      isolation: isolate;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 74% 26%, rgba(50, 213, 255, 0.26), transparent 55%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.9), rgba(17, 24, 39, 0.78));
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at 64% 72%, rgba(16, 185, 129, 0.28), transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0.2;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-anim-ready .hero-copy-stage,
+    .hero-anim-ready .hero-copy-sub,
+    .hero-anim-ready .hero-copy-cta {
+      opacity: 0;
+      transform: translateY(42px);
+    }
+
+    @media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+      #hero {
+        min-height: auto;
+      }
+
+      .hero-copy-stage,
+      .hero-copy-sub,
+      .hero-copy-cta {
+        opacity: 1;
+        transform: none;
+      }
     }
   </style>
 </head>
@@ -131,14 +183,16 @@
   </header>
 
   <!-- HERO -->
-  <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
-    <div>
-      <h2 class="text-5xl font-extrabold mb-4 leading-tight">Create Value From <span class="text-green-700">Dubai Tire Hub</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
+  <section id="hero" class="max-w-7xl mx-auto mt-6 px-6 py-10 md:py-16 grid md:grid-cols-2 gap-12 items-center">
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div id="hero-content" class="relative z-10">
+      <h2 class="hero-copy-stage text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight">Create Value From <span class="text-emerald-300">Dubai Tire Hub</span></h2>
+      <p class="hero-copy-sub text-lg md:text-xl text-neutral-200 mb-6 md:pr-8">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers.</p>
+      <a href="#shop" class="hero-copy-cta inline-flex px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
     </div>
-    <div>
-      <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
+    <div id="hero-visual" class="relative z-10 flex justify-center md:justify-end">
+      <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="w-full max-w-[560px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.45)] will-change-transform" alt="Tire showcase">
     </div>
   </section>
 
@@ -1712,5 +1766,60 @@
     }
   };
 </script>
+  <script>
+    (function () {
+      const hero = document.getElementById('hero');
+      if (!hero || !window.gsap || !window.ScrollTrigger) return;
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const desktop = window.matchMedia('(min-width: 1024px)').matches;
+      if (reduced || !desktop) return;
+
+      document.body.classList.add('hero-anim-ready');
+      gsap.registerPlugin(ScrollTrigger);
+
+      const heroVisual = hero.querySelector('#hero-visual img');
+      const heroOverlay = hero.querySelector('.hero-overlay');
+      const heroGlow = hero.querySelector('.hero-glow');
+      const heroHeadline = hero.querySelector('.hero-copy-stage');
+      const heroSub = hero.querySelector('.hero-copy-sub');
+      const heroCta = hero.querySelector('.hero-copy-cta');
+
+      gsap.set(heroHeadline, { y: 34, opacity: 0 });
+      gsap.set(heroSub, { y: 44, opacity: 0 });
+      gsap.set(heroCta, { y: 50, opacity: 0 });
+      gsap.set(heroVisual, { scale: 1, xPercent: 0, yPercent: 0, rotate: 0 });
+      gsap.set(heroGlow, { opacity: 0.2 });
+
+      const heroTl = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: hero,
+          start: 'top top+=78',
+          end: '+=220%',
+          pin: true,
+          scrub: 0.6,
+          anticipatePin: 1
+        }
+      });
+
+      heroTl
+        .to(heroVisual, { scale: 1.15, xPercent: 6, yPercent: -3, duration: 1.2 }, 0.15)
+        .to(heroHeadline, { opacity: 1, y: 0, duration: 0.45 }, 0.45)
+        .to(heroSub, { opacity: 1, y: 0, duration: 0.45 }, 0.95)
+        .to(heroCta, { opacity: 1, y: 0, duration: 0.4 }, 1.32)
+        .to(heroOverlay, {
+          background: 'radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.2), transparent 52%), linear-gradient(140deg, rgba(2, 6, 23, 0.94), rgba(15, 23, 42, 0.88))',
+          duration: 1.1
+        }, 1.05)
+        .to(heroGlow, { opacity: 0.48, duration: 1 }, 1.1)
+        .to([heroHeadline, heroSub, heroCta], { y: -36, opacity: 0, stagger: 0.06, duration: 0.45 }, 2.05)
+        .to(heroVisual, { scale: 1.22, xPercent: 9, yPercent: -7, opacity: 0.22, duration: 0.75 }, 2.15)
+        .to(heroOverlay, { opacity: 0.32, duration: 0.7 }, 2.25);
+
+      ScrollTrigger.refresh();
+    })();
+  </script>
+
 </body>
 </html>
