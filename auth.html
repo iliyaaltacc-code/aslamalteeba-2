@@ -117,6 +117,9 @@
     <input id="email" type="email" placeholder="Email" />
     <input id="password" type="password" placeholder="Password" />
     
+    <input id="phoneNumber" type="tel" placeholder="Phone Number (e.g., +1234567890)" style="display: none;" />
+    <input id="verificationCode" type="text" placeholder="Verification Code" style="display: none;" />
+    
     <div class="forgot-password" id="forgotPassword">Forgot password?</div>
 
     <button class="primary" id="submitBtn">Sign In</button>
@@ -129,12 +132,19 @@
       </svg>
       Continue with Google
     </button>
+    <button class="secondary" id="phoneBtn">
+      <svg class="provider-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+      </svg>
+      Continue with Phone Number
+    </button>
 
     <div class="switch" id="toggleMode">
       Don’t have an account? Create one
     </div>
 
     <div class="status" id="status"></div>
+    <div id="recaptcha-container"></div>
   </div>
 
   <!-- LOCALIZATION -->
@@ -229,7 +239,9 @@
       signInWithPopup,
       setPersistence,
       browserLocalPersistence,
-      onAuthStateChanged
+      onAuthStateChanged,
+      RecaptchaVerifier,
+      signInWithPhoneNumber
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -256,8 +268,38 @@
     const title = document.getElementById("title");
     const googleBtn = document.getElementById("googleBtn");
     const forgotPassword = document.getElementById("forgotPassword");
+    const phoneBtn = document.getElementById("phoneBtn");
+    const phoneNumber = document.getElementById("phoneNumber");
+    const verificationCode = document.getElementById("verificationCode");
+
+    let confirmationResult = null;
+    let recaptchaVerifier = null;
+    let phoneAuthStep = 0;
 
     toggleMode.onclick = () => {
+      if (phoneAuthStep > 0) {
+        phoneAuthStep = 0;
+        email.style.display = "block";
+        password.style.display = "block";
+        forgotPassword.style.display = "block";
+        submitBtn.style.display = "block";
+        googleBtn.style.display = "block";
+        phoneNumber.style.display = "none";
+        verificationCode.style.display = "none";
+        phoneNumber.value = "";
+        verificationCode.value = "";
+        phoneBtn.textContent = "Continue with Phone Number";
+        phoneBtn.disabled = false;
+        toggleMode.textContent = mode === "signin" ? "Don't have an account? Create one" : "Already have an account? Sign in";
+        status.textContent = "";
+        status.style.color = "#fca5a5";
+        if (recaptchaVerifier) {
+          recaptchaVerifier.clear();
+          recaptchaVerifier = null;
+        }
+        return;
+      }
+      
       mode = mode === "signin" ? "signup" : "signin";
       title.textContent = mode === "signin" ? "Sign In" : "Create Account";
       submitBtn.textContent = mode === "signin" ? "Sign In" : "Sign Up";
@@ -366,6 +408,89 @@
         
         forgotPassword.style.pointerEvents = "auto";
         forgotPassword.style.opacity = "1";
+      }
+    };
+
+    phoneBtn.onclick = async () => {
+      status.textContent = "";
+      status.style.color = "#fca5a5";
+      
+      if (phoneAuthStep === 0) {
+        email.style.display = "none";
+        password.style.display = "none";
+        forgotPassword.style.display = "none";
+        submitBtn.style.display = "none";
+        googleBtn.style.display = "none";
+        phoneNumber.style.display = "block";
+        phoneBtn.textContent = "Send Verification Code";
+        toggleMode.textContent = "Back to other sign-in options";
+        
+        if (!recaptchaVerifier) {
+          try {
+            recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+              size: "invisible"
+            });
+          } catch (err) {
+            status.textContent = "Failed to initialize reCAPTCHA. Please refresh the page.";
+            return;
+          }
+        }
+        
+        phoneAuthStep = 1;
+        return;
+      }
+
+      if (phoneAuthStep === 1) {
+        if (!phoneNumber.value) {
+          status.textContent = "Please enter a phone number.";
+          return;
+        }
+
+        phoneBtn.disabled = true;
+        try {
+          confirmationResult = await signInWithPhoneNumber(auth, phoneNumber.value, recaptchaVerifier);
+          phoneNumber.style.display = "none";
+          verificationCode.style.display = "block";
+          phoneBtn.textContent = "Verify Code";
+          phoneBtn.disabled = false;
+          status.style.color = "#86efac";
+          status.textContent = "Verification code sent to your phone.";
+          phoneAuthStep = 2;
+        } catch (err) {
+          phoneBtn.disabled = false;
+          status.style.color = "#fca5a5";
+          if (recaptchaVerifier) {
+            recaptchaVerifier.clear();
+            recaptchaVerifier = null;
+          }
+          if (err.code === "auth/invalid-phone-number") {
+            status.textContent = "Invalid phone number format.";
+          } else if (err.code === "auth/too-many-requests") {
+            status.textContent = "Too many requests. Please try again later.";
+          } else {
+            status.textContent = err.message;
+          }
+        }
+      } else if (phoneAuthStep === 2) {
+        if (!verificationCode.value) {
+          status.textContent = "Please enter the verification code.";
+          return;
+        }
+
+        phoneBtn.disabled = true;
+        try {
+          await confirmationResult.confirm(verificationCode.value);
+        } catch (err) {
+          phoneBtn.disabled = false;
+          status.style.color = "#fca5a5";
+          if (err.code === "auth/invalid-verification-code") {
+            status.textContent = "Invalid verification code.";
+          } else if (err.code === "auth/code-expired") {
+            status.textContent = "Verification code expired. Please try again.";
+          } else {
+            status.textContent = err.message;
+          }
+        }
       }
     };
 
