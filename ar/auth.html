@@ -1,14 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>Sign In / Sign Up</title>
+  <title>تسجيل الدخول / الحساب</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>
-    document.documentElement.classList.add("js-page-transition");
-  </script>
-  <link rel="stylesheet" href="/styles/smoothness.css">
-  <script defer src="/transition.js"></script>
 
   <style>
     body {
@@ -90,7 +85,7 @@
 
     .forgot-password {
       margin-top: 8px;
-      text-align: end;
+      text-align: right;
       font-size: 13px;
       cursor: pointer;
       color: #93c5fd;
@@ -110,16 +105,15 @@
 </head>
 
 <body>
-  <div id="page-transition" class="page-transition is-active" aria-hidden="true"></div>
   <div class="card">
-    <h1 id="title">Sign In</h1>
+    <h1 id="title">تسجيل الدخول</h1>
 
-    <input id="email" type="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Password" />
+    <input id="email" type="email" placeholder="البريد الإلكتروني" />
+    <input id="password" type="password" placeholder="كلمة المرور" />
     
-    <div class="forgot-password" id="forgotPassword">Forgot password?</div>
+    <div class="forgot-password" id="forgotPassword">نسيت كلمة المرور؟</div>
 
-    <button class="primary" id="submitBtn">Sign In</button>
+    <button class="primary" id="submitBtn">تسجيل الدخول</button>
     <button class="secondary" id="googleBtn">
       <svg class="provider-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -136,85 +130,6 @@
 
     <div class="status" id="status"></div>
   </div>
-
-  <!-- LOCALIZATION -->
-  <script>
-    // Language detection from URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const lang = urlParams.get('lang') || 'en';
-    
-    // Localization texts
-    const texts = {
-      en: {
-        signIn: 'Sign In',
-        createAccount: 'Create Account',
-        signUp: 'Sign Up',
-        email: 'Email',
-        password: 'Password',
-        forgotPassword: 'Forgot password?',
-        continueWithGoogle: 'Continue with Google',
-        noAccount: "Don't have an account? Create one",
-        haveAccount: "Already have an account? Sign in"
-      },
-      fa: {
-        signIn: 'ورود',
-        createAccount: 'ایجاد حساب',
-        signUp: 'ثبت‌نام',
-        email: 'ایمیل',
-        password: 'رمز عبور',
-        forgotPassword: 'رمز عبور را فراموش کردهاید؟',
-        continueWithGoogle: 'ادامه با Google',
-        noAccount: 'حساب کاربری ندارید؟ ایجاد حساب',
-        haveAccount: 'حساب کاربری دارید؟ ورود'
-      },
-      ar: {
-        signIn: 'تسجيل الدخول',
-        createAccount: 'إنشاء حساب',
-        signUp: 'التسجيل',
-        email: 'البريد الإلكتروني',
-        password: 'كلمة المرور',
-        forgotPassword: 'هل نسيت كلمة المرور؟',
-        continueWithGoogle: 'المتابعة باستخدام Google',
-        noAccount: 'ليس لديك حساب؟ أنشئ حسابًا',
-        haveAccount: 'لديك حساب؟ تسجيل الدخول'
-      }
-    };
-    
-    // Get current language texts (default to en if invalid)
-    const t = texts[lang] || texts.en;
-    
-    // Set document direction and language
-    if (lang === 'fa' || lang === 'ar') {
-      document.documentElement.dir = 'rtl';
-      document.documentElement.lang = lang;
-    } else {
-      document.documentElement.dir = 'ltr';
-      document.documentElement.lang = lang;
-    }
-    
-    // Apply localization when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('title').textContent = t.signIn;
-      document.getElementById('email').placeholder = t.email;
-      document.getElementById('password').placeholder = t.password;
-      document.getElementById('forgotPassword').textContent = t.forgotPassword;
-      document.getElementById('submitBtn').textContent = t.signIn;
-      document.getElementById('toggleMode').textContent = t.noAccount;
-      
-      // Update Google button text (preserve SVG)
-      const googleBtn = document.getElementById('googleBtn');
-      // Find the text node (more robust approach)
-      const textNode = Array.from(googleBtn.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-      if (textNode) {
-        textNode.textContent = t.continueWithGoogle;
-      }
-      
-      // Adjust Google button for RTL
-      if (lang === 'fa' || lang === 'ar') {
-        googleBtn.style.flexDirection = 'row-reverse';
-      }
-    });
-  </script>
 
   <!-- FIREBASE AUTH -->
   <script type="module">
