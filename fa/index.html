@@ -71,7 +71,7 @@
 <body class="bg-neutral-950 text-neutral-100" x-data="appState()" x-init="init(); showWelcomeMessage()">
   <div id="page-transition" class="page-transition is-active" aria-hidden="true"></div>
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 glass">
+  <header class="sticky top-0 z-50 glass" @keydown.escape.window="mobileNavOpen=false">
     <div class="max-w-7xl mx-auto flex items-center px-4 py-3 gap-6">
       <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap">Aslama <span class="text-emerald-400">Alteeba</span></h1>
       <nav class="hidden md:flex gap-6 text-sm flex-wrap">
@@ -97,10 +97,10 @@
         <a href="#contact" class="hover:text-white">تماس</a>
       </nav>
       <div class="flex items-center gap-2 ml-auto">
-        <a href="/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+        <a href="/" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇬🇧 English
         </a>
-        <a href="/ar/" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+        <a href="/ar/" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇦🇪 العربية
         </a>
 
@@ -120,18 +120,43 @@
         </button>
 
         <!-- Auth buttons (controlled by Firebase) -->
-        <a href="/auth.html?lang=fa" id="authSignInBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
+        <a href="/auth.html?lang=fa" id="authSignInBtn" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           ورود / حساب کاربری
         </a>
-        <button id="authSignOutBtn" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" style="display: none;">
+        <button id="authSignOutBtn" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" style="display: none;">
           خروج
         </button>
 
-        <a href="tel:+971554637045" class="px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
+        <a href="tel:+971554637045" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
           <span id="phone-display" class="phone-number">+971 55 463 7045</span>
         </a>
+        <button id="mobileMenuButton" type="button" class="md:hidden w-10 h-10 rounded-full bg-white/10 border border-white/10 hover:bg-white/15 flex items-center justify-center" aria-label="باز کردن منوی موبایل" :aria-expanded="mobileNavOpen" aria-controls="mobileMenu" @click="mobileNavOpen = !mobileNavOpen">
+          <svg x-show="!mobileNavOpen" x-cloak width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg x-show="mobileNavOpen" x-cloak width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
       </div>
     </div>
+    <nav id="mobileMenu" class="md:hidden border-t border-white/10 bg-neutral-950/95 backdrop-blur" x-show="mobileNavOpen" x-transition x-cloak @click.outside="mobileNavOpen=false">
+      <div class="max-w-7xl mx-auto px-4 py-4 grid gap-2 text-sm">
+        <a href="#about" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">درباره ما</a>
+        <a href="#materials" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">محصولات</a>
+        <a href="#intro" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">ایمیل معرفی</a>
+        <a href="#shop" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">مرور</a>
+        <a href="#contact" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">تماس</a>
+        <a href="#hq" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">دفتر مرکزی</a>
+        <a href="#imports" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">واردات</a>
+        <a href="#shipping" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">ارسال</a>
+        <a href="#brands" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">برندها</a>
+        <a href="/fa/favorites.html" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">علاقه‌مندی‌ها</a>
+        <button type="button" class="text-right rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false; handleProfileClick()">حساب کاربری</button>
+        <a href="/fa/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇮🇷 فارسی</a>
+        <a href="/ar/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇦🇪 العربية</a>
+      </div>
+    </nav>
   </header>
 
   <!-- HERO -->
@@ -653,6 +678,7 @@
 
       return {
         ...favoritesController,
+        mobileNavOpen:false,
         filters:{brand: initialBrandFilter, query:''},
         passengerBrandSelection:'',
         activePassengerBrand:'',
