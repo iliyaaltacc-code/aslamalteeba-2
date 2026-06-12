@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>اسلمه الطیبه — فروشگاه تایر</title>
+  <title>اسلمه الطیبه — فروشگاه تایر در دیره، دبی</title>
   <script>
     document.documentElement.classList.add("js-page-transition");
   </script>
-  <meta name="description" content="اسلمالطیبه تأمین‌کننده باتجربه تایر است، از تولیدکنندگان شناخته‌شده چینی، هندی و ژاپنی." />
+  <meta name="description" content="اسلمالطیبه تأمین‌کننده باتجربه تایر با محل مراجعه مشتریان در خیابان بیمارستان آل مکتوم، نایف، دیره، دبی و تأمین از تولیدکنندگان چینی، هندی و ژاپنی است." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
@@ -19,6 +19,21 @@
   <script src="../customerMemory.js"></script>
   <script src="/favorites.js"></script>
   <script defer src="/transition.js"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AutoPartsStore",
+      "name": "ALSAMA ALTEEBA TYRES",
+      "alternateName": "Aslama Alteeba",
+      "description": "تأمین‌کننده تایر در دبی برای تایرهای سواری، کامیون، اتوبوس و OTR با هماهنگی عمده و پشتیبانی واتساپ.",
+      "address": {"@type": "PostalAddress", "streetAddress": "Al Maktoum Hospital Rd", "addressLocality": "Naif, Deira", "addressRegion": "Dubai", "addressCountry": "AE"},
+      "geo": {"@type": "GeoCoordinates", "latitude": 25.2697932, "longitude": 55.311797},
+      "areaServed": ["Dubai", "Sharjah", "Ras Al Khaimah", "United Arab Emirates"],
+      "hasMap": "https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu",
+      "telephone": "+971554637045",
+      "makesOffer": [{"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Passenger car tires"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Truck and bus tires"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "OTR tires"}}]
+    }
+  </script>
   <style>
     html,body{font-family:Vazirmatn,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
     .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
@@ -95,6 +110,7 @@
         <a href="#intro" class="hover:text-white">ایمیل معرفی</a>
         <a href="#shop" class="hover:text-white">مرور</a>
         <a href="#contact" class="hover:text-white">تماس</a>
+        <a href="#location" class="hover:text-white">موقعیت</a>
       </nav>
       <div class="flex items-center gap-2 ml-auto">
         <a href="/" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
@@ -127,6 +143,9 @@
           خروج
         </button>
 
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-sky-400 text-black font-semibold hover:opacity-90">
+          📍 مسیر
+        </a>
         <a href="tel:+971554637045" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
           <span id="phone-display" class="phone-number">+971 55 463 7045</span>
         </a>
@@ -147,11 +166,13 @@
         <a href="#intro" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">ایمیل معرفی</a>
         <a href="#shop" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">مرور</a>
         <a href="#contact" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">تماس</a>
+        <a href="#location" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">موقعیت</a>
         <a href="#hq" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">دفتر مرکزی</a>
         <a href="#imports" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">واردات</a>
         <a href="#shipping" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">ارسال</a>
         <a href="#brands" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">برندها</a>
         <a href="/fa/favorites.html" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">علاقه‌مندی‌ها</a>
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="rounded-xl px-3 py-2 bg-sky-400/15 text-sky-200 hover:bg-sky-400/25" @click="mobileNavOpen=false">📍 دریافت مسیر</a>
         <button type="button" class="text-right rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false; handleProfileClick()">حساب کاربری</button>
         <a href="/fa/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇮🇷 فارسی</a>
         <a href="/ar/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇦🇪 العربية</a>
@@ -163,8 +184,16 @@
   <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
     <div>
       <h2 class="text-5xl font-extrabold mb-4 leading-tight">خلق ارزش از <span class="text-green-700">هاب تایر دبی</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">اسلمالطیبه تأمین‌کننده باتجربه تایر است، از تولیدکنندگان شناخته‌شده چینی، هندی و ژاپنی.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">مرور تایرها</a>
+      <p class="text-lg text-neutral-300 mb-6">اسلمالطیبه تأمین‌کننده باتجربه تایر از تولیدکنندگان شناخته‌شده چینی، هندی و ژاپنی است و محل مراجعه مشتریان ما در خیابان بیمارستان آل مکتوم، نایف، دیره قرار دارد.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">مرور تایرها</a>
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-6 py-3 rounded-2xl bg-white/10 border border-white/10 font-bold hover:bg-white/15">دریافت مسیر</a>
+      </div>
+      <div class="mt-6 grid sm:grid-cols-3 gap-3 text-sm">
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">📍 فروشگاه تایر در دیره</div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">🚚 پشتیبانی ارسال در امارات</div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">💬 واتساپ قبل از مراجعه</div>
+      </div>
     </div>
     <div>
       <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="نمای تایر">
@@ -247,7 +276,29 @@
   <!-- HQ -->
   <section id="hq" class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-bold mb-4">دفتر مرکزی و امکانات</h2>
-    <p class="text-neutral-300 leading-relaxed">دفتر مرکزی ما در دبی، مرکز عملیات لجستیک و مدیریت واردات است. با مراکز پشتیبان در شارجه و راس‌الخیمه، توزیع سریع و ردیابی موجودی را تضمین می‌کنیم.</p>
+    <p class="text-neutral-300 leading-relaxed">دفتر مرکزی ما در دبی، مرکز عملیات لجستیک و مدیریت واردات است. محل مراجعه مشتریان در دیره از استعلام‌های محلی، هماهنگی دریافت حضوری و راهنمایی حضوری پشتیبانی می‌کند، و مراکز پشتیبان در شارجه و راس‌الخیمه توزیع سریع و ردیابی موجودی را تضمین می‌کنند.</p>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="location" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl scroll-mt-24">
+    <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+      <div class="glass rounded-3xl border-white/10 p-6 space-y-5">
+        <div>
+          <p class="text-sm uppercase tracking-[0.3em] text-emerald-300 mb-2">به دیره سر بزنید</p>
+          <h2 class="text-3xl font-bold mb-3">ALSAMA ALTEEBA TYRES در خیابان بیمارستان آل مکتوم</h2>
+          <p class="text-neutral-300 leading-relaxed">محل مراجعه مشتریان ما در نایف، دیره قرار دارد؛ گزینه‌ای مناسب در دبی برای بررسی موجودی تایر، هماهنگی دریافت حضوری، گفت‌وگو درباره سفارش عمده و دریافت راهنمایی پیش از سفارش تایر سواری، کامیون، اتوبوس یا OTR.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4"><div class="font-semibold text-white">آدرس</div><p class="text-neutral-300 mt-1">خیابان بیمارستان آل مکتوم، نایف، دیره، دبی</p></div>
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4"><div class="font-semibold text-white">قبل از مراجعه</div><p class="text-neutral-300 mt-1">سایز تایر یا عکس دیواره تایر را در واتساپ بفرستید تا تیم گزینه‌های موجود را تأیید کند.</p></div>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-5 py-3 rounded-2xl brand-gradient text-black font-bold">باز کردن در Google Maps</a>
+          <a href="https://wa.me/971554637045?text=Hello%20Aslama%20Alteeba%2C%20I%20would%20like%20to%20confirm%20tire%20availability%20before%20visiting%20your%20Deira%20shop%20on%20Al%20Maktoum%20Hospital%20Road." target="_blank" rel="noopener" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10 font-bold hover:bg-white/15" @click="trackWhatsAppUsage()">واتساپ قبل از مراجعه</a>
+        </div>
+      </div>
+      <div class="glass rounded-3xl border-white/10 overflow-hidden min-h-[360px]"><iframe title="Map to ALSAMA ALTEEBA TYRES" src="https://www.google.com/maps?q=25.2697932,55.311797&z=16&output=embed" class="w-full h-full min-h-[360px] border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+    </div>
   </section>
 
   <!-- IMPORTS -->
@@ -496,6 +547,9 @@
             ></div>
             
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            <div class="inline-flex items-center gap-2 rounded-full bg-sky-400/10 border border-sky-300/20 px-3 py-1 text-xs font-semibold text-sky-200">
+              📍 درباره دریافت از دیره یا ارسال در امارات سؤال کنید
+            </div>
             
             <!-- Quick Questions Section (Persian) -->
             <div class="pt-2 border-t border-white/10">
@@ -552,12 +606,19 @@
   <!-- CONTACT -->
   <section id="contact" class="max-w-7xl mx-auto px-4 py-20">
     <h2 class="text-3xl font-bold mb-6">تماس با ما</h2>
-    <form @submit.prevent="sendContact" class="space-y-4 max-w-xl">
-      <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="نام شما"/>
-      <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="ایمیل شما"/>
-      <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="پیام شما"></textarea>
-      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">ارسال پیام</button>
-    </form>
+    <div class="grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
+      <form @submit.prevent="sendContact" class="space-y-4 glass rounded-3xl border-white/10 p-6">
+        <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="نام شما"/>
+        <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="ایمیل شما"/>
+        <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="پیام شما"></textarea>
+        <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">ارسال پیام</button>
+      </form>
+      <aside class="glass rounded-3xl border-white/10 p-6 space-y-4">
+        <div><p class="text-sm uppercase tracking-[0.25em] text-sky-300 mb-2">موقعیت دیره</p><h3 class="text-2xl font-bold">ALSAMA ALTEEBA TYRES</h3><p class="text-neutral-300 mt-2">خیابان بیمارستان آل مکتوم، نایف، دیره، دبی، امارات متحده عربی</p></div>
+        <div class="rounded-2xl overflow-hidden border border-white/10 min-h-[220px]"><iframe title="Contact map to ALSAMA ALTEEBA TYRES" src="https://www.google.com/maps?q=25.2697932,55.311797&z=16&output=embed" class="w-full h-[220px] border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <div class="flex flex-wrap gap-3"><a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-400 text-black font-bold hover:opacity-90">دریافت مسیر</a><a href="tel:+971554637045" class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 font-bold hover:bg-white/15">تماس +971 55 463 7045</a></div>
+      </aside>
+    </div>
   </section>
 
   <!-- FOOTER -->

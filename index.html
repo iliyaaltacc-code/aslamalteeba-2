@@ -4,11 +4,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aslama Alteeba — Tire Shop</title>
+  <title>Aslama Alteeba — Tire Shop in Deira, Dubai</title>
   <script>
     document.documentElement.classList.add("js-page-transition");
   </script>
-  <meta name="description" content="Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers." />
+  <meta name="description" content="Aslamalteeba is an experienced tire supplier with a customer location on Al Maktoum Hospital Road in Naif, Deira, Dubai, sourcing from Chinese, Indian, and Japanese manufacturers." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -22,6 +22,35 @@
   <script src="/data/products.js"></script>
   <script src="/compareState.js"></script>
   <script defer src="/transition.js"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AutoPartsStore",
+      "name": "ALSAMA ALTEEBA TYRES",
+      "alternateName": "Aslama Alteeba",
+      "description": "Dubai tire supplier for passenger, truck, bus, and OTR tires with wholesale coordination and WhatsApp quote support.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Maktoum Hospital Rd",
+        "addressLocality": "Naif, Deira",
+        "addressRegion": "Dubai",
+        "addressCountry": "AE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 25.2697932,
+        "longitude": 55.311797
+      },
+      "areaServed": ["Dubai", "Sharjah", "Ras Al Khaimah", "United Arab Emirates"],
+      "hasMap": "https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu",
+      "telephone": "+971554637045",
+      "makesOffer": [
+        {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Passenger car tires"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Truck and bus tires"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "OTR tires"}}
+      ]
+    }
+  </script>
   <style>
     html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
     .glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)}
@@ -87,6 +116,7 @@
         <a href="#intro" class="hover:text-white">Introduction Email</a>
         <a href="#shop" class="hover:text-white">Browse</a>
         <a href="#contact" class="hover:text-white">Contact</a>
+        <a href="#location" class="hover:text-white">Location</a>
         <a href="#hq" class="hover:text-white">HQ</a>
         <a href="#imports" class="hover:text-white">Imports</a>
         <a href="#shipping" class="hover:text-white">Shipping</a>
@@ -123,6 +153,9 @@
           Sign Out
         </button>
 
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-sky-400 text-black font-semibold hover:opacity-90">
+          📍 Directions
+        </a>
         <a href="tel:+971554637045" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-emerald-500 text-black font-semibold hover:opacity-90">
           +971 55 463 7045
         </a>
@@ -143,11 +176,13 @@
         <a href="#intro" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Introduction Email</a>
         <a href="#shop" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Browse</a>
         <a href="#contact" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Contact</a>
+        <a href="#location" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Location</a>
         <a href="#hq" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">HQ</a>
         <a href="#imports" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Imports</a>
         <a href="#shipping" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Shipping</a>
         <a href="#brands" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Brands</a>
         <a href="/favorites.html" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">Favorites</a>
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="rounded-xl px-3 py-2 bg-sky-400/15 text-sky-200 hover:bg-sky-400/25" @click="mobileNavOpen=false">📍 Get Directions</a>
         <button type="button" class="text-left rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false; handleProfileClick()">Profile</button>
         <a href="/fa/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇮🇷 Persian</a>
         <a href="/ar/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇦🇪 Arabic</a>
@@ -159,8 +194,16 @@
   <section id="hero" class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
     <div>
       <h2 class="text-5xl font-extrabold mb-4 leading-tight">Create Value From <span class="text-green-700">Dubai Tire Hub</span></h2>
-      <p class="text-lg text-neutral-300 mb-6">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers.</p>
-      <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
+      <p class="text-lg text-neutral-300 mb-6">Aslamalteeba is an experienced tire supplier, from well known Chinese, Indian and Japanese manufacturers, with a customer location on Al Maktoum Hospital Road in Naif, Deira.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#shop" class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Browse Tires</a>
+        <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-6 py-3 rounded-2xl bg-white/10 border border-white/10 font-bold hover:bg-white/15">Get Directions</a>
+      </div>
+      <div class="mt-6 grid sm:grid-cols-3 gap-3 text-sm">
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">📍 Deira tire shop</div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">🚚 UAE delivery support</div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">💬 WhatsApp before visiting</div>
+      </div>
     </div>
     <div>
       <img src="https://www.duraturntires.com/wp-content/uploads/tire-mozzo-touring-hero.png" class="rounded-2xl shadow-lg" alt="Tire showcase">
@@ -243,7 +286,43 @@
   <!-- HQ -->
   <section id="hq" class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="text-3xl font-bold mb-4">Headquarters & Facilities</h2>
-    <p class="text-neutral-300 leading-relaxed">Our Dubai HQ is the operational hub for logistics, import coordination, and partner management. With satellite facilities in Sharjah and Ras Al Khaimah, we ensure smooth inventory distribution and real-time container tracking.</p>
+    <p class="text-neutral-300 leading-relaxed">Our Dubai HQ is the operational hub for logistics, import coordination, and partner management. Our Deira customer location supports local tire inquiries, pickup coordination, and walk-in guidance, while satellite facilities in Sharjah and Ras Al Khaimah help us ensure smooth inventory distribution and real-time container tracking.</p>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="location" class="max-w-7xl mx-auto px-4 py-16 bg-neutral-900/50 rounded-3xl scroll-mt-24">
+    <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+      <div class="glass rounded-3xl border-white/10 p-6 space-y-5">
+        <div>
+          <p class="text-sm uppercase tracking-[0.3em] text-emerald-300 mb-2">Visit us in Deira</p>
+          <h2 class="text-3xl font-bold mb-3">ALSAMA ALTEEBA TYRES on Al Maktoum Hospital Road</h2>
+          <p class="text-neutral-300 leading-relaxed">Find our customer location in Naif, Deira — a convenient Dubai stop for tire availability checks, pickup coordination, wholesale discussions, and guidance before placing a passenger, truck, bus, or OTR tire order.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div class="font-semibold text-white">Address</div>
+            <p class="text-neutral-300 mt-1">Al Maktoum Hospital Rd, Naif, Deira, Dubai</p>
+          </div>
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div class="font-semibold text-white">Best before visiting</div>
+            <p class="text-neutral-300 mt-1">Send your tire size or a sidewall photo on WhatsApp so the team can confirm options.</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-5 py-3 rounded-2xl brand-gradient text-black font-bold">Open in Google Maps</a>
+          <a href="https://wa.me/971554637045?text=Hello%20Aslama%20Alteeba%2C%20I%20would%20like%20to%20confirm%20tire%20availability%20before%20visiting%20your%20Deira%20shop%20on%20Al%20Maktoum%20Hospital%20Road." target="_blank" rel="noopener" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10 font-bold hover:bg-white/15" @click="trackWhatsAppUsage()">WhatsApp before visiting</a>
+        </div>
+      </div>
+      <div class="glass rounded-3xl border-white/10 overflow-hidden min-h-[360px]">
+        <iframe
+          title="Map to ALSAMA ALTEEBA TYRES in Naif, Deira, Dubai"
+          src="https://www.google.com/maps?q=25.2697932,55.311797&z=16&output=embed"
+          class="w-full h-full min-h-[360px] border-0"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
   </section>
 
   <!-- IMPORTS -->
@@ -489,6 +568,9 @@
             ></div>
             
             <p class="text-neutral-300 text-sm" x-text="p.desc"></p>
+            <div class="inline-flex items-center gap-2 rounded-full bg-sky-400/10 border border-sky-300/20 px-3 py-1 text-xs font-semibold text-sky-200">
+              📍 Ask about Deira pickup or UAE delivery
+            </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-white/10">
               <label
@@ -568,12 +650,34 @@
   <!-- CONTACT -->
   <section id="contact" class="max-w-7xl mx-auto px-4 py-20">
     <h2 class="text-3xl font-bold mb-6">Contact Us</h2>
-    <form @submit.prevent="sendContact" class="space-y-4 max-w-xl">
-      <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your name"/>
-      <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your email"/>
-      <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your message"></textarea>
-      <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Message</button>
-    </form>
+    <div class="grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
+      <form @submit.prevent="sendContact" class="space-y-4 glass rounded-3xl border-white/10 p-6">
+        <input required x-model="contact.name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your name"/>
+        <input required x-model="contact.email" type="email" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your email"/>
+        <textarea required x-model="contact.message" rows="4" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-full" placeholder="Your message"></textarea>
+        <button class="px-6 py-3 rounded-2xl brand-gradient text-black font-bold">Send Message</button>
+      </form>
+      <aside class="glass rounded-3xl border-white/10 p-6 space-y-4">
+        <div>
+          <p class="text-sm uppercase tracking-[0.25em] text-sky-300 mb-2">Deira location</p>
+          <h3 class="text-2xl font-bold">ALSAMA ALTEEBA TYRES</h3>
+          <p class="text-neutral-300 mt-2">Al Maktoum Hospital Rd, Naif, Deira, Dubai, United Arab Emirates</p>
+        </div>
+        <div class="rounded-2xl overflow-hidden border border-white/10 min-h-[220px]">
+          <iframe
+            title="Contact map to ALSAMA ALTEEBA TYRES"
+            src="https://www.google.com/maps?q=25.2697932,55.311797&z=16&output=embed"
+            class="w-full h-[220px] border-0"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-sky-400 text-black font-bold hover:opacity-90">Get Directions</a>
+          <a href="tel:+971554637045" class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 font-bold hover:bg-white/15">Call +971 55 463 7045</a>
+        </div>
+      </aside>
+    </div>
   </section>
 
   <!-- FOOTER -->
