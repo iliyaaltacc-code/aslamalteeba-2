@@ -18,15 +18,14 @@ The system automatically remembers and restores:
 
 ### Multilingual Support
 
-- Fully implemented across English (`/`), Persian (`/fa/`), and Arabic (`/ar/`)
+- Fully implemented across English (`/`) and Arabic (`/ar/`)
 - Welcome messages translated appropriately
-- RTL (Right-to-Left) layout respected for Persian and Arabic
+- RTL (Right-to-Left) layout respected for Arabic
 
 ### Welcome Back Message
 
 When a returning user visits the site, a subtle, non-intrusive notification appears:
 - **English**: "Welcome back — preferences restored"
-- **Persian**: "خوش آمدید — ترجیحات بازیابی شد"
 - **Arabic**: "مرحبًا بعودتك — تم استعادة التفضيلات"
 
 The message:
@@ -45,7 +44,7 @@ The message:
   - Preference management
   - Welcome message display
 
-- **`index.html`** (English), **`ar/index.html`** (Arabic), **`fa/index.html`** (Persian)
+- **`index.html`** (English), **`ar/index.html`** (Arabic)
   - Integration with Alpine.js state management
   - Tracking of user interactions
   - Automatic preference restoration
@@ -56,7 +55,7 @@ All preferences are stored in localStorage with the `aa_` prefix:
 
 ```javascript
 {
-  aa_language: 'en' | 'fa' | 'ar',
+  aa_language: 'en' | 'ar',
   aa_currency: 'USD' | 'AED',
   aa_bulkMode: 'true' | 'false',
   aa_brandFilter: 'Duraturn' | 'Bridgestone' | 'Firemax' | '',

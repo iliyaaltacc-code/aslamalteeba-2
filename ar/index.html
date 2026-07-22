@@ -11,7 +11,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/timeline.css">
   <link rel="stylesheet" href="/styles/smoothness.css">
   <link rel="stylesheet" href="/styles/favorites.css">
@@ -76,18 +75,6 @@
       box-shadow: 0 2px 8px rgba(0,224,164,0.4);
     }
     
-    /* Fix Persian button text shaping */
-    a[href="/fa/"] {
-      font-family: Vazirmatn, sans-serif !important;
-      letter-spacing: 0 !important;
-      word-spacing: 0 !important;
-      font-variant-ligatures: common-ligatures contextual;
-      font-feature-settings: "liga" 1, "clig" 1, "calt" 1, "ccmp" 1;
-      text-rendering: optimizeLegibility;
-      white-space: nowrap;
-      direction: rtl;
-    }
-    
     /* Fix phone number display for RTL */
     .phone-number {
       direction: ltr;
@@ -128,9 +115,6 @@
       <div class="flex items-center gap-2 ml-auto">
         <a href="/" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
           🇬🇧 English
-        </a>
-        <a href="/fa/" class="hidden md:inline-flex px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15">
-          🇮🇷 فارسی
         </a>
 
         <a href="/ar/favorites.html" class="favorite-nav-link w-10 h-10 rounded-full bg-white/10 border border-white/10 hover:bg-white/15 flex items-center justify-center" aria-label="عرض المفضلة">
@@ -187,7 +171,6 @@
         <a href="/ar/favorites.html" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">المفضلة</a>
         <a href="https://www.google.com/maps/dir//ALSAMA+ALTEEBA+TYRES,+Al+Maktoum+Hospital+Rd+-+Naif+-+Deira+-+Dubai/@25.0905084,55.1486213,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3e5f43f1f8d5ffc7:0x6e750646d20e34e2!2m2!1d55.311797!2d25.2697932?entry=ttu" target="_blank" rel="noopener" class="rounded-xl px-3 py-2 bg-sky-400/15 text-sky-200 hover:bg-sky-400/25" @click="mobileNavOpen=false">📍 الحصول على الاتجاهات</a>
         <button type="button" class="text-right rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false; handleProfileClick()">الحساب</button>
-        <a href="/fa/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇮🇷 فارسی</a>
         <a href="/ar/" class="rounded-xl px-3 py-2 hover:bg-white/10" @click="mobileNavOpen=false">🇦🇪 العربية</a>
       </div>
     </nav>
@@ -1666,18 +1649,5 @@
     }
   };
 </script>
-  
-  <!-- Convert phone number digits to Persian numerals -->
-  <script>
-    (function() {
-      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-      const phoneEl = document.getElementById('phone-display');
-      if (phoneEl) {
-        const text = phoneEl.textContent;
-        const persianText = text.replace(/\d/g, digit => persianDigits[digit]);
-        phoneEl.textContent = persianText;
-      }
-    })();
-  </script>
 </body>
 </html>

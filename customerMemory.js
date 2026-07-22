@@ -1,6 +1,6 @@
 // customerMemory.js — Customer Memory Layer
 // Persists non-personal user preferences across visits
-// Works across EN / FA / AR with graceful localStorage fallback
+// Works across EN / AR with graceful localStorage fallback
 
 (() => {
   'use strict';
@@ -23,10 +23,6 @@
       welcomeBack: 'Welcome back — preferences restored',
       resetPreferences: 'Reset preferences'
     },
-    fa: {
-      welcomeBack: 'خوش آمدید — ترجیحات بازیابی شد',
-      resetPreferences: 'بازنشانی ترجیحات'
-    },
     ar: {
       welcomeBack: 'مرحبًا بعودتك — تم استعادة التفضيلات',
       resetPreferences: 'إعادة تعيين التفضيلات'
@@ -39,7 +35,6 @@
     const htmlLang = document.documentElement.lang;
     
     if (path.startsWith('/ar') || htmlLang === 'ar') return 'ar';
-    if (path.startsWith('/fa') || htmlLang === 'fa') return 'fa';
     return 'en';
   }
 
@@ -123,7 +118,7 @@
     },
     
     setLanguage(lang) {
-      if (['en', 'fa', 'ar'].includes(lang)) {
+      if (['en', 'ar'].includes(lang)) {
         storage.set(STORAGE_KEYS.LANGUAGE, lang);
       }
     },
