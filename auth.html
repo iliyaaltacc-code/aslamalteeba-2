@@ -141,7 +141,8 @@
   <script>
     // Language detection from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const lang = urlParams.get('lang') || 'en';
+    const requestedLang = urlParams.get('lang') || 'en';
+    const lang = ['en', 'ar'].includes(requestedLang) ? requestedLang : 'en';
     
     // Localization texts
     const texts = {
@@ -155,17 +156,6 @@
         continueWithGoogle: 'Continue with Google',
         noAccount: "Don't have an account? Create one",
         haveAccount: "Already have an account? Sign in"
-      },
-      fa: {
-        signIn: 'ورود',
-        createAccount: 'ایجاد حساب',
-        signUp: 'ثبت‌نام',
-        email: 'ایمیل',
-        password: 'رمز عبور',
-        forgotPassword: 'رمز عبور را فراموش کردهاید؟',
-        continueWithGoogle: 'ادامه با Google',
-        noAccount: 'حساب کاربری ندارید؟ ایجاد حساب',
-        haveAccount: 'حساب کاربری دارید؟ ورود'
       },
       ar: {
         signIn: 'تسجيل الدخول',
@@ -184,7 +174,7 @@
     const t = texts[lang] || texts.en;
     
     // Set document direction and language
-    if (lang === 'fa' || lang === 'ar') {
+    if (lang === 'ar') {
       document.documentElement.dir = 'rtl';
       document.documentElement.lang = lang;
     } else {
@@ -210,7 +200,7 @@
       }
       
       // Adjust Google button for RTL
-      if (lang === 'fa' || lang === 'ar') {
+      if (lang === 'ar') {
         googleBtn.style.flexDirection = 'row-reverse';
       }
     });

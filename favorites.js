@@ -130,17 +130,12 @@
     ar: {
       added: 'تمت الإضافة إلى المفضلة',
       removed: 'تمت الإزالة من المفضلة'
-    },
-    fa: {
-      added: 'به علاقه‌مندی‌ها اضافه شد',
-      removed: 'از علاقه‌مندی‌ها حذف شد'
     }
   };
 
   const detectLocale = () => {
     const lang = document.documentElement.lang || 'en';
     if (lang.startsWith('ar')) return 'ar';
-    if (lang.startsWith('fa')) return 'fa';
     return 'en';
   };
 

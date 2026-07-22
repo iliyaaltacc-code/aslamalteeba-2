@@ -1,4 +1,4 @@
-// chat.js — Production AI Chat (EN / FA / AR auto-detect)
+// chat.js — Production AI Chat (EN / AR auto-detect)
 // Frontend only. Backend remains /api/chat.
 
 (() => {
@@ -11,9 +11,7 @@
   const htmlLang = document.documentElement.lang;
 
   const isArabic = path.startsWith("/ar") || htmlLang === "ar";
-  const isFarsi  = path.startsWith("/fa") || htmlLang === "fa";
-
-  const locale = isArabic ? "ar" : isFarsi ? "fa" : "en";
+  const locale = isArabic ? "ar" : "en";
   const isRTL = locale !== "en";
 
   // ---------------------------
@@ -28,15 +26,6 @@
       send: "Send",
       typing: "Aslama AI is typing…",
       error: "Sorry, something went wrong. Please try again."
-    },
-    fa: {
-      button: "چت هوشمند",
-      title: "دستیار هوشمند اسلمه",
-      subtitle: "درباره سایز، برند یا موجودی بپرسید.",
-      placeholder: "سؤال خود را بنویسید…",
-      send: "ارسال",
-      typing: "دستیار در حال تایپ است…",
-      error: "مشکلی پیش آمد. لطفاً دوباره تلاش کنید."
     },
     ar: {
       button: "الدردشة الذكية",
